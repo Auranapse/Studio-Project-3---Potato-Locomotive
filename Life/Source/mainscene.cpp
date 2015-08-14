@@ -375,25 +375,13 @@ void mainscene::Init()
 	meshList[GEO_SNIPER_CROSSHAIR_1]->textureID[0] = LoadTGA("GameData//Image//weapons//SNIPER_SCOPE.tga", true);
 	meshList[GEO_SNIPER_CROSSHAIR_2] = MeshBuilder::GenerateQuad("Crosshair Sniper Part 2", Color(0.f, 0.f, 0.f), .5f, 1.0f, 1.f);
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 1.f, 1.f, 40.f);
-	meshList[GEO_FLOOR_TILE_SQUARE] = MeshBuilder::GenerateQuad("Room floor square to scale", Color(1.f, 1.f, 1.f), 1.f, 1.f, 4.f);
-	meshList[GEO_FLOOR_CONCRETE] = MeshBuilder::GenerateQuad("Office floor square", Color(1.f, 1.f, 1.f), 1.f, 1.f, 20.f);//ViewRoom
-	meshList[GEO_WALL_PANEL] = MeshBuilder::GenerateQuad("Portal panel wall 1", Color(1.f, 1.f, 1.f), 2.f, 0.6f, 3.5f);
-	meshList[GEO_WALL_PANEL2] = MeshBuilder::GenerateQuad("Portal panel wall 2", Color(1.f, 1.f, 1.f), 0.6f, 0.6f, 3.5f);
-	meshList[GEO_WALL_PANEL_SQUARE] = MeshBuilder::GenerateQuad("Portal panel wall square to scale", Color(1.f, 1.f, 1.f), 1.f, 1.f, 1.f);
-	meshList[GEO_WALL_WORN1] = MeshBuilder::GenerateQuad("Worn Wall", Color(1.f, 1.f, 1.f), 0.6f, 0.6f, 3.5f);
-	meshList[GEO_WALL_WORN_SQUARE] = MeshBuilder::GenerateQuad("Worn Wall square to scale", Color(1.f, 1.f, 1.f), 1.f, 1.f, 1.f);
-	meshList[GEO_WALL2] = MeshBuilder::GenerateQuad("Room wall2 rectagle black pattern", Color(1.f, 1.f, 1.f), 2.f, 0.6f, 6.f);
-	meshList[GEO_WALL3] = MeshBuilder::GenerateQuad("Office Wall texture", Color(1.f, 1.f, 1.f), 1.f, 1.f, 10.f);//View room
-	meshList[GEO_WALLRUSTED1] = MeshBuilder::GenerateQuad("Metal rusted wall", Color(1.f, 1.f, 1.f), 2.f, 0.6f, 3.5f);//Ruins area wall
+	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
 	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
 
-	meshList[GEO_WALL_WORN_RUINS1] = MeshBuilder::GenerateQuad("Ruin walls", Color(1, 1, 1), 1, 1, 20);
-
 	//Load OBJ Models
 	meshList[GEO_OBJCAKE] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//CAKE.obj");
-	
-	meshList[GEO_GEL] = MeshBuilder::GenerateSphere("Gel", Color(0.f, 0.5f, 1.0f), 5, 5, 1.f);
+	meshList[GEO_OBJCAKE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Cake_UV.tga", true);
 
 	//WEAPONS
 	//if(weaponsEnabled)
@@ -417,11 +405,6 @@ void mainscene::Init()
 		meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
 	}
 
-	meshList[GEO_TARGET] = MeshBuilder::GenerateOBJ("M4A1", "GameData//OBJ//other//TARGET.obj");
-	meshList[GEO_TARGET]->textureID[0] = LoadTGA("GameData//Image//other//TARGET.tga", true);
-	meshList[GEO_TARGETBASE] = MeshBuilder::GenerateOBJ("M4A1", "GameData//OBJ//other//TARGETBASE.obj");
-	meshList[GEO_TARGETBASE]->textureID[0] = LoadTGA("GameData//Image//other//TARGET.tga", true);
-
 	//----------------------SKYBOX
 	meshList[E_GEO_LEFT] = MeshBuilder::GenerateSkybox("left", Color(0.f, 0.f, 0.f), 1.f);
 	meshList[E_GEO_LEFT]->textureID[0] = LoadTGA("GameData//Image//skybox//plain_sky_left.tga");
@@ -440,32 +423,7 @@ void mainscene::Init()
 	//---------------------------------------------------------------------------------------
 	//Text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
-	meshList[GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false);
-
-	//UI
-	meshList[GEO_UI_AMMO] = MeshBuilder::GenerateQuad("Ammo", Color(1.f, 1.f, 1.f), 1.28f, 0.72f, 1.f);
-	meshList[GEO_UI_AMMO]->textureID[0] = LoadTGA("GameData//Image//UI//ingame//Ammo.tga", false);
-	//Minimap
-	meshList[GEO_MINIMAP_BASE] = MeshBuilder::GenerateQuad("Minimap", Color(1.f, 1.f, 1.f), 1.f, 1.f, 1.f);
-	meshList[GEO_MINIMAP_BASE]->textureID[0] = LoadTGA("GameData//Image//UI//ingame//minimap.tga", false);
-	meshList[GEO_MINIMAP_PLAYER] = MeshBuilder::GenerateQuad("MinimapPlayer", Color(1.f, 1.f, 1.f), 1.f, 1.f, 1.f);
-	meshList[GEO_MINIMAP_PLAYER]->textureID[0] = LoadTGA("GameData//Image//UI//ingame//prograde.tga", false);
-	//Generate Textures---------------------------------------------------------------------
-	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
-	meshList[GEO_FLOOR_TILE_SQUARE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
-	meshList[GEO_FLOOR_CONCRETE]->textureID[0] = LoadTGA("GameData//Image//concrete_floor.tga", false);
-	meshList[GEO_WALL_PANEL]->textureID[0] = LoadTGA("GameData//Image//walltexture.tga", false);
-	meshList[GEO_WALL_PANEL2]->textureID[0] = LoadTGA("GameData//Image//walltexture.tga", false);
-	meshList[GEO_WALL_PANEL_SQUARE]->textureID[0] = LoadTGA("GameData//Image//walltexture.tga", true);
-	meshList[GEO_WALL_WORN1]->textureID[0] = LoadTGA("GameData//Image//concrete_wall.tga", false);
-	meshList[GEO_WALL_WORN_SQUARE]->textureID[0] = LoadTGA("GameData//Image//concrete_wall.tga", false);
-	meshList[GEO_WALL2]->textureID[0] = LoadTGA("GameData//Image//walltexture2.tga", false);
-	meshList[GEO_WALL3]->textureID[0] = LoadTGA("GameData//Image//walltexture3.tga", false);
-	meshList[GEO_WALLRUSTED1]->textureID[0] = LoadTGA("GameData//Image//wall_rusted1.tga", false);
-	
-	meshList[GEO_WALL_WORN_RUINS1]->textureID[0] = LoadTGA("GameData//Image//wall_ruin.tga", false);
-
-	meshList[GEO_OBJCAKE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Cake_UV.tga", true);
+	meshList[GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false);	
 
 	//--------------------------------------------------------------------------------------
 
@@ -499,61 +457,6 @@ void mainscene::Init()
 	meshList[GEO_FLOOR_TILE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_FLOOR_TILE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_FLOOR_TILE]->material.kShininess = 1.0f;
-
-	meshList[GEO_FLOOR_TILE_SQUARE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_FLOOR_TILE_SQUARE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_FLOOR_TILE_SQUARE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_FLOOR_TILE_SQUARE]->material.kShininess = 1.0f;
-
-	meshList[GEO_FLOOR_CONCRETE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_FLOOR_CONCRETE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_FLOOR_CONCRETE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_FLOOR_CONCRETE]->material.kShininess = 1.0f;
-	
-	meshList[GEO_WALL_PANEL]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_PANEL]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_PANEL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_PANEL]->material.kShininess = 2.0f;
-
-	meshList[GEO_WALL_PANEL2]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_PANEL2]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_PANEL2]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_PANEL2]->material.kShininess = 2.0f;
-
-	meshList[GEO_WALL_PANEL_SQUARE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_PANEL_SQUARE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_PANEL_SQUARE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_PANEL_SQUARE]->material.kShininess = 2.0f;
-
-	meshList[GEO_WALL2]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL2]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL2]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL2]->material.kShininess = 7.0f;
-
-	meshList[GEO_WALL3]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL3]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL3]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL3]->material.kShininess = 1.0f;
-
-	meshList[GEO_WALL_WORN1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_WORN1]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_WORN1]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_WORN1]->material.kShininess = 1.0f;
-
-	meshList[GEO_WALL_WORN_SQUARE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_WORN_SQUARE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_WORN_SQUARE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_WORN_SQUARE]->material.kShininess = 1.0f;
-
-	meshList[GEO_WALL_WORN_RUINS1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALL_WORN_RUINS1]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALL_WORN_RUINS1]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALL_WORN_RUINS1]->material.kShininess = 1.0f;
-
-	meshList[GEO_WALLRUSTED1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_WALLRUSTED1]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_WALLRUSTED1]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_WALLRUSTED1]->material.kShininess = 1.0f;
 
 	meshList[GEO_OBJCAKE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
 	meshList[GEO_OBJCAKE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
@@ -592,16 +495,6 @@ void mainscene::Init()
 		meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
 		meshList[GEO_SPAS12]->material.kShininess = 12.0f;
 	}
-
-	meshList[GEO_TARGETBASE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_TARGETBASE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_TARGETBASE]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_TARGETBASE]->material.kShininess = 10.0f;
-
-	meshList[GEO_TARGET]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_TARGET]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_TARGET]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_TARGET]->material.kShininess = 10.0f;
 
 
 	//Starting position of translations and initialize physics
@@ -1663,17 +1556,8 @@ void mainscene::RenderParticles(void)
 					modelStack.PopMatrix();
 					break;
 				}
-			case Particle::PAR_GEL:
-				{
-					{
-					modelStack.PushMatrix();
-					modelStack.Translate(Par->Pos);
-					modelStack.Scale(Par->Scale);
-					RenderMesh(meshList[GEO_GEL], false);
-					modelStack.PopMatrix();
-					break;
-				}
-				}
+			default:
+				break;
 			}
 		}
 	}
@@ -2133,7 +2017,6 @@ void mainscene::RenderUI(void)
 			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
 		}
 
-		RenderMeshin2D(meshList[GEO_UI_AMMO], false, 3.5, Application::GetWindowWidth()*0.1f - 4, 2);
 		if(weaponList[currentWeapon].CurrentClip == 0)
 		{
 			RenderTextOnScreen(meshList[GEO_TEXT], "R", Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
