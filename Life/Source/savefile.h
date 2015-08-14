@@ -1,5 +1,14 @@
-#ifndef SAVEFILEHANDLER_H
-#define SAVEFILEHANDLER_H
+/****************************************************************************/
+/*!
+\file savefile.h
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Save file
+!*/
+/****************************************************************************/
+#ifndef SAVEFILE_H
+#define SAVEFILE_H
 
 #include <iostream>
 #include <vector>

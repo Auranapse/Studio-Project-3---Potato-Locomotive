@@ -28,10 +28,10 @@ Anim4::Anim4(float a, float b, float c, float d) : LEFT_ARM(a), RIGHT_ARM(b), LE
 {
 
 }
+
 /******************************************************************************/
 /*!
-\brief
-destructor
+\brief	Anim4 default destructor
 */
 /******************************************************************************/
 Anim4::~Anim4()

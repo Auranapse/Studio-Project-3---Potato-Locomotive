@@ -1,3 +1,12 @@
+/****************************************************************************/
+/*!
+\file GameObject.h
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Game Object base class
+!*/
+/****************************************************************************/
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 

@@ -21,7 +21,7 @@ Main menu for the openGL framework
 #include "Application.h"
 #include "MeshBuilder.h"
 #include "Utility.h"
-#include<sstream>
+#include <sstream>
 
 const unsigned int MenuScene::ui_NUM_LIGHT_PARAMS = MenuScene::E_UNI_LIGHT0_EXPONENT - (MenuScene::E_UNI_LIGHT0_POSITION - 1/*Minus the enum before this*/);
 /******************************************************************************/

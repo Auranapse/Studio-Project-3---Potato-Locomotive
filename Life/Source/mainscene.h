@@ -4,7 +4,7 @@
 \author Gabriel Wong Choon Jieh
 \par email: AuraTigital\@gmail.com
 \brief
-Portal scene of the Sentry Turret, Companion Cube and Storage Cubes/
+Main scene
 !*/
 /****************************************************************************/
 #ifndef MAINSCENE_H
@@ -14,7 +14,6 @@ Portal scene of the Sentry Turret, Companion Cube and Storage Cubes/
 #include <vector>
 #include <iostream>
 #include "Scene.h"
-#include "Camera4.h"
 #include "CustomCam1.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
@@ -24,10 +23,13 @@ Portal scene of the Sentry Turret, Companion Cube and Storage Cubes/
 #include "GameObject.h"
 #include "SpriteAnimation.h"
 #include "particle.h"
-#include "savefileHandler.h"
+#include "savefile.h"
 #include "DepthFBO.h"
 #include "GBuffer.h"
 #include "GabrielDLC.h"
+
+#include "CharacterObject.h"
+#include "Player.h"
 
 /******************************************************************************/
 /*!

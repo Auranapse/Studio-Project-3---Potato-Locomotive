@@ -83,12 +83,10 @@
     <ClCompile Include="Source\Anim4.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
+    <ClCompile Include="Source\CharacterObject.cpp" />
     <ClCompile Include="Source\CustomCam1.cpp" />
-    <ClCompile Include="Source\CustomCam2D.cpp" />
     <ClCompile Include="Source\DepthFBO.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
-    <ClCompile Include="Source\GameObjectButton.cpp" />
-    <ClCompile Include="Source\GameObjectTrigger.cpp" />
     <ClCompile Include="Source\GBuffer.cpp" />
     <ClCompile Include="Source\LoadHmap.cpp" />
     <ClCompile Include="Source\mainscene.cpp" />
@@ -104,7 +102,7 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\particle.cpp" />
-    <ClCompile Include="Source\portal.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\savefileHandler.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
@@ -115,12 +113,10 @@
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BulletInfo.h" />
     <ClInclude Include="Source\Button.h" />
+    <ClInclude Include="Source\CharacterObject.h" />
     <ClInclude Include="Source\CustomCam1.h" />
-    <ClInclude Include="Source\CustomCam2D.h" />
     <ClInclude Include="Source\DepthFBO.h" />
     <ClInclude Include="Source\GameObject.h" />
-    <ClInclude Include="Source\GameObjectButton.h" />
-    <ClInclude Include="Source\GameObjectTrigger.h" />
     <ClInclude Include="Source\GBuffer.h" />
     <ClInclude Include="Source\LoadHmap.h" />
     <ClInclude Include="Source\mainscene.h" />
@@ -137,7 +133,7 @@
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshBuilder.h" />
     <ClInclude Include="Source\particle.h" />
-    <ClInclude Include="Source\portal.h" />
+    <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\savefileHandler.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\shader.hpp" />

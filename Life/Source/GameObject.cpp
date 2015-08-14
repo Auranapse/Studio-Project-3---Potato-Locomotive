@@ -1,6 +1,20 @@
-
+/****************************************************************************/
+/*!
+\file GameObject.cpp
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Game Object base class
+!*/
+/****************************************************************************/
 #include "GameObject.h"
 
+/******************************************************************************/
+/*!
+\brief
+Default constructor
+*/
+/******************************************************************************/
 GameObject::GameObject(GAMEOBJECT_TYPE typeValue) 
 	: type(typeValue),
 	scale(1, 1, 1),
@@ -21,6 +35,12 @@ GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	mesh = NULL;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Default destructor
+*/
+/******************************************************************************/
 GameObject::~GameObject()
 {
 
