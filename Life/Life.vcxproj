@@ -103,7 +103,7 @@
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\particle.cpp" />
     <ClCompile Include="Source\Player.cpp" />
-    <ClCompile Include="Source\savefileHandler.cpp" />
+    <ClCompile Include="Source\savefile.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
@@ -134,7 +134,7 @@
     <ClInclude Include="Source\MeshBuilder.h" />
     <ClInclude Include="Source\particle.h" />
     <ClInclude Include="Source\Player.h" />
-    <ClInclude Include="Source\savefileHandler.h" />
+    <ClInclude Include="Source\savefile.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\SpriteAnimation.h" />

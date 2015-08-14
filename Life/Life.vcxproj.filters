@@ -28,23 +28,11 @@
     <Filter Include="Header Files\GameObject">
       <UniqueIdentifier>{ab7c2c7b-2ced-45a9-9144-2d65f5d19790}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Mesh">
-      <UniqueIdentifier>{342aab0e-9b11-4071-86a0-86d0c456f582}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Mesh">
-      <UniqueIdentifier>{d6f1e540-70fe-4a2e-8e9c-b5a22ae7464d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Camera">
       <UniqueIdentifier>{29455fbf-e786-418e-96bc-ec8d90141cb9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Camera">
       <UniqueIdentifier>{3461ff79-0072-4afa-94e8-11851b1357ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Mesh\Model/Texture">
-      <UniqueIdentifier>{47ab2b6a-bf82-433b-86f0-41d45313d5b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Mesh\Model/Texture">
-      <UniqueIdentifier>{9c42e182-f631-497f-9c2a-1282d6aaea1f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Save/Load">
       <UniqueIdentifier>{d3086d86-eae5-4046-8f08-f8f87f9d7090}</UniqueIdentifier>
@@ -54,6 +42,24 @@
     </Filter>
     <Filter Include="Source Files\Character">
       <UniqueIdentifier>{f299ad50-7261-4260-b481-f6e4c5ed3b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Visuals">
+      <UniqueIdentifier>{82555ad9-3d9a-4376-bd6d-586d09c5f361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visuals">
+      <UniqueIdentifier>{82f62380-49df-433f-88d7-2b3639cf9e43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visuals\Mesh">
+      <UniqueIdentifier>{342aab0e-9b11-4071-86a0-86d0c456f582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visuals\Mesh\Model/Texture">
+      <UniqueIdentifier>{47ab2b6a-bf82-433b-86f0-41d45313d5b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Visuals\Mesh">
+      <UniqueIdentifier>{d6f1e540-70fe-4a2e-8e9c-b5a22ae7464d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Visuals\Mesh\Model/Texture">
+      <UniqueIdentifier>{9c42e182-f631-497f-9c2a-1282d6aaea1f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,19 +75,7 @@
     <ClCompile Include="Source\LoadHmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SpriteAnimation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\particle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\maploader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DepthFBO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\CharacterObject.cpp">
@@ -100,10 +94,10 @@
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\Mesh.cpp">
-      <Filter>Source Files\Mesh</Filter>
+      <Filter>Source Files\Visuals\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="Source\MeshBuilder.cpp">
-      <Filter>Source Files\Mesh</Filter>
+      <Filter>Source Files\Visuals\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="Source\Camera.cpp">
       <Filter>Source Files\Camera</Filter>
@@ -124,19 +118,31 @@
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\LoadOBJ.cpp">
-      <Filter>Source Files\Mesh\Model/Texture</Filter>
+      <Filter>Source Files\Visuals\Mesh\Model/Texture</Filter>
     </ClCompile>
     <ClCompile Include="Source\LoadTGA.cpp">
-      <Filter>Source Files\Mesh\Model/Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\savefileHandler.cpp">
-      <Filter>Source Files\Save/Load</Filter>
+      <Filter>Source Files\Visuals\Mesh\Model/Texture</Filter>
     </ClCompile>
     <ClCompile Include="Source\shader.cpp">
       <Filter>Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp">
       <Filter>Source Files\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\savefile.cpp">
+      <Filter>Source Files\Save/Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DepthFBO.cpp">
+      <Filter>Source Files\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GBuffer.cpp">
+      <Filter>Source Files\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\particle.cpp">
+      <Filter>Source Files\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpriteAnimation.cpp">
+      <Filter>Source Files\Visuals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,9 +154,6 @@
     </ClInclude>
     <ClInclude Include="Source\shader.hpp">
       <Filter>Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Light.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility.h">
       <Filter>Header Files</Filter>
@@ -165,12 +168,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\maploader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DepthFBO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Button.h">
@@ -192,13 +189,13 @@
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\MeshBuilder.h">
-      <Filter>Header Files\Mesh</Filter>
+      <Filter>Header Files\Visuals\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="Source\Mesh.h">
-      <Filter>Header Files\Mesh</Filter>
+      <Filter>Header Files\Visuals\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="Source\Material.h">
-      <Filter>Header Files\Mesh</Filter>
+      <Filter>Header Files\Visuals\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera.h">
       <Filter>Header Files\Camera</Filter>
@@ -219,19 +216,28 @@
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\Vertex.h">
-      <Filter>Header Files\Mesh</Filter>
+      <Filter>Header Files\Visuals\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="Source\LoadOBJ.h">
-      <Filter>Header Files\Mesh\Model/Texture</Filter>
+      <Filter>Header Files\Visuals\Mesh\Model/Texture</Filter>
     </ClInclude>
     <ClInclude Include="Source\LoadTGA.h">
-      <Filter>Header Files\Mesh\Model/Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\savefileHandler.h">
-      <Filter>Header Files\Save/Load</Filter>
+      <Filter>Header Files\Visuals\Mesh\Model/Texture</Filter>
     </ClInclude>
     <ClInclude Include="Source\Player.h">
       <Filter>Header Files\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\savefile.h">
+      <Filter>Header Files\Save/Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GBuffer.h">
+      <Filter>Header Files\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Light.h">
+      <Filter>Header Files\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DepthFBO.h">
+      <Filter>Header Files\Visuals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
