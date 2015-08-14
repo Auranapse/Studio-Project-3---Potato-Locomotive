@@ -87,6 +87,64 @@ void mainscene2D::assignSave(void)
 /******************************************************************************/
 /*!
 \brief
+Initializes menu
+*/
+/******************************************************************************/
+void mainscene2D::InitMenu(void)
+{
+	UIColor.Set(0.1f, 0.1f, 0.1f);
+	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
+
+	//Pause Menu--------------------------------------------------------
+	S_BUTTON* S_MB;
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Back to game";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+	
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Previous level";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 10.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Skip to next level";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 15.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	//End Menu----------------------------------------------------------
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Play again";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+}
+
+/******************************************************************************/
+/*!
+\brief
 Initialize default variables, create meshes, lighting
 */
 /******************************************************************************/
@@ -111,8 +169,6 @@ void mainscene2D::Init()
 	f_currentfov = f_fov;
 	X_camLimit = 1000.f;
 	mainCamera.Set(10.f, 10.0f, 0.f);
-
-	renderAxis = false;
 
 	mouseEnabled = true;
 	if (mouseEnabled == false)
@@ -158,11 +214,15 @@ void mainscene2D::Init()
 	inputDelay = 0.f;
 	timer = 0.f;
 
-	ISoundSource* backgroundAmbience;
-	backgroundAmbience = engine->addSoundSourceFromFile("GameData//sounds//ambience//gun_ambient.wav");
-	backgroundAmbience->setDefaultVolume(0.3f);
-	engine->play2D(backgroundAmbience, true);
 
+	soundList[ST_BACKGROUND_1] = engine->addSoundSourceFromFile("GameData//sounds//ambience//gun_ambient.wav");
+	soundList[ST_BACKGROUND_1]->setDefaultVolume(0.3f);
+
+	soundList[ST_BACKGROUND_2] = engine->addSoundSourceFromFile("GameData//sounds//ambience//portal_ambient.wav");
+	soundList[ST_BACKGROUND_2]->setDefaultVolume(0.1f);
+
+	engine->play2D(soundList[ST_BACKGROUND_1], true);
+	engine->play2D(soundList[ST_BACKGROUND_2], true);
 
 	soundList[ST_PANEL] = engine->addSoundSourceFromFile("GameData//sounds//other//panel.wav");
 	soundList[ST_PANEL]->setDefaultVolume(4.5f);
@@ -171,6 +231,10 @@ void mainscene2D::Init()
 	soundList[ST_STEP] = engine->addSoundSourceFromFile("GameData//sounds//other//step1.wav");
 	soundList[ST_LAND] = engine->addSoundSourceFromFile("GameData//sounds//other//land.wav");
 	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav");
+
+	soundList[ST_BUTTON_ON] = engine->addSoundSourceFromFile("GameData//sounds//triggers//button.wav");
+	soundList[ST_BUTTON_ON]->setDefaultVolume(0.5f);
+
 	soundList[ST_PORTAL_SHOOT_BLUE] = engine->addSoundSourceFromFile("GameData//sounds//portal//shoot_blue.wav");
 	soundList[ST_PORTAL_SHOOT_ORANGE] = engine->addSoundSourceFromFile("GameData//sounds//portal//shoot_orange.wav");
 
@@ -180,14 +244,14 @@ void mainscene2D::Init()
 	soundList[ST_PORTAL_RESET] = engine->addSoundSourceFromFile("GameData//sounds//portal//portal_reset.wav");
 	soundList[ST_PORTAL_RESET]->setDefaultVolume(0.5f);
 
+	soundList[ST_PORTAL_CLOSE] = engine->addSoundSourceFromFile("GameData//sounds//portal//portal_close.wav");
+	soundList[ST_PORTAL_CLOSE]->setDefaultVolume(0.5f);
+
 	soundList[ST_PORTAL_INVALID_SURFACE] = engine->addSoundSourceFromFile("GameData//sounds//portal//portal_invalid_surface.wav");
 	soundList[ST_PORTAL_INVALID_SURFACE]->setDefaultVolume(0.5f);
 
 	soundList[ST_PORTAL_ENTER_PORTAL] = engine->addSoundSourceFromFile("GameData//sounds//portal//portal_enter.wav");
 	soundList[ST_PORTAL_ENTER_PORTAL]->setDefaultVolume(0.5f);
-
-	currentLevel = 1;
-	loadLevel(currentLevel);
 
 	PORTAL_GUN.BluePortal->scale.Set(tileSize*1.1f, tileSize*1.1f, tileSize*1.1f);
 	PORTAL_GUN.OrangePortal->scale = PORTAL_GUN.BluePortal->scale;
@@ -208,6 +272,11 @@ void mainscene2D::Init()
 	PB_O->type = GameObject::GO_PORTAL_BULLET;
 	PB_O->scale.Set(0.5, 0.5, 0.5);
 	PB_O->obMesh = meshList[GEO_PORTAL_BULLET_ORANGE];
+
+	InitMenu();
+	GAME_STATE = GS_PLAY;
+	currentLevel = 1;
+	loadLevel(currentLevel);
 }
 
 /******************************************************************************/
@@ -407,7 +476,7 @@ void mainscene2D::InitShaders()
 	glUniform1f(m_parameters[U_LIGHT3_EXPONENT], lights[3].exponent);
 
 	//Generate meshes------------------------------------------------------------------------
-	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
+	//meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
 
 	meshList[GEO_BACKGROUND] = MeshBuilder::GenerateQuad("Background", Color(1.0f, 1.0f, 1.0f), static_cast<float>(Application::GetWindowWidth() / 2)*0.1f, static_cast<float>(Application::GetWindowHeight() / 2)*0.1f, 1.0f);
 	meshList[GEO_BACKGROUND]->textureID[0] = LoadTGA("GameData//2D//background.tga", true, false);
@@ -437,7 +506,7 @@ void mainscene2D::InitShaders()
 
 	meshList[GEO_PORTAL_BULLET_BLUE] = MeshBuilder::GenerateSphere("Blue Portal Projectile", Color(0.f, 0.f, 1.f), 16, 16, 1);
 	meshList[GEO_PORTAL_BULLET_ORANGE] = MeshBuilder::GenerateSphere("Orange Portal Projectile", Color(1.f, 0.f, 0.f), 16, 16, 1);
-	
+
 	meshList[GEO_T_BUTTON] = MeshBuilder::GenerateQuad("Button", Color(1.0f, 0.f, 0.f), 1.f, 1.f, 1.0f);
 	meshList[GEO_T_BUTTON]->textureID[0] = LoadTGA("GameData//2D//triggers//button.tga", true, false);
 
@@ -503,6 +572,7 @@ bool mainscene2D::loadLevel(int level)
 
 	GOp_DoorExit->active = false;
 	GOp_Player->active = false;
+	GOp_Player->vel.SetZero();
 	PORTAL_GUN.BP_AttachedTo = NULL;
 	PORTAL_GUN.OP_AttachedTo = NULL;
 	PORTAL_GUN.BluePortal->active = false;
@@ -533,7 +603,7 @@ bool mainscene2D::loadLevel(int level)
 				GameObjectButton *goB;
 				goB = FetchGOButton();
 				goB->scale.Set(tileSize, tileSize, tileSize);
-				goB->ColBox.Set(tileSize*0.5f, tileSize, tileSize);
+				goB->ColBox.Set(tileSize*0.8f, tileSize, tileSize);
 				goB->pos.Set(x*tileSize*2.f, (GAME_MAP.map_height - y)*tileSize*2.f, 0.5f);
 				goB->ID = GAME_MAP.map_data[y][x][1];
 				goB->obMesh = meshList[GEO_T_BUTTON];
@@ -555,7 +625,7 @@ bool mainscene2D::loadLevel(int level)
 					goT->TRIGGER_TYPE = GameObjectTrigger::T_LASER;
 					goT->obMesh = meshList[GEO_T_LASER];
 				}
-				
+
 				if (GAME_MAP.map_data[y][x][3] == 'F')
 				{
 					goT->triggerActive = false;
@@ -695,6 +765,28 @@ void mainscene2D::editFOV(float newFOV)
 /******************************************************************************/
 /*!
 \brief
+Check if colliding with triggers
+*/
+/******************************************************************************/
+bool mainscene2D::collideTrigger(Vector3 &pos)
+{
+	for (std::vector<GameObjectTrigger *>::iterator it = m_goTriggerList.begin(); it != m_goTriggerList.end(); ++it)
+	{
+		GameObjectTrigger *goT = (GameObjectTrigger *)*it;
+		if (goT->active && goT->triggerActive)
+		{
+			if (GOcollide2D(goT, pos))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/******************************************************************************/
+/*!
+\brief
 Check if colliding in 2D space
 */
 /******************************************************************************/
@@ -717,6 +809,21 @@ Check for collision between gameobject
 bool mainscene2D::GOcollide2D(GameObject *go1, GameObject *go2)
 {
 	if (intersect2D(go2->pos + go2->ColBox, go2->pos - go2->ColBox, go1->pos))
+	{
+		return true;
+	}
+	return false;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Check for collision between and position
+*/
+/******************************************************************************/
+bool mainscene2D::GOcollide2D(GameObject *go1, Vector3 &pos)
+{
+	if (intersect2D(go1->pos + go1->ColBox, go1->pos - go1->ColBox, pos))
 	{
 		return true;
 	}
@@ -854,7 +961,7 @@ GameObject* mainscene2D::FetchGO(void)
 Updates camera position
 */
 /******************************************************************************/
-void mainscene2D::UpdateCamera(double dt)
+void mainscene2D::UpdateCamera(double &dt)
 {
 	//if (mainCamera.x < X_camLimit)
 	{
@@ -909,7 +1016,7 @@ void mainscene2D::UpdateCamera(double dt)
 Handles character control and physics
 */
 /******************************************************************************/
-void mainscene2D::UpdateCharacter(double dt)
+void mainscene2D::UpdateCharacter(double &dt)
 {
 	bool inAir = false;
 	float MOVESPEED = 120.f;
@@ -923,11 +1030,11 @@ void mainscene2D::UpdateCharacter(double dt)
 		}
 	}
 
-	if (collide2D(GOp_Player->pos + Vector3(0, -GOp_Player->ColBox.y *0.9f, 0)))
+	if (collide2D(GOp_Player->pos + Vector3(-GOp_Player->ColBox.x*0.7f, -GOp_Player->ColBox.y *0.85f, 0)) || collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x*0.7f, -GOp_Player->ColBox.y *0.85f, 0)))
 	{
 		GOp_Player->vel.y = 400.f * static_cast<float>(dt);
 	}
-	else if (collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x*0.8f, -GOp_Player->ColBox.y, 0)) || collide2D(GOp_Player->pos + Vector3(-GOp_Player->ColBox.x*0.8f, -GOp_Player->ColBox.y, 0)))
+	else if (collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x*0.7f, -GOp_Player->ColBox.y, 0)) || collide2D(GOp_Player->pos + Vector3(-GOp_Player->ColBox.x*0.7f, -GOp_Player->ColBox.y, 0)))
 	{
 		if (GOp_Player->vel.y != 0)
 		{
@@ -979,7 +1086,7 @@ void mainscene2D::UpdateCharacter(double dt)
 	//Player X Axis collision
 	if (collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x, GOp_Player->ColBox.y*0.6f, 0)) || collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x, -GOp_Player->ColBox.y*0.8f, 0)))
 	{
-		if (collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x*0.9f, 0, 0)))
+		if (collide2D(GOp_Player->pos + Vector3(GOp_Player->ColBox.x*0.8f, 0.f, 0)))
 		{
 			GOp_Player->vel.x = -250.f * static_cast<float>(dt);
 		}
@@ -992,7 +1099,7 @@ void mainscene2D::UpdateCharacter(double dt)
 
 	if (collide2D(GOp_Player->pos - Vector3(GOp_Player->ColBox.x, GOp_Player->ColBox.y*0.6f, 0)) || collide2D(GOp_Player->pos - Vector3(GOp_Player->ColBox.x, -GOp_Player->ColBox.y*0.8f, 0)))
 	{
-		if (collide2D(GOp_Player->pos - Vector3(GOp_Player->ColBox.x*0.9f, 0, 0)))
+		if (collide2D(GOp_Player->pos - Vector3(GOp_Player->ColBox.x*0.8f, 0.f, 0)))
 		{
 			GOp_Player->vel.x = 250.f * static_cast<float>(dt);
 		}
@@ -1039,7 +1146,10 @@ void mainscene2D::UpdateCharacter(double dt)
 		if (GOcollide2D(GOp_Player, GOp_DoorExit))
 		{
 			++currentLevel;
-			loadLevel(currentLevel);
+			if (!loadLevel(currentLevel))
+			{
+				GAME_STATE = GS_END;
+			}
 		}
 
 		for (std::vector<GameObjectButton *>::iterator it = m_goButtonList.begin(); it != m_goButtonList.end(); ++it)
@@ -1069,19 +1179,34 @@ void mainscene2D::UpdateCharacter(double dt)
 Handles portal gun
 */
 /******************************************************************************/
-void mainscene2D::UpdatePortalGun(double dt)
+void mainscene2D::UpdatePortalGun(double &dt)
 {
+	Mtx44 rotationOP, rotationBP;
+	rotationOP.SetToRotation(PORTAL_GUN.OrangePortal->rotationZ, 0, 0, 1);
+	rotationBP.SetToRotation(PORTAL_GUN.BluePortal->rotationZ, 0, 0, 1);
+	PORTAL_GUN.OrangePortal->ColBoxOffset.Set(0, tileSize*1.8f, 0);
+	PORTAL_GUN.BluePortal->ColBoxOffset = PORTAL_GUN.OrangePortal->ColBoxOffset;
+	PORTAL_GUN.OrangePortal->ColBoxOffset = rotationOP * PORTAL_GUN.OrangePortal->ColBoxOffset;
+	PORTAL_GUN.BluePortal->ColBoxOffset = rotationBP * PORTAL_GUN.BluePortal->ColBoxOffset;
+
+	if (PORTAL_GUN.OrangePortal->active)
+	{
+		if (collideTrigger(PORTAL_GUN.OrangePortal->pos + PORTAL_GUN.OrangePortal->ColBoxOffset))
+		{
+			resetPortalGun(false, false);
+		}
+	}
+
+	if (PORTAL_GUN.BluePortal->active)
+	{
+		if (collideTrigger(PORTAL_GUN.BluePortal->pos + PORTAL_GUN.BluePortal->ColBoxOffset))
+		{
+			resetPortalGun(false, true);
+		}
+	}
+
 	if (PORTAL_GUN.BluePortal->active && PORTAL_GUN.OrangePortal->active)
 	{
-
-		Mtx44 rotationOP, rotationBP;
-		rotationOP.SetToRotation(PORTAL_GUN.OrangePortal->rotationZ, 0, 0, 1);
-		rotationBP.SetToRotation(PORTAL_GUN.BluePortal->rotationZ, 0, 0, 1);
-		PORTAL_GUN.OrangePortal->ColBoxOffset.Set(0, tileSize*1.8f, 0);
-		PORTAL_GUN.BluePortal->ColBoxOffset = PORTAL_GUN.OrangePortal->ColBoxOffset;
-		PORTAL_GUN.OrangePortal->ColBoxOffset = rotationOP * PORTAL_GUN.OrangePortal->ColBoxOffset;
-		PORTAL_GUN.BluePortal->ColBoxOffset = rotationBP * PORTAL_GUN.BluePortal->ColBoxOffset;
-
 		if (intersect2D(PORTAL_GUN.OrangePortal->pos + PORTAL_GUN.OrangePortal->ColBox*0.8f + PORTAL_GUN.OrangePortal->ColBoxOffset, PORTAL_GUN.OrangePortal->pos - PORTAL_GUN.OrangePortal->ColBox*0.8f + PORTAL_GUN.OrangePortal->ColBoxOffset, GOp_Player->pos))
 		{
 			PORTAL_GUN.OP_AttachedTo->colEnable = false;
@@ -1099,7 +1224,6 @@ void mainscene2D::UpdatePortalGun(double dt)
 		{
 			PORTAL_GUN.BP_AttachedTo->colEnable = true;
 		}
-
 
 		if (intersect2D(PORTAL_GUN.BluePortal->pos + PORTAL_GUN.BluePortal->ColBox, PORTAL_GUN.BluePortal->pos - PORTAL_GUN.BluePortal->ColBox, GOp_Player->pos))
 		{
@@ -1137,20 +1261,32 @@ void mainscene2D::UpdatePortalGun(double dt)
 		resetPortalGun();
 	}
 
-	if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !PB_B->active)
+	static bool isLMBpressed = false;
+	static bool isRMBpressed = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !PB_B->active && !isLMBpressed)
 	{
+		isLMBpressed = true;
 		PB_B->active = true;
 		PB_B->pos = GOp_Player->pos;
 		PB_B->vel = (Vector3(mousePosX, mousePosY, 0) - GOp_Player->pos).Normalized() * 80.f;
 		engine->play2D(soundList[ST_PORTAL_SHOOT_BLUE]);
 	}
-
-	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) && !PB_O->active)
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isLMBpressed)
 	{
+		isLMBpressed = false;
+	}
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) && !PB_O->active && !isRMBpressed)
+	{
+		isRMBpressed = true;
 		PB_O->active = true;
 		PB_O->pos = GOp_Player->pos;
 		PB_O->vel = (Vector3(mousePosX, mousePosY, 0) - GOp_Player->pos).Normalized() * 80.f;
 		engine->play2D(soundList[ST_PORTAL_SHOOT_ORANGE]);
+	}
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_AIM]) && isRMBpressed)
+	{
+		isRMBpressed = false;
 	}
 
 	if (PB_B->active)
@@ -1165,7 +1301,7 @@ void mainscene2D::UpdatePortalGun(double dt)
 				{
 					PORTAL_GUN.BP_AttachedTo->colEnable = true;
 				}
-				engine->play2D(soundList[ST_PORTAL_OPEN]);
+
 				Vector3 temp = PB_B->pos - bcolc->pos;
 				static bool XN = false;
 				static bool YN = false;
@@ -1189,33 +1325,49 @@ void mainscene2D::UpdatePortalGun(double dt)
 					YN = false;
 				}
 
+				float tempRotation;
+
 				if (temp.x > temp.y)
 				{
 					if (XN)
 					{
-						PORTAL_GUN.BluePortal->rotationZ = 90.f;
+						tempRotation = 90.f;
 					}
 					else
 					{
-						PORTAL_GUN.BluePortal->rotationZ = -90.f;
+						tempRotation = -90.f;
 					}
 				}
 				else
 				{
 					if (YN)
 					{
-						PORTAL_GUN.BluePortal->rotationZ = 180.f;
+						tempRotation = 180.f;
 					}
 					else
 					{
-						PORTAL_GUN.BluePortal->rotationZ = 0.f;
+						tempRotation = 0.f;
 					}
 				}
 
-				PORTAL_GUN.BluePortal->active = true;
-				PORTAL_GUN.BluePortal->pos = bcolc->pos;
 
-				PORTAL_GUN.BP_AttachedTo = bcolc;
+				Mtx44 rotation;
+				rotation.SetToRotation(tempRotation, 0, 0, 1);
+				Vector3 tempCheck;
+				tempCheck = rotation * Vector3(0, bcolc->ColBox.y + 1.f, 0);
+
+				if (collide2D(tempCheck + bcolc->pos) || collideTrigger(tempCheck + bcolc->pos))
+				{
+					engine->play2D(soundList[ST_PORTAL_INVALID_SURFACE]);
+				}
+				else
+				{
+					engine->play2D(soundList[ST_PORTAL_OPEN]);
+					PORTAL_GUN.BluePortal->active = true;
+					PORTAL_GUN.BluePortal->pos = bcolc->pos;
+					PORTAL_GUN.BluePortal->rotationZ = tempRotation;
+					PORTAL_GUN.BP_AttachedTo = bcolc;
+				}
 			}
 			else
 			{
@@ -1225,6 +1377,12 @@ void mainscene2D::UpdatePortalGun(double dt)
 		else
 		{
 			PB_B->pos += PB_B->vel * static_cast<float>(dt);
+		}
+
+		if (collideTrigger(PB_B->pos))
+		{
+			PB_B->active = false;
+			engine->play2D(soundList[ST_PORTAL_INVALID_SURFACE]);
 		}
 	}
 
@@ -1240,9 +1398,8 @@ void mainscene2D::UpdatePortalGun(double dt)
 				{
 					PORTAL_GUN.OP_AttachedTo->colEnable = true;
 				}
-				engine->play2D(soundList[ST_PORTAL_OPEN]);
-				Vector3 temp = PB_O->pos - bcolc->pos;
 
+				Vector3 temp = PB_O->pos - bcolc->pos;
 				static bool XN = false;
 				static bool YN = false;
 
@@ -1265,33 +1422,49 @@ void mainscene2D::UpdatePortalGun(double dt)
 					YN = false;
 				}
 
+				float tempRotation;
+
 				if (temp.x > temp.y)
 				{
 					if (XN)
 					{
-						PORTAL_GUN.OrangePortal->rotationZ = 90.f;
+						tempRotation = 90.f;
 					}
 					else
 					{
-						PORTAL_GUN.OrangePortal->rotationZ = -90.f;
+						tempRotation = -90.f;
 					}
 				}
 				else
 				{
 					if (YN)
 					{
-						PORTAL_GUN.OrangePortal->rotationZ = 180.f;
+						tempRotation = 180.f;
 					}
 					else
 					{
-						PORTAL_GUN.OrangePortal->rotationZ = 0.f;
+						tempRotation = 0.f;
 					}
 				}
 
-				PORTAL_GUN.OrangePortal->active = true;
-				PORTAL_GUN.OrangePortal->pos = bcolc->pos;
+				Mtx44 rotation;
+				rotation.SetToRotation(tempRotation, 0, 0, 1);
+				Vector3 tempCheck;
+				tempCheck = rotation * Vector3(0, bcolc->ColBox.y + 1.f, 0);
 
-				PORTAL_GUN.OP_AttachedTo = bcolc;
+				if (collide2D(tempCheck + bcolc->pos) || collideTrigger(tempCheck + bcolc->pos))
+				{
+					engine->play2D(soundList[ST_PORTAL_INVALID_SURFACE]);
+				}
+				else
+				{
+					engine->play2D(soundList[ST_PORTAL_OPEN]);
+					PORTAL_GUN.OrangePortal->active = true;
+					PORTAL_GUN.OrangePortal->pos = bcolc->pos;
+					PORTAL_GUN.OrangePortal->rotationZ = tempRotation;
+
+					PORTAL_GUN.OP_AttachedTo = bcolc;
+				}
 			}
 			else
 			{
@@ -1302,6 +1475,12 @@ void mainscene2D::UpdatePortalGun(double dt)
 		{
 			PB_O->pos += PB_O->vel * static_cast<float>(dt);
 		}
+
+		if (collideTrigger(PB_O->pos))
+		{
+			PB_O->active = false;
+			engine->play2D(soundList[ST_PORTAL_INVALID_SURFACE]);
+		}
 	}
 }
 
@@ -1311,27 +1490,54 @@ void mainscene2D::UpdatePortalGun(double dt)
 Resets the portal gun portals
 */
 /******************************************************************************/
-void mainscene2D::resetPortalGun(void)
+void mainscene2D::resetPortalGun(bool resetall, bool blue)
 {
 	if (PORTAL_GUN.BluePortal->active || PORTAL_GUN.OrangePortal->active || PB_B->active || PB_O->active)
 	{
 		PB_B->active = false;
 		PB_O->active = false;
-		PORTAL_GUN.BluePortal->active = false;
-		PORTAL_GUN.OrangePortal->active = false;
-		if (PORTAL_GUN.BP_AttachedTo != NULL)
+
+		if (resetall)
 		{
-			PORTAL_GUN.BP_AttachedTo->colEnable = true;
-			PORTAL_GUN.BP_AttachedTo = NULL;
+			PORTAL_GUN.BluePortal->active = false;
+			if (PORTAL_GUN.BP_AttachedTo != NULL)
+			{
+				PORTAL_GUN.BP_AttachedTo->colEnable = true;
+				PORTAL_GUN.BP_AttachedTo = NULL;
+			}
+
+			PORTAL_GUN.OrangePortal->active = false;
+			if (PORTAL_GUN.OP_AttachedTo != NULL)
+			{
+				PORTAL_GUN.OP_AttachedTo->colEnable = true;
+				PORTAL_GUN.OP_AttachedTo = NULL;
+			}
+
+			engine->play2D(soundList[ST_PORTAL_RESET]);
 		}
 
-		if (PORTAL_GUN.OP_AttachedTo != NULL)
+		else if (blue && PORTAL_GUN.BluePortal->active)
 		{
-			PORTAL_GUN.OP_AttachedTo->colEnable = true;
-			PORTAL_GUN.OP_AttachedTo = NULL;
-		}
+			PORTAL_GUN.BluePortal->active = false;
+			if (PORTAL_GUN.BP_AttachedTo != NULL)
+			{
+				PORTAL_GUN.BP_AttachedTo->colEnable = true;
+				PORTAL_GUN.BP_AttachedTo = NULL;
+			}
 
-		engine->play2D(soundList[ST_PORTAL_RESET]);
+			engine->play2D(soundList[ST_PORTAL_CLOSE]);
+		}
+		else if (PORTAL_GUN.OrangePortal->active)
+		{
+			PORTAL_GUN.OrangePortal->active = false;
+			if (PORTAL_GUN.OP_AttachedTo != NULL)
+			{
+				PORTAL_GUN.OP_AttachedTo->colEnable = true;
+				PORTAL_GUN.OP_AttachedTo = NULL;
+			}
+
+			engine->play2D(soundList[ST_PORTAL_CLOSE]);
+		}
 	}
 }
 
@@ -1341,8 +1547,8 @@ void mainscene2D::resetPortalGun(void)
 Handles trigger effects
 */
 /******************************************************************************/
-void mainscene2D::UpdateGOTriggers(double dt)
-{	
+void mainscene2D::UpdateGOTriggers(double &dt)
+{
 	for (std::vector<GameObjectTrigger *>::iterator it = m_goTriggerList.begin(); it != m_goTriggerList.end(); ++it)
 	{
 		GameObjectTrigger *goT = (GameObjectTrigger *)*it;
@@ -1353,15 +1559,15 @@ void mainscene2D::UpdateGOTriggers(double dt)
 				switch (goT->TRIGGER_TYPE)
 				{
 				case GameObjectTrigger::T_GRILL:
-				{
-					resetPortalGun();
-					break;
-				}
+					{
+						resetPortalGun();
+						break;
+					}
 				case GameObjectTrigger::T_LASER:
-				{
-					loadLevel(currentLevel);
-					break;
-				}
+					{
+						loadLevel(currentLevel);
+						break;
+					}
 				}
 				break;
 			}
@@ -1375,7 +1581,7 @@ void mainscene2D::UpdateGOTriggers(double dt)
 Handles button triggers for button
 */
 /******************************************************************************/
-void mainscene2D::UpdateGOButton(double dt)
+void mainscene2D::UpdateGOButton(double &dt)
 {
 	for (std::vector<GameObjectButton *>::iterator it = m_goButtonList.begin(); it != m_goButtonList.end(); ++it)
 	{
@@ -1402,7 +1608,7 @@ void mainscene2D::UpdateGOButton(double dt)
 						}
 					}
 				}
-
+				engine->play2D(soundList[ST_BUTTON_ON]);
 				goB->Triggered = false;
 			}
 		}
@@ -1415,7 +1621,7 @@ void mainscene2D::UpdateGOButton(double dt)
 Handles game object physics
 */
 /******************************************************************************/
-void mainscene2D::UpdateGO(double dt)
+void mainscene2D::UpdateGO(double &dt)
 {
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -1460,7 +1666,7 @@ void mainscene2D::Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity, 
 update player sound position
 */
 /******************************************************************************/
-void mainscene2D::UpdateSound(double dt)
+void mainscene2D::UpdateSound(double &dt)
 {
 	engine->setListenerPosition(vec3df(GOp_Player->pos.x, GOp_Player->pos.y, GOp_Player->pos.z), vec3df(1, 0, 0), vec3df(0, 0, 0), vec3df(0, 1, 0));
 }
@@ -1479,112 +1685,138 @@ void mainscene2D::Update(double dt)
 	mousePosX = (static_cast<float>(x) / static_cast<float>(Application::GetWindowWidth()) * static_cast<float>(Application::GetWindowWidth())*0.1f) + mainCamera.x;
 	mousePosY = ((static_cast<float>(Application::GetWindowHeight()) - static_cast<float>(y)) / static_cast<float>(Application::GetWindowHeight()) * static_cast<float>(Application::GetWindowHeight())*0.1f) + mainCamera.y;
 
-	FPScounter = static_cast<float>(1 / dt);
-
-	if (Application::IsKeyPressed('2'))
-	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-		else
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-	}
-
-	if (Application::IsKeyPressed('4'))
-	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			DisplayInfo = false;
-		}
-		else
-		{
-			DisplayInfo = true;
-		}
-	}
-
-	UpdateCharacter(dt);
-	UpdatePortalGun(dt);
-	UpdateGOTriggers(dt);
-	UpdateGOButton(dt);
-	UpdateGO(dt);
-	UpdateCamera(dt);
-
-	if (Application::IsKeyPressed(VK_F1))
-	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			mouseEnabled = true;
-			Application::SetCursor(false);
-		}
-		else
-		{
-			mouseEnabled = false;
-			Application::SetCursor(true);
-		}
-	}
-
-	//UpdateSound(dt);
-
 	if (TESTMODE)
 	{
-		if (Application::IsKeyPressed(VK_F3))
+		FPScounter = static_cast<float>(1 / dt);
+		if (Application::IsKeyPressed('1'))
 		{
+			if (!Application::IsKeyPressed(VK_SHIFT))
+			{
+				DisplayInfo = false;
+			}
+			else
+			{
+				DisplayInfo = true;
+			}
+		}
 
+		if (Application::IsKeyPressed('2'))
+		{
+			if (!Application::IsKeyPressed(VK_SHIFT))
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
 		}
 	}
-}
 
-/******************************************************************************/
-/*!
-\brief
-Render another object if object/player is in between portals
-*/
-/******************************************************************************/
-void mainscene2D::RenderPortalEffect(GameObject *go)
-{
-	bool o2b = true;
+	static bool isLmbPressed = false;
+	static bool isEscPressed = false;
 
-	if (o2b)
+	UpdateButtons();
+	switch (GAME_STATE)
 	{
-		Mtx44 rotation;
-		Vector3 objectOffset = PORTAL_GUN.OrangePortal->pos - go->pos;
+	case mainscene2D::GS_PLAY:
+		UpdateCharacter(dt);
+		UpdatePortalGun(dt);
+		UpdateGOTriggers(dt);
+		UpdateGOButton(dt);
+		UpdateGO(dt);
+		UpdateCamera(dt);
 
-		rotation.SetToRotation(PORTAL_GUN.BluePortal->rotationZ - PORTAL_GUN.OrangePortal->rotationZ, 0, 0, 1);
-		objectOffset = PORTAL_GUN.BluePortal->pos + rotation*(GOp_Player->pos - PORTAL_GUN.OrangePortal->pos);
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			GAME_STATE = GS_PAUSED;
+		}
+		break;
+	case mainscene2D::GS_PAUSED:
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			GAME_STATE = GS_PLAY;
+		}
 
-		PORTAL_GUN.pVelChange(objectOffset, o2b);
-		modelStack.PushMatrix();
-		modelStack.Translate(PORTAL_GUN.BluePortal->pos);
-		modelStack.Rotate(PORTAL_GUN.BluePortal->rotationZ - PORTAL_GUN.OrangePortal->rotationZ, 0, 0, 1);
-		modelStack.Translate(objectOffset);
-		modelStack.Rotate(PORTAL_GUN.BluePortal->rotationZ - PORTAL_GUN.OrangePortal->rotationZ, 0, 0, 1);
-		modelStack.Rotate(go->rotationZ, 0, 0, 1);
-		modelStack.Scale(go->scale);
-		RenderMeshin2D(go->obMesh, false);
-		modelStack.PopMatrix();
+		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
+		{
+			isLmbPressed = true;
+		}
+		else if(!Application::IsKeyPressed(VK_LBUTTON) && isLmbPressed)
+		{
+			isLmbPressed = false;
+			if (FetchBUTTON("Return to menu")->active)
+			{
+				e_nextScene = Application::E_SCENE_MENU;
+			}
+			else if (FetchBUTTON("Back to game")->active)
+			{
+				GAME_STATE = GS_PLAY;
+			}
+			else if(FetchBUTTON("Previous level")->active)
+			{
+				--currentLevel;
+				if (!loadLevel(currentLevel))
+				{
+					++currentLevel;
+				}
+				GAME_STATE = GS_PLAY;
+			}
+			else if (FetchBUTTON("Skip to next level")->active)
+			{
+				++currentLevel;
+				if (!loadLevel(currentLevel))
+				{
+					--currentLevel;
+				}
+				GAME_STATE = GS_PLAY;
+			}
+		}
+		break;
+	case mainscene2D::GS_END:
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			e_nextScene = Application::E_SCENE_MENU;
+		}
+
+		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
+		{
+			isLmbPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_LBUTTON) && isLmbPressed)
+		{
+			isLmbPressed = false;
+			if (FetchBUTTON("Return to menu")->active)
+			{
+				e_nextScene = Application::E_SCENE_MENU;
+			}
+			else if (FetchBUTTON("Play again")->active)
+			{
+				currentLevel = 1;
+				loadLevel(currentLevel);
+				GAME_STATE = GS_PLAY;
+			}
+		}
+		break;
+	default:
+		break;
 	}
-	else
-	{
-		Mtx44 rotation;
-		Vector3 objectOffset = PORTAL_GUN.BluePortal->pos - go->pos;
 
-		rotation.SetToRotation(PORTAL_GUN.OrangePortal->rotationZ - PORTAL_GUN.BluePortal->rotationZ, 0, 0, 1);
-		objectOffset = PORTAL_GUN.OrangePortal->pos + rotation*(GOp_Player->pos - PORTAL_GUN.BluePortal->pos);
-
-		PORTAL_GUN.pVelChange(objectOffset, !o2b);
-		modelStack.PushMatrix();
-		modelStack.Translate(PORTAL_GUN.OrangePortal->pos);
-		modelStack.Rotate(PORTAL_GUN.OrangePortal->rotationZ - PORTAL_GUN.BluePortal->rotationZ, 0, 0, 1);
-		modelStack.Translate(objectOffset);
-		modelStack.Rotate(PORTAL_GUN.OrangePortal->rotationZ - PORTAL_GUN.BluePortal->rotationZ, 0, 0, 1);
-		modelStack.Rotate(go->rotationZ, 0, 0, 1);
-		modelStack.Scale(go->scale);
-		RenderMeshin2D(go->obMesh, false);
-		modelStack.PopMatrix();
-	}
 }
 
 /******************************************************************************/
@@ -1650,22 +1882,22 @@ void mainscene2D::RenderGO(GameObject *go)
 	switch (go->type)
 	{
 	case GameObject::GO_PLAYER_CHAR:
-	{
-		RenderBendy();
-		break;
-	}
-	default:
-	{
-		if (go->obMesh != NULL)
 		{
-			modelStack.PushMatrix();
-			modelStack.Translate(go->pos);
-			modelStack.Rotate(go->rotationZ, 0, 0, 1);
-			modelStack.Scale(go->scale);
-			RenderMeshin2D(go->obMesh, false);
-			modelStack.PopMatrix();
+			RenderBendy();
+			break;
 		}
-	}
+	default:
+		{
+			if (go->obMesh != NULL)
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(go->pos);
+				modelStack.Rotate(go->rotationZ, 0, 0, 1);
+				modelStack.Scale(go->scale);
+				RenderMeshin2D(go->obMesh, false);
+				modelStack.PopMatrix();
+			}
+		}
 	}
 }
 
@@ -1895,7 +2127,7 @@ void mainscene2D::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, 
 	viewStack.PushMatrix();
 	viewStack.LoadIdentity(); //No need camera for ortho mode
 	modelStack.PushMatrix();
-	modelStack.LoadIdentity(); //Reset modelStack
+	//modelStack.LoadIdentity(); //Reset modelStack
 	modelStack.Translate(x, y, 0);
 	modelStack.Scale(size, size, size);
 
@@ -2023,73 +2255,147 @@ void mainscene2D::Render(void)
 		);
 	modelStack.LoadIdentity();
 
-	if (renderAxis)
-	{
-		modelStack.PushMatrix();
-		modelStack.Scale(10, 10, 10);
-		RenderMesh(meshList[GEO_AXES], false);
-		modelStack.PopMatrix();
-	}
-
 	modelStack.PushMatrix();
-	modelStack.Translate(-mainCamera*0.1f);
+	modelStack.Translate(-mainCamera*0.05f);
 	modelStack.Translate(static_cast<float>(Application::GetWindowWidth())*0.05f, static_cast<float>(Application::GetWindowHeight())*0.05f, -5.0f);
 	modelStack.Scale(2, 2, 2);
 	RenderMeshin2D(meshList[GEO_BACKGROUND], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();//=========================================================================================================================================================================
-
-	modelStack.Translate(-mainCamera);
-
-	RenderGO(GOp_DoorExit);
-	RenderGO(GOp_Player);
-
-	for (std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	switch (GAME_STATE)
 	{
-		GameObject *go = (GameObject *)*it;
-		if (go->active)
+	case mainscene2D::GS_PLAY:
+		modelStack.PushMatrix();//Translate by camera
+
+		modelStack.Translate(-mainCamera);
+
+		RenderGO(GOp_DoorExit);
+		RenderGO(GOp_Player);
+
+		for (std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 		{
-			if (go->pos.x + tileSize > mainCamera.x && go->pos.x - tileSize < mainCamera.x + Application::GetWindowWidth()*0.1f)//Only render if in screen
+			GameObject *go = (GameObject *)*it;
+			if (go->active)
 			{
-				if (go->pos.y + tileSize > mainCamera.y && go->pos.y - tileSize < mainCamera.y + Application::GetWindowHeight()*0.1f)//Only render if in screen
+				if (go->pos.x + tileSize > mainCamera.x && go->pos.x - tileSize < mainCamera.x + Application::GetWindowWidth()*0.1f)//Only render if in screen
 				{
-					RenderGO(go);
+					if (go->pos.y + tileSize > mainCamera.y && go->pos.y - tileSize < mainCamera.y + Application::GetWindowHeight()*0.1f)//Only render if in screen
+					{
+						RenderGO(go);
+					}
 				}
 			}
 		}
+
+		if (PORTAL_GUN.BluePortal->active)
+		{
+			RenderGO(PORTAL_GUN.BluePortal);
+		}
+		if (PORTAL_GUN.OrangePortal->active)
+		{
+			RenderGO(PORTAL_GUN.OrangePortal);
+		}
+		if (PB_B->active)
+		{
+			RenderGO(PB_B);
+		}
+		if (PB_O->active)
+		{
+			RenderGO(PB_O);
+		}
+
+		RenderGOButtons();
+		RenderGOTriggers();
+		modelStack.PopMatrix();//End of camera translation
+		break;
+	case mainscene2D::GS_PAUSED:
+		{
+		std::stringstream ss;
+		ss << "Current Level: " << currentLevel;
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f + 10.f, 0.1f);
+		modelStack.Scale(2.5f, 2.5f, 2.5f);
+		RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), UIColor);
+		modelStack.PopMatrix();
+		break;
+		}
+	case mainscene2D::GS_END:
+		break;
+	default:
+		break;
 	}
 
-	if (PORTAL_GUN.BluePortal->active)
-	{
-		RenderGO(PORTAL_GUN.BluePortal);
-	}
-	if (PORTAL_GUN.OrangePortal->active)
-	{
-		RenderGO(PORTAL_GUN.OrangePortal);
-	}
-	if (PB_B->active)
-	{
-		RenderGO(PB_B);
-	}
-	if (PB_O->active)
-	{
-		RenderGO(PB_O);
-	}
+	RenderButtons();
 
-	RenderGOButtons();
-	RenderGOTriggers();
-
-	/*modelStack.PushMatrix();
-	modelStack.Translate(mousePosX, mousePosY, 0);
-	RenderMeshin2D(meshList[GEO_CHAR_PLAYER], false);
-	modelStack.PopMatrix();//*/
-
-	modelStack.PopMatrix();//==========================================================================================================================================================================
-
-	if (DisplayInfo == true)
+	if (TESTMODE && DisplayInfo == true)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Gets the button
+*/
+/******************************************************************************/
+S_BUTTON* mainscene2D::FetchBUTTON(std::string name)
+{
+	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		if (S_MB->text == name)
+		{
+			return S_MB;
+		}
+	}
+
+	return NULL;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Update button state
+*/
+/******************************************************************************/
+void mainscene2D::UpdateButtons(void)
+{
+	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0) - mainCamera))
+		{
+			S_MB->active = true;
+			S_MB->color = UIColorPressed;
+		}
+		else
+		{
+			S_MB->active = false;
+			S_MB->color = UIColor;
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Renders the menu buttons
+*/
+/******************************************************************************/
+void mainscene2D::RenderButtons(void)
+{
+	for (unsigned i = 0; i < v_buttonList.size(); ++i)
+	{
+		S_BUTTON *S_MB = v_buttonList[i];
+		if (S_MB->gamestate == GAME_STATE)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(S_MB->pos);
+			modelStack.Scale(S_MB->scale);
+			RenderTextOnScreen(meshList[GEO_TEXT], S_MB->text, S_MB->color);
+			modelStack.PopMatrix();
+		}
 	}
 }
 
@@ -2167,6 +2473,16 @@ void mainscene2D::Exit(void)
 			delete goB;
 		}
 		m_goButtonList.pop_back();
+	}
+
+	while (v_buttonList.size() > 0)
+	{
+		S_BUTTON *S_MB = v_buttonList.back();
+		if (S_MB != NULL)
+		{
+			delete S_MB;
+		}
+		v_buttonList.pop_back();
 	}
 
 	glDeleteVertexArrays(1, &m_vertexArrayID);

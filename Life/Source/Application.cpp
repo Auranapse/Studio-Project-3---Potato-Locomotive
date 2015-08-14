@@ -394,11 +394,6 @@ void Application::Run()
 				{
 					b_quitProgram = true;
 				}
-				else
-				{
-					scene->e_nextScene = E_SCENE_MENU;
-					SetCursor(true);
-				}
 			}
 			if(IsKeyPressed(VK_F10))
 			{
@@ -436,6 +431,7 @@ void Application::Run()
 					glfwMakeContextCurrent(m_window);
 					scene->InitShaders();
 				}
+				scene->e_nextScene = E_SCENE_MENU;
 			}
 		} //Check if the ESC key had been pressed or if the window had been closed
 		e_currentScene = scene->GetNextScene();

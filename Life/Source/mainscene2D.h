@@ -29,6 +29,7 @@ Portal scene of the Sentry Turret, Companion Cube and Storage Cubes/
 #include "portal.h"
 #include "GabrielDLC.h"
 #include "Anim4.h"
+#include "Button.h"
 
 /******************************************************************************/
 /*!
@@ -41,7 +42,7 @@ class mainscene2D : public Scene
 {
 	enum GEOMETRY_TYPE
 	{
-		GEO_AXES,
+		//GEO_AXES,
 		GEO_BACKGROUND,
 
 		GEO_CHAR_PLAYER,
@@ -213,17 +214,30 @@ class mainscene2D : public Scene
 		Mesh* mesh;
 	};
 
+	enum GAME_STATES
+	{
+		GS_PLAY,
+		GS_PAUSED,
+		GS_END,
+	};
+
 	enum SOUND_TYPE
 	{
+		ST_BACKGROUND_1,
+		ST_BACKGROUND_2,
 		ST_PANEL,
 		ST_STEP,
 		ST_JUMP,
 		ST_LAND,
 		ST_BUZZER,
+
+		ST_BUTTON_ON,
+
 		ST_PORTAL_SHOOT_BLUE,
 		ST_PORTAL_SHOOT_ORANGE,
 		ST_PORTAL_OPEN,
 		ST_PORTAL_RESET,
+		ST_PORTAL_CLOSE,
 		ST_PORTAL_INVALID_SURFACE,
 		ST_PORTAL_ENTER_PORTAL,
 
@@ -242,6 +256,7 @@ public:
 private:
 	unsigned m_vertexArrayID;
 	const bool TESTMODE;
+	GAME_STATES GAME_STATE;
 	Vector3 gravity_force;
 
 	irrklang::ISoundSource *soundList[ST_TOTAL];
@@ -271,6 +286,14 @@ private:
 	Portal PORTAL_GUN;
 	GameObject *PB_B, *PB_O;
 
+	//Buttons
+	void InitMenu(void);
+	Color UIColor, UIColorPressed;
+	std::vector<S_BUTTON*> v_buttonList;
+	S_BUTTON* FetchBUTTON(std::string name);
+	void UpdateButtons(void);
+	void RenderButtons(void);
+
 	//******************************************************************************/
 	/*!
 	unsigned short us_control:
@@ -292,7 +315,6 @@ private:
 	float f_currentfov;
 	float FPScounter;
 
-	bool renderAxis;
 	bool mouseEnabled;
 
 	bool DisplayInfo;
@@ -300,33 +322,34 @@ private:
 	float timer;
 	float inputDelay;
 
-	void UpdateSound(double dt);
+	void UpdateSound(double &dt);
 
-	void UpdateCamera(double dt);
-	void UpdateCharacter(double dt);
-	void UpdatePortalGun(double dt);
-	void resetPortalGun(void);
-	void UpdateGOTriggers(double dt);
-	void UpdateGOButton(double dt);
-	void UpdateGO(double dt);
+	void UpdateCamera(double &dt);
+	void UpdateCharacter(double &dt);
+	void UpdatePortalGun(double &dt);
+	void resetPortalGun(bool resetall = true, bool blue = true);
+	void UpdateGOTriggers(double &dt);
+	void UpdateGOButton(double &dt);
+	void UpdateGO(double &dt);
 	void Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity = 10, float dmg = 100);
 
 	Light lights[4];
 
 	void editFOV(float newFOV);
 	void RenderText(Mesh* mesh, std::string text, Color color);
-	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
 	void RenderMeshin2D(Mesh *mesh, bool enableLight, float size = 1.0f, float x = .0f, float y = .0f, float rotation = 0.f);
 
-	void RenderPortalEffect(GameObject *go);
 	void RenderGOTriggers(void);
 	void RenderGOButtons(void);
 	void RenderGO(GameObject *go);
 	void RenderBendy(void);
 	void RenderBullet(void);
 	void RenderMesh(Mesh *mesh, bool enableLight);
+	bool collideTrigger(Vector3 &pos);
 	bool collide2D(Vector3 &Position);
 	bool GOcollide2D(GameObject *go1, GameObject *go2);
+	bool GOcollide2D(GameObject *go1, Vector3 &pos);
 	GameObject *GOcollide2D(Vector3 &Position);
 	GameObject *GOcollide2D(GameObject *go2);
 	MS modelStack, viewStack, projectionStack;

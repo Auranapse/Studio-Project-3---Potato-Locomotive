@@ -317,9 +317,8 @@ private:
 	E_MENU_STATE MENU_STATE;
 	E_MENU_STATE PREV_STATE;
 
-	Color UIColor;
+	Color UIColor, UIColorPressed;
 	std::vector<S_BUTTON*> v_buttonList;
-
 	S_BUTTON* FetchBUTTON(std::string name);
 	void UpdateButtons(void);
 	void RenderButtons(void);

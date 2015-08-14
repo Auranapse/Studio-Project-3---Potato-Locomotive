@@ -930,7 +930,7 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 /******************************************************************************/
 /*!
 \brief
-Renders the menu uttons
+Renders the menu buttons
 */
 /******************************************************************************/
 void MenuScene::RenderButtons(void)
