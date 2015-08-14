@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{65793EA9-1461-4F53-9B5C-0B2D11D8CC0C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Life</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IrrKlang\include;$(SolutionDir)\IrrKlang\include;$(SolutionDir)\Common\Source;$(SolutionDir)\glfw\include;$(SolutionDir)\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\IrrKlang\lib;$(SolutionDir)\IrrKlang\lib;$(SolutionDir)$(Configuration);$(SolutionDir)\glfw\lib-msvc100;$(SolutionDir)\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IrrKlang\include;$(SolutionDir)\Common\Source;$(SolutionDir)\glfw\include;$(SolutionDir)\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\IrrKlang\lib;$(SolutionDir)$(Configuration);$(SolutionDir)\glfw\lib-msvc100;$(SolutionDir)\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Anim4.cpp" />
+    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\BulletInfo.cpp" />
+    <ClCompile Include="Source\CustomCam1.cpp" />
+    <ClCompile Include="Source\CustomCam2D.cpp" />
+    <ClCompile Include="Source\DepthFBO.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
+    <ClCompile Include="Source\GameObjectButton.cpp" />
+    <ClCompile Include="Source\GameObjectTrigger.cpp" />
+    <ClCompile Include="Source\GBuffer.cpp" />
+    <ClCompile Include="Source\LoadHmap.cpp" />
+    <ClCompile Include="Source\mainscene.cpp" />
+    <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\Camera2.cpp" />
+    <ClCompile Include="Source\Camera4.cpp" />
+    <ClCompile Include="Source\Camera5.cpp" />
+    <ClCompile Include="Source\LoadOBJ.cpp" />
+    <ClCompile Include="Source\LoadTGA.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\mainscene2D.cpp" />
+    <ClCompile Include="Source\maploader.cpp" />
+    <ClCompile Include="Source\MenuScene.cpp" />
+    <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\MeshBuilder.cpp" />
+    <ClCompile Include="Source\particle.cpp" />
+    <ClCompile Include="Source\portal.cpp" />
+    <ClCompile Include="Source\savefileHandler.cpp" />
+    <ClCompile Include="Source\shader.cpp" />
+    <ClCompile Include="Source\SpriteAnimation.cpp" />
+    <ClCompile Include="Source\Utility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Anim4.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\BulletInfo.h" />
+    <ClInclude Include="Source\Button.h" />
+    <ClInclude Include="Source\CustomCam1.h" />
+    <ClInclude Include="Source\CustomCam2D.h" />
+    <ClInclude Include="Source\DepthFBO.h" />
+    <ClInclude Include="Source\GameObject.h" />
+    <ClInclude Include="Source\GameObjectButton.h" />
+    <ClInclude Include="Source\GameObjectTrigger.h" />
+    <ClInclude Include="Source\GBuffer.h" />
+    <ClInclude Include="Source\LoadHmap.h" />
+    <ClInclude Include="Source\mainscene.h" />
+    <ClInclude Include="Source\Camera.h" />
+    <ClInclude Include="Source\Camera2.h" />
+    <ClInclude Include="Source\Camera4.h" />
+    <ClInclude Include="Source\Camera5.h" />
+    <ClInclude Include="Source\Light.h" />
+    <ClInclude Include="Source\LoadOBJ.h" />
+    <ClInclude Include="Source\LoadTGA.h" />
+    <ClInclude Include="Source\mainscene2D.h" />
+    <ClInclude Include="Source\maploader.h" />
+    <ClInclude Include="Source\Material.h" />
+    <ClInclude Include="Source\MenuScene.h" />
+    <ClInclude Include="Source\Mesh.h" />
+    <ClInclude Include="Source\MeshBuilder.h" />
+    <ClInclude Include="Source\particle.h" />
+    <ClInclude Include="Source\portal.h" />
+    <ClInclude Include="Source\savefileHandler.h" />
+    <ClInclude Include="Source\Scene.h" />
+    <ClInclude Include="Source\shader.hpp" />
+    <ClInclude Include="Source\SpriteAnimation.h" />
+    <ClInclude Include="Source\Utility.h" />
+    <ClInclude Include="Source\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameData\Shader\comg.fragmentshader" />
+    <None Include="GameData\Shader\comg.vertexshader" />
+    <None Include="GameData\Shader\Fog.fragmentshader" />
+    <None Include="GameData\Shader\Fog.vertexshader" />
+    <None Include="GameData\Shader\GBuffer.fragmentshader" />
+    <None Include="GameData\Shader\GBuffer.vertexshader" />
+    <None Include="GameData\Shader\GPass.fragmentshader" />
+    <None Include="GameData\Shader\GPass.vertexshader" />
+    <None Include="GameData\Shader\LightPass.fragmentshader" />
+    <None Include="GameData\Shader\LightPass.vertexshader" />
+    <None Include="GameData\Shader\Shadow.fragmentshader" />
+    <None Include="GameData\Shader\Shadow.vertexshader" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
