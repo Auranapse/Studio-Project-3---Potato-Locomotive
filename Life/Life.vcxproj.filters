@@ -78,9 +78,6 @@
     <ClCompile Include="Source\particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\mainscene2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\CustomCam2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -177,9 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\mainscene2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\CustomCam2D.h">

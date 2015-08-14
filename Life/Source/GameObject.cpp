@@ -18,7 +18,7 @@ GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	rotationZ(0.f),
 	rotationalVelocity(0.f)
 {
-	obMesh = NULL;
+	mesh = NULL;
 }
 
 GameObject::~GameObject()

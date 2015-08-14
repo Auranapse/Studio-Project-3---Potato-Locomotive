@@ -99,7 +99,6 @@
     <ClCompile Include="Source\LoadOBJ.cpp" />
     <ClCompile Include="Source\LoadTGA.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\mainscene2D.cpp" />
     <ClCompile Include="Source\maploader.cpp" />
     <ClCompile Include="Source\MenuScene.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
@@ -132,7 +131,6 @@
     <ClInclude Include="Source\Light.h" />
     <ClInclude Include="Source\LoadOBJ.h" />
     <ClInclude Include="Source\LoadTGA.h" />
-    <ClInclude Include="Source\mainscene2D.h" />
     <ClInclude Include="Source\maploader.h" />
     <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\MenuScene.h" />

@@ -21,7 +21,6 @@ To handle the window and the application
 
 #include "MenuScene.h"
 #include "MainScene.h"
-#include "mainscene2D.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 120; // FPS of this game
@@ -349,20 +348,18 @@ void Application::Run()
 		//Main Loop
 		switch (e_currentScene)
 		{
-			case E_SCENE_MENU:
-				scene = new MenuScene();
-				break;
-			case E_SCENE_MAIN:
-				scene = new mainscene();
-				break;
-			case E_SCENE_MAIN2:
-				scene = new mainscene2D();
-				break;
-			default:
-				scene = new MenuScene();
-				break;
+		case E_SCENE_MENU:
+			scene = new MenuScene();
+			break;
+		case E_SCENE_MAIN2:
+		case E_SCENE_MAIN:
+			scene = new mainscene();
+			break;
+		default:
+			scene = new MenuScene();
+			break;
 		}
-
+		//SetCursor(true);
 		scene->Init();
 
 		m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame

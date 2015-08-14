@@ -44,15 +44,7 @@ class mainscene : public Scene
 		GEO_CROSSHAIR,
 		GEO_SNIPER_CROSSHAIR_1,
 		GEO_SNIPER_CROSSHAIR_2,
-		GEO_TERRAIN,
 		GEO_SKYPLANE,
-		GEO_OLDCUBE1,
-		GEO_MOSS1,
-		GEO_MOSS2,
-		GEO_MOSS3,
-		GEO_CHAMBER,
-		GEO_CUBE,
-		GEO_WATER_SPRITE,
 		GEO_WALL_PANEL,
 		GEO_WALL_PANEL2,
 		GEO_WALL_PANEL_SQUARE,
@@ -62,38 +54,13 @@ class mainscene : public Scene
 		GEO_WALL2,
 		GEO_WALL3,
 		GEO_WALLRUSTED1,
-		GEO_GLASSR1,
 		GEO_FLOOR_TILE,
 		GEO_FLOOR_TILE_SQUARE,
 		GEO_FLOOR_CONCRETE,
-		GEO_WSC_SPHERE_COMPANION,
 		GEO_AXES,
-		GEO_WSC,
-		GEO_WSC_SPHERE,
-		GEO_WSC_MID_EDGE,
-		GEO_WSC_SIDE_EDGE,
-		GEO_WSC_LINES_COMPANION,
-		GEO_WSC_LINES,
-		GEO_TURRETBODY,
-		GEO_TURRETBODYMAIN,
-		GEO_TURRETGUNMOUNT1,
-		GEO_TURRETGUNMOUNT2,
-		GEO_TURRETGUNMOUNT3,
-		GEO_GUNBARREL1,
-		GEO_GUNBARREL2,
-		GEO_TURRETLEGSP1,
-		GEO_TURRETLEGSP2,
-		GEO_TURRETEYES1,
-		GEO_TURRETCYLINDER,
-		GEO_TURRETANTENNA,
-		GEO_BULLETP1,
-		GEO_BULLETP2,
-		GEO_FLight,
 		GEO_LIGHT,
 		GEO_TEXT,
-		GEO_APERTUREOLDLOGO,
-		//Environment
-		GEO_TREE_1,
+
 		//SKYBOX
 		E_GEO_LEFT,
 		E_GEO_RIGHT,
@@ -104,23 +71,7 @@ class mainscene : public Scene
 		
 
 		//OBJ MODELS--------------
-		GEO_OBJ_TV_A,
 		GEO_OBJCAKE,
-		GEO_OBJTABLE,
-		GEO_PANELP1,
-		GEO_PANELP2,
-		GEO_PANELP3,
-		GEO_ELSHAFT,
-		GEO_ELBOTTOM,
-		GEO_ELEVATOR,
-		GEO_DOORA,
-		GEO_RAILING,
-		GEO_LOWERH,
-		GEO_UPPERH,
-		GEO_BUTTON_STAND,
-		GEO_BUTTON,
-		GEO_DISPENSER,
-		GEO_GLADOS,
 
 		//GUNS
 		GEO_M9,
@@ -327,35 +278,6 @@ class mainscene : public Scene
 		E_CTRL_TOTAL
 	};
 
-	struct Transformation
-	{
-		float rotateA;
-		float translateX;
-		float translateY;
-		float translateZ;
-		bool Camera;
-	};
-
-	struct terrain
-	{
-		bool ColEnable;
-		Vector3 position;
-		Vector3 scale;
-		std::vector<unsigned char> uc_heightmap;
-		Mesh* mesh;
-	};
-
-	struct targetBoard
-	{
-		Vector3 position;
-		Vector3 collisionBox;
-		float health;
-		float rotation;
-		float life;
-		bool active;
-	};
-
-	std::vector<targetBoard*> targetBList;
 
 	struct weaponStats
 	{
@@ -442,9 +364,6 @@ private:
 	bool enableFOG;
 	const bool TESTMODE;
 	Vector3 gravity_force;
-
-	terrain monalisa;
-
 	
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 	
@@ -452,8 +371,7 @@ private:
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
-
-	Transformation S1, S2, TURRET, TLEG1, TLEG2, TLEG3, BULLETR, BULLETL, CAKE, PanelP1, PanelP2, LIFT, LIFT2, SWITCH, SWITCH2, SWITCH3;
+	
 	GameObject *GOp_Player;
 
 	unsigned m_programID;
@@ -478,35 +396,17 @@ private:
 
 	SaveFile SF_1;
 	void assignSave(void);
-
-	SpriteAnimation* SA_waterSprite;
-
+	
 	float f_fov;
 	float f_currentfov;
 	float FPScounter;
-	bool Attackmode;
-	bool moving;
-	bool limitmove1; 
-	bool limitmove2; 
-	bool limitmove3; 
-	bool forward;
-	bool turnleft; 
-	bool turnright;
 	bool renderAxis;
-	bool firing;
 	bool mouseEnabled;
-	bool CubeDispense;
 
 	bool DisplayInfo;
 
-	bool LightSwitch;
-	float delayf;
-
-	bool PanelOpen, PanelOpen2;
-	bool ElevatorDown, ElevatorDown2;
 	
 	bool weaponsEnabled;
-	float liftDelay;
 	bool renderScope;
 	float ScopeAnim;
 	float scopeExeTime;
@@ -518,31 +418,16 @@ private:
 	float fireRate;
 	float fireRateMax;
 	int currentWeapon;
-
-	bool ShootingRangeMode;
-	float shootingRangeDelay;
-	float targetSpawnrate;
-	float targetSpawnTimer;
-	int targetsActive;
-	int targetLimit;
-	int targetsHit;
-	float ShootingRangeTimer;
-	float showScoreTimer;
-	void resetShootingRange(void);
-
+	
 	Particle* FetchParticle(void);
 
 	void UpdateSound(double dt);
-	void UpdatePanel(double dt, Vector3 Pos, bool &panel, float &doorangle);
-	void UpdateElevator(double dt);
-	void UpdateTurret(double dt);
 	void UpdatePlayer(double dt);
 	void UpdateGO(double dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type = Particle::PAR_DEFAULT, float lifetime = 5.f);
 	void UpdateParticles(double dt);
 	void UpdateBullets(double dt);
-	void UpdateTargetBoard(double dt);
-	void ActivateTargetBoard(void);
+
 	void Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity = 10, float dmg = 100);
 	void weaponsUpdate(double dt);
 
@@ -556,31 +441,15 @@ private:
 
 	void initWeapons(void);
 	void generateRoom1(void);
-	void generateRoom2(void);
-	void generateRuins(void);
-	void generateexterior(void);
 
 	bool isVisible(Vector3 &ObjPosition);
-
-	void RenderROOM1(void);
-	void RenderROOM2(void);
-	void RenderViewingRoom1(void);
-	void RenderViewingRoom2(void);
-	void RenderRuinsP1(void);
-	void RenderRuinsP2(void);
-	void RenderRuinsP3(void);
-	void RenderExterior(void);
-	void RenderMinimap(void);
+	
 
 	void RenderGO(GameObject *go);
 	void RenderParticles(void);
 	void RenderBullet(void);
-	void RenderTargetBoard(void);
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, Material *material = NULL);
-	void RenderTurret(void);
-	void RenderCubes(bool Companion, float x, float y, float z, float R, int RXYZ);
 	void RenderSkybox(void);
-	void RenderPanel(Vector3 pos, float rotation, float doorangle);
 	void RenderObjectsAlpha(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);

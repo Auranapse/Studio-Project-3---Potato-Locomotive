@@ -44,7 +44,7 @@ struct GameObject
 	bool portalble;
 	float mass;
 	float rotationX, rotationY, rotationZ;
-	Mesh* obMesh;
+	Mesh* mesh;
 
 	Material material;
 	float lightRadius;
