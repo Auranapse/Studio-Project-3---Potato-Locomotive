@@ -7,7 +7,7 @@
 Save file
 !*/
 /****************************************************************************/
-#include "savefile"
+#include "savefile.h"
 
 SaveFile::SaveFile()
 {

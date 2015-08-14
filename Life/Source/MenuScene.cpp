@@ -234,7 +234,6 @@ void MenuScene::InitShaders()
 	glBindVertexArray(u_m_vertexArrayID);
 
 	// Initialize Materials
-	InitTextureResource();
 	InitShadersAndLights();
 
 	//Set projection matrix to perspective mode
@@ -264,10 +263,6 @@ void MenuScene::InitMeshList()
 	P_meshArray[E_GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	P_meshArray[E_GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false, false);
 
-	// UI
-	P_meshArray[E_GEO_UI_GRID] = MeshBuilder::GenerateQuad("ui_gridlines", Color(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 1.0f);
-	P_meshArray[E_GEO_UI_GRID]->mode = Mesh::DRAW_LINES;
-
 	P_meshArray[E_GEO_BACKGROUND] = MeshBuilder::GenerateQuad("Background", Color(1.0f, 1.0f, 1.0f), static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2), 1.0f);
 	P_meshArray[E_GEO_BACKGROUND]->textureID[0] = LoadTGA("GameData//Image//UI//Background.tga", true, false);
 
@@ -276,19 +271,6 @@ void MenuScene::InitMeshList()
 
 	P_meshArray[E_GEO_LOADING_BACKGROUND] = MeshBuilder::GenerateQuad("Loading Screen", Color(1.0f, 1.0f, 1.0f), static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2), 1.0f);
 	P_meshArray[E_GEO_LOADING_BACKGROUND]->textureID[0] = LoadTGA("GameData//Image//UI//Loading.tga", true);
-
-	P_meshArray[E_GEO_UI_BUTTON] = MeshBuilder::GenerateQuad("ui_scrBtn", Color(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 1.0f);
-}
-
-/******************************************************************************/
-/*!
-\brief
-Initializes texture resources
-*/
-/******************************************************************************/
-void MenuScene::InitTextureResource(void)
-{
-	u_texResourceArray[E_TEX_BUTTON] = LoadTGA("GameData//Image//UI//buttons//button.tga", false);
 }
 
 /******************************************************************************/

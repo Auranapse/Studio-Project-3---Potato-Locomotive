@@ -14,6 +14,7 @@ Main scene
 #include <vector>
 #include <iostream>
 #include "Scene.h"
+#include "Camera4.h"
 #include "CustomCam1.h"
 #include "Mesh.h"
 #include "MatrixStack.h"

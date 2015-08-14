@@ -96,25 +96,13 @@ class MenuScene : public Scene
 		// Text
 		E_GEO_TEXT,
 		// UI---------------------
-		E_GEO_UI_GRID,
-		E_GEO_UI_BUTTON,
 		E_GEO_SPLASH,
 		E_GEO_BACKGROUND,
 		E_GEO_LOADING_BACKGROUND,
 		// -----------------------
 		E_GEO_TOTAL,
 	};
-	/******************************************************************************/
-	/*!
-	enum E_TEX_TYPE:
-	\brief	Lists the types of reusable texture resources
-	*/
-	/******************************************************************************/
-	enum E_TEX_TYPE
-	{
-		E_TEX_BUTTON,
-		E_TEX_TOTAL
-	};
+	
 	/******************************************************************************/
 	/*!
 	enum E_UNI_TYPE:
@@ -190,6 +178,7 @@ private:
 	*/
 	/******************************************************************************/
 	static const unsigned int ui_NUM_LIGHT_PARAMS;
+
 	/******************************************************************************/
 	/*!
 	unsigned u_m_vertexArrayID:
@@ -231,15 +220,6 @@ private:
 	*/
 	/******************************************************************************/
 	Camera camera;
-
-	// Reusable Resources
-	/******************************************************************************/
-	/*!
-			unsigned u_texResourceArray[E_TEX_TOTAL]:
-	\brief	Stores reusable textures
-	*/
-	/******************************************************************************/
-	unsigned u_texResourceArray[E_TEX_TOTAL];
 
 	// Controls
 	/******************************************************************************/
@@ -329,7 +309,6 @@ private:
 
 	// Init Functions
 	void InitMeshList(void);
-	void InitTextureResource(void);
 	void InitShadersAndLights(void);
 	void InitMenu(void);
 
