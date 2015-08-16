@@ -1502,6 +1502,59 @@ Mesh* MeshBuilder::GenerateTerrain(const std::string &meshName, const std::strin
 		}
 	}
 
+	Vector3 firstPos, secondPos, thirdPos, normal;
+	int firstPoint = 0, secondPoint = 0, thirdPoint = 0;
+	for (unsigned z = 0; z < terrainSize - 1; ++z)
+	{
+		for (unsigned x = 1; x < terrainSize; ++x)
+		{
+			firstPoint = x + z * terrainSize;
+			secondPoint = (x - 1) + (z * terrainSize);
+			thirdPoint = x + (z + 1) * terrainSize;
+
+			//First Point
+			firstPos.x = vertex_buffer_data[firstPoint].pos.x;
+			firstPos.y = vertex_buffer_data[firstPoint].pos.y;
+			firstPos.z = vertex_buffer_data[firstPoint].pos.z;
+
+			//Second Point
+			secondPos.x = vertex_buffer_data[secondPoint].pos.x - firstPos.x;
+			secondPos.y = vertex_buffer_data[secondPoint].pos.y - firstPos.y;
+			secondPos.z = vertex_buffer_data[secondPoint].pos.z - firstPos.z;
+
+			//Third Point
+			thirdPos.x = vertex_buffer_data[thirdPoint].pos.x - firstPos.x;
+			thirdPos.y = vertex_buffer_data[thirdPoint].pos.y - firstPos.y;
+			thirdPos.z = vertex_buffer_data[thirdPoint].pos.z - firstPos.z;
+
+			//Finding normal
+			normal = secondPos.Cross(thirdPos);
+			normal.Normalize();
+			vertex_buffer_data[firstPoint].normal = normal;
+		}
+	}
+
+	Vector3 aNormal; // Average Normal
+	Vector3 firstNormal, secondNormal, thirdNormal;
+	for (unsigned i = 0; i < index_buffer_data.size(); i += 3)
+	{
+		firstNormal = vertex_buffer_data[index_buffer_data[i]].normal;
+		secondNormal = vertex_buffer_data[index_buffer_data[i + 1]].normal;
+		thirdNormal = vertex_buffer_data[index_buffer_data[i + 2]].normal;
+
+		//Getting all three normal together
+		aNormal = firstNormal + secondNormal + thirdNormal;
+
+		//Finding the average value
+		aNormal.x /= 3;
+		aNormal.y /= 3;
+		aNormal.z /= 3;
+
+		//Putting the values back
+		vertex_buffer_data[index_buffer_data[i]].normal = aNormal;
+		vertex_buffer_data[index_buffer_data[i + 1]].normal = aNormal;
+		vertex_buffer_data[index_buffer_data[i + 2]].normal = aNormal;
+	}
 
 	Mesh *mesh = new Mesh(meshName);
 
