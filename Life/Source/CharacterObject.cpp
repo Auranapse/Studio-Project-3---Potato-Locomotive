@@ -15,9 +15,11 @@ Character Object used by AI and player
 Default constructor
 */
 /******************************************************************************/
-CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.f, 0.f), Velocity(0.f, 0.f, 0.f), Scale(1.f, 1.f, 1.f), Head(NULL), Chest(NULL), Arms(NULL), Legs(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(35.f), f_movementSpeed(f_move_walk)
+CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.f, 1.f), Velocity(0.f, 0.f, 0.f), Scale(1.f, 1.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(35.f), f_movementSpeed(f_move_walk)
 {
-
+	HeadPos.Set(0.f, 0.6f, 0.f);
+	ArmPos.Set(0.4f, 0.4f, 0.f);
+	LegPos.Set(0.f, -0.6f, 0.f);
 }
 
 /******************************************************************************/
@@ -28,24 +30,40 @@ Default destructor
 /******************************************************************************/
 CharacterObject::~CharacterObject(void)
 {
-	if(Head != NULL)
+	if (Head != NULL)
 	{
 		delete Head;
+		Head = NULL;
 	}
 
-	if(Chest != NULL)
+	if (Chest != NULL)
 	{
 		delete Chest;
+		Chest = NULL;
 	}
 
-	if(Arms != NULL)
+	if (Arm_left != NULL)
 	{
-		delete Arms;
+		delete Arm_left;
+		Arm_left = NULL;
 	}
 
-	if(Legs != NULL)
+	if (Arm_right != NULL)
 	{
-		delete Legs;
+		delete Arm_right;
+		Arm_right = NULL;
+	}
+
+	if (Leg_left != NULL)
+	{
+		delete Leg_left;
+		Leg_left = NULL;
+	}
+
+	if (Leg_right != NULL)
+	{
+		delete Leg_right;
+		Leg_right = NULL;
 	}
 }
 
@@ -106,6 +124,38 @@ Vector3 CharacterObject::getDirection(void)
 /******************************************************************************/
 /*!
 \brief
+Inits the character
+\param Pos
+Position of the character
+\param Lookat
+what character is looking at
+\param texturedir
+the texture location
+*/
+/******************************************************************************/
+void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
+{
+	this->Position = Pos;
+	this->Lookat = Lookat;
+
+	Head = MeshBuilder::GenerateOBJ("Head", "GameData//OBJ//character//Person_Head.obj");
+	Chest = MeshBuilder::GenerateOBJ("Chest", "GameData//OBJ//character//Person_Chest.obj");
+	Arm_left = MeshBuilder::GenerateOBJ("Arm Left", "GameData//OBJ//character//Person_Arm_Left.obj");
+	Arm_right = MeshBuilder::GenerateOBJ("Arm Right", "GameData//OBJ//character//Person_Arm_Right.obj");
+	Leg_left = MeshBuilder::GenerateOBJ("Leg Left", "GameData//OBJ//character//Person_Leg_Left.obj");
+	Leg_right = MeshBuilder::GenerateOBJ("Leg Right", "GameData//OBJ//character//Person_Leg_Right.obj");
+
+	Head->textureID[0] = LoadTGA(texturedir);
+	Chest->textureID[0] = Head->textureID[0];
+	Arm_left->textureID[0] = Head->textureID[0];
+	Arm_right->textureID[0] = Head->textureID[0];
+	Leg_left->textureID[0] = Head->textureID[0];
+	Leg_right->textureID[0] = Head->textureID[0];
+}
+
+/******************************************************************************/
+/*!
+\brief
 Updates the charater
 \param dt
 delta time
@@ -113,5 +163,6 @@ delta time
 /******************************************************************************/
 void CharacterObject::Update(double &dt)
 {
+	Animation.Update(dt, Velocity.LengthSquared());
 	Position += Velocity * static_cast<float>(dt);
 }

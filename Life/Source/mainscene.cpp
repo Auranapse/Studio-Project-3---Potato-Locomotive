@@ -54,7 +54,7 @@ Loads save file from file
 void mainscene::assignSave(void)
 {
 	f_fov = static_cast<float>(std::stoi(*SF_1.Data[0]));
-	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14]))/100.f;
+	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14])) / 100.f;
 	char CN = std::stoi(*SF_1.Data[1]);
 	us_control[E_CTRL_MOVE_FRONT] = CN;
 	CN = std::stoi(*SF_1.Data[2]);
@@ -95,7 +95,7 @@ void mainscene::Init()
 	engine = createIrrKlangDevice(ESOD_AUTO_DETECT, ESEO_MULTI_THREADED | ESEO_LOAD_PLUGINS | ESEO_USE_3D_BUFFERS);
 	weaponsEnabled = true;
 	//Control initialization--------------
-	for(unsigned i = 0; i < E_CTRL_TOTAL; ++i)
+	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
 		us_control[i] = 0;
 	}
@@ -132,10 +132,10 @@ void mainscene::Init()
 	//Load vertex and fragment shaders
 	m_gPassShaderID = LoadShaders("GameData//Shader//GPass.vertexshader", "GameData//Shader//GPass.fragmentshader");
 	m_parameters[U_LIGHT_DEPTH_MVP_GPASS] = glGetUniformLocation(m_gPassShaderID, "lightDepthMVP");
-	m_programID = LoadShaders("GameData//Shader//Shadow.vertexshader", "GameData//Shader//Shadow.fragmentshader" );
-	m_gBufferShaderID = LoadShaders("GameData//Shader//GBuffer.vertexshader", "GameData//Shader//GBuffer.fragmentshader" );
-	m_lightShaderID = LoadShaders("GameData//Shader//LightPass.vertexshader", "GameData//Shader//LightPass.fragmentshader" );
-	
+	m_programID = LoadShaders("GameData//Shader//Shadow.vertexshader", "GameData//Shader//Shadow.fragmentshader");
+	m_gBufferShaderID = LoadShaders("GameData//Shader//GBuffer.vertexshader", "GameData//Shader//GBuffer.fragmentshader");
+	m_lightShaderID = LoadShaders("GameData//Shader//LightPass.vertexshader", "GameData//Shader//LightPass.fragmentshader");
+
 	m_parameters[U_MVP_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MVP");
 	m_parameters[U_MODELVIEW_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MV");
 	m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MV_inverse_transpose");
@@ -178,7 +178,7 @@ void mainscene::Init()
 
 	glUseProgram(m_programID);
 	// Get a handle for our "MVP" uniform
-	
+
 
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 	m_parameters[U_MODELVIEW] = glGetUniformLocation(m_programID, "MV");
@@ -256,12 +256,12 @@ void mainscene::Init()
 	lights[0].cosInner = cos(Math::DegreeToRadian(20.f));
 	lights[0].exponent = 3.f;
 	lights[0].spotDirection.Set(0.f, 1.f, 0.f);//*/
-	
+
 	lights[0].type = LIGHT_DIRECTIONAL;
 	lights[0].position.Set(10.f, 100.f, 0.f);
 	lights[0].color.Set(1.f, 1.f, 1.f);
 	lights[0].power = 1.0f;
-	
+
 
 	//Viewing room 2 light
 	lights[1].type = LIGHT_POINT;
@@ -419,11 +419,11 @@ void mainscene::Init()
 
 	meshList[E_GEO_SKYPLANE] = MeshBuilder::GenerateSkyPlane("SKYPLANE", Color(0.5, 0.5, 0.5), 128, 200.f, 2000.f, 1.f, 1.f);
 	meshList[E_GEO_SKYPLANE]->textureID[0] = LoadTGA("GameData//Image//skybox//CLOUDS.tga");
-	
+
 	//---------------------------------------------------------------------------------------
 	//Text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
-	meshList[GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false);	
+	meshList[GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false);
 
 	//--------------------------------------------------------------------------------------
 
@@ -433,7 +433,7 @@ void mainscene::Init()
 	meshList[GEO_POSITION_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_POSITION);
 	meshList[GEO_RENDERING_SPHERE] = MeshBuilder::GenerateSphere("rendering sphere", Color(1, 1, 1), 20, 20, 1); //radius must be 1
 	meshList[GEO_RENDERING_QUAD] = MeshBuilder::GenerateQuad("rendering quad", Color(1, 1, 1), 1.f, 1.f, 1.f); //side must be length 2
-	
+
 	meshList[GEO_NORMAL_QUAD] = MeshBuilder::GenerateQuad("normal map", Color(1, 1, 1), 1.f, 1.f, 1.f);
 	meshList[GEO_NORMAL_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
 
@@ -452,7 +452,7 @@ void mainscene::Init()
 	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false, 20, 50, 50);
 	//*/
 	//Lighting-------------------------------------------------------------------------------
-	
+
 	meshList[GEO_FLOOR_TILE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_FLOOR_TILE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_FLOOR_TILE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -499,11 +499,11 @@ void mainscene::Init()
 
 	//Starting position of translations and initialize physics
 
-	
+
 	renderAxis = false;
-	
+
 	mouseEnabled = true;
-	if(mouseEnabled == true)
+	if (mouseEnabled == true)
 	{
 		Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 		Application::SetCursor(false);
@@ -511,8 +511,8 @@ void mainscene::Init()
 	FPScounter = 0.f;
 
 	DisplayInfo = true;
-	
-	for(unsigned short i = 0; i < 100; ++i)
+
+	for (unsigned short i = 0; i < 100; ++i)
 	{
 		BulletInfo* BI = new BulletInfo();
 		BI->setStatus(false);
@@ -564,9 +564,9 @@ void mainscene::InitShaders()
 
 Particle* mainscene::FetchParticle(void)
 {
-	for(unsigned i = 0; i < m_ParList.size(); ++i)
+	for (unsigned i = 0; i < m_ParList.size(); ++i)
 	{
-		if(!m_ParList[i]->active)
+		if (!m_ParList[i]->active)
 		{
 			m_ParList[i]->active = true;
 			m_ParList[i]->ParticleType = Particle::PAR_DEFAULT;
@@ -575,7 +575,7 @@ Particle* mainscene::FetchParticle(void)
 		}
 	}
 
-	for(unsigned i = 0; i < 10; ++i)
+	for (unsigned i = 0; i < 10; ++i)
 	{
 		Particle *Par;
 		Par = new Particle;
@@ -596,7 +596,7 @@ void mainscene::initWeapons(void)
 	fireRate = 0.f;
 	reloadTimer = 0.f;
 
-	for(unsigned i = 0; i < WT_TOTAL; ++i)
+	for (unsigned i = 0; i < WT_TOTAL; ++i)
 	{
 		weaponList[i].mesh = NULL;
 		weaponList[i].damage = 10;
@@ -713,7 +713,7 @@ void mainscene::initWeapons(void)
 	scopeExeTime = 0.f;
 
 	currentWeapon = WT_M9;
-	fireRateMax = 60.f/static_cast<float>(weaponList[currentWeapon].fireRate);
+	fireRateMax = 60.f / static_cast<float>(weaponList[currentWeapon].fireRate);
 	AimDownSight = false;
 	f_curRecoil = 0.f;
 }
@@ -727,7 +727,7 @@ Generate collision boxes and positions of objects in room 1
 void mainscene::generateRoom1(void)
 {
 	GameObject *go;
-	
+
 	go = new GameObject(GameObject::GOW_FLOOR_TILE);
 	go->pos.Set(0, 0, 0);
 	go->rotationX = -90;
@@ -749,7 +749,7 @@ Function to edit fov
 void mainscene::editFOV(float &newFOV)
 {
 	Mtx44 proj;
-	proj.SetToPerspective(newFOV, static_cast<double>(Application::GetWindowWidth())/static_cast<double>(Application::GetWindowHeight()), 0.1f, 10000.0f);
+	proj.SetToPerspective(newFOV, static_cast<double>(Application::GetWindowWidth()) / static_cast<double>(Application::GetWindowHeight()), 0.1f, 10000.0f);
 	projectionStack.LoadMatrix(proj);
 }
 
@@ -764,16 +764,16 @@ void mainscene::UpdatePlayer(double dt)
 	float walkSoundDelay = 0.7f;
 	float ShakeMultiplier = 0.f;
 	bool inAir = false;
-	if(GOp_Player->active)
+	if (GOp_Player->active)
 	{
 		//Y axis collision handling
-		if(!collide(Vector3(GOp_Player->pos - Vector3(0.f, 42.f, 0.f))))
+		if (!collide(Vector3(GOp_Player->pos - Vector3(0.f, 42.f, 0.f))))
 		{
-			if(collide(Vector3(GOp_Player->pos + Vector3(0.f, 8.f, 0.f))))
+			if (collide(Vector3(GOp_Player->pos + Vector3(0.f, 8.f, 0.f))))
 			{
 				GOp_Player->vel.y = -10;
 			}
-			else if(collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 0.f))))
+			else if (collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 0.f))))
 			{
 				GOp_Player->vel.y = 0;
 			}
@@ -783,24 +783,24 @@ void mainscene::UpdatePlayer(double dt)
 		}
 		else
 		{
-			if(collide(Vector3(GOp_Player->pos - Vector3(0.f, 36.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
+			if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 36.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 			{
 				GOp_Player->vel.y = 100;
 			}
 
-			else if(collide(Vector3(GOp_Player->pos - Vector3(0.f, 38.f, 0.f))))
+			else if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 38.f, 0.f))))
 			{
 				GOp_Player->vel.y = 50;
 			}
 
-			else if(collide(Vector3(GOp_Player->pos - Vector3(0.f, 40.f, 0.f))))
+			else if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 40.f, 0.f))))
 			{
 				GOp_Player->vel.y = 10;
 			}
 
 			else
 			{
-				if(GOp_Player->vel.y < -100)
+				if (GOp_Player->vel.y < -100)
 				{
 					engine->play2D(soundList[ST_STEP_2]);
 				}
@@ -815,14 +815,14 @@ void mainscene::UpdatePlayer(double dt)
 		LookDir.Normalize();
 		RightDir.Normalize();
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_SPRINT]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_SPRINT]))
 		{
 			LookDir *= 18;
 			RightDir *= 12;
 			ShakeMultiplier = 1.6f;
 			walkSoundDelay /= 2;
 		}
-		else if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
+		else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
 		{
 			LookDir *= 4.5f;
 			RightDir *= 4.5f;
@@ -836,55 +836,55 @@ void mainscene::UpdatePlayer(double dt)
 		}
 
 		//Player movement
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 		{
 			GOp_Player->vel.x += LookDir.x;
 			GOp_Player->vel.z += LookDir.z;
 
-			if(walkSoundDelay + f_step < timer && !inAir)
+			if (walkSoundDelay + f_step < timer && !inAir)
 			{
 				engine->play2D(soundList[ST_STEP]);
 				f_step = timer;
 			}
 		}
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 		{
 			GOp_Player->vel.x -= LookDir.x;
 			GOp_Player->vel.z -= LookDir.z;
 
-			if(walkSoundDelay + f_step < timer && !inAir)
+			if (walkSoundDelay + f_step < timer && !inAir)
 			{
 				engine->play2D(soundList[ST_STEP]);
 				f_step = timer;
 			}
 		}
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
 		{
 			GOp_Player->vel -= RightDir;
 
-			if(walkSoundDelay + f_step < timer && !inAir)
+			if (walkSoundDelay + f_step < timer && !inAir)
 			{
 				engine->play2D(soundList[ST_STEP]);
 				f_step = timer;
 			}
 		}
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
 		{
 			GOp_Player->vel += RightDir;
 
-			if(walkSoundDelay + f_step < timer && !inAir)
+			if (walkSoundDelay + f_step < timer && !inAir)
 			{
 				engine->play2D(soundList[ST_STEP]);
 				f_step = timer;
 			}
 		}
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_JUMP]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_JUMP]))
 		{
-			if(inAir == false)
+			if (inAir == false)
 			{
 				GOp_Player->vel.y += 120;
 				engine->play2D(soundList[ST_STEP]);
@@ -892,27 +892,27 @@ void mainscene::UpdatePlayer(double dt)
 		}
 
 		//smooth slowing down
-		if(GOp_Player->vel.x != 0)
+		if (GOp_Player->vel.x != 0)
 		{
 			float SForceX = 0 - GOp_Player->vel.x;
 			GOp_Player->vel.x += SForceX * 0.1f;
 		}
 
-		if(GOp_Player->vel.z != 0)
+		if (GOp_Player->vel.z != 0)
 		{
 			float SForceZ = 0 - GOp_Player->vel.z;
 			GOp_Player->vel.z += SForceZ * 0.1f;
 		}
 
-		if(Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 		{
-			if(ShakeState)
+			if (ShakeState)
 			{
 				V3_CamShaker.y += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
 				V3_CamShaker.x += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
 				V3_CamShaker.z += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
 
-				if(V3_CamShaker.y >= (0.006f))
+				if (V3_CamShaker.y >= (0.006f))
 				{
 					ShakeState = false;
 				}
@@ -923,7 +923,7 @@ void mainscene::UpdatePlayer(double dt)
 				V3_CamShaker.x -= 0.03f * static_cast<float>(dt) * ShakeMultiplier;
 				V3_CamShaker.z -= 0.03f * static_cast<float>(dt) * ShakeMultiplier;
 
-				if(V3_CamShaker.y <= (-0.006f))
+				if (V3_CamShaker.y <= (-0.006f))
 				{
 					ShakeState = true;
 				}
@@ -931,19 +931,19 @@ void mainscene::UpdatePlayer(double dt)
 		}
 		else
 		{
-			if(V3_CamShaker.x != 0)
+			if (V3_CamShaker.x != 0)
 			{
 				float SForceX = 0 - V3_CamShaker.x;
 				V3_CamShaker.x += SForceX * 0.1f;
 			}
 
-			if(V3_CamShaker.y != 0)
+			if (V3_CamShaker.y != 0)
 			{
 				float SForceY = 0 - V3_CamShaker.y;
 				V3_CamShaker.y += SForceY * 0.1f;
 			}
 
-			if(V3_CamShaker.z != 0)
+			if (V3_CamShaker.z != 0)
 			{
 				float SForceZ = 0 - V3_CamShaker.z;
 				V3_CamShaker.z += SForceZ * 0.1f;
@@ -951,33 +951,33 @@ void mainscene::UpdatePlayer(double dt)
 		}
 
 		//Collision handling
-		if(collide(Vector3(GOp_Player->pos + Vector3(10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(10.f, 5.f, 0.f))))
+		if (collide(Vector3(GOp_Player->pos + Vector3(10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(10.f, 5.f, 0.f))))
 		{
-			if(GOp_Player->vel.x > 0)
+			if (GOp_Player->vel.x > 0)
 			{
 				GOp_Player->vel.x = 0;
 			}
 		}
 
-		if(collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, 10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 10.f))))
+		if (collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, 10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 10.f))))
 		{
-			if(GOp_Player->vel.z > 0)
+			if (GOp_Player->vel.z > 0)
 			{
 				GOp_Player->vel.z = 0;
 			}
 		}
 
-		if(collide(Vector3(GOp_Player->pos + Vector3(-10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(-10.f, 5.f, 0.f))))
+		if (collide(Vector3(GOp_Player->pos + Vector3(-10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(-10.f, 5.f, 0.f))))
 		{
-			if(GOp_Player->vel.x < 0)
+			if (GOp_Player->vel.x < 0)
 			{
 				GOp_Player->vel.x = 0;
 			}
 		}
 
-		if(collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, -10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, -10.f))))
+		if (collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, -10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, -10.f))))
 		{
-			if(GOp_Player->vel.z < 0)
+			if (GOp_Player->vel.z < 0)
 			{
 				GOp_Player->vel.z = 0;
 			}
@@ -996,10 +996,10 @@ Handles game object physics
 /******************************************************************************/
 void mainscene::UpdateGO(double dt)
 {
-	for(std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
-		if(go->active && go->enablePhysics)
+		if (go->active && go->enablePhysics)
 		{
 			{
 				go->vel += gravity_force * static_cast<float>(dt);
@@ -1034,12 +1034,12 @@ Handles particle physics
 /******************************************************************************/
 void mainscene::UpdateParticles(double dt)
 {
-	for(std::vector<Particle *>::iterator it = m_ParList.begin(); it != m_ParList.end(); ++it)
+	for (std::vector<Particle *>::iterator it = m_ParList.begin(); it != m_ParList.end(); ++it)
 	{
 		Particle *Par = (Particle *)*it;
-		if(Par->active)
+		if (Par->active)
 		{
-			if(Par->lifetime < 0)
+			if (Par->lifetime < 0)
 			{
 				Par->Vel.SetZero();
 				Par->active = false;
@@ -1060,18 +1060,18 @@ Updates bullet
 /******************************************************************************/
 void mainscene::UpdateBullets(double dt)
 {
-	for(std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
+	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
 		BulletInfo *BI = (BulletInfo *)*it;
-		if(BI->getStatus())
+		if (BI->getStatus())
 		{
-			if(collide(BI->getPosition(), true))
+			if (collide(BI->getPosition(), true))
 			{
 				BI->verticalvelocity = 0.f;
 				BI->setStatus(false);
-				for(unsigned i = 0; i < 5; ++i)
+				for (unsigned i = 0; i < 5; ++i)
 				{
-					generateParticle(BI->getPosition(), Vector3(0.5, 0.5, 0.5), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70))+BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
+					generateParticle(BI->getPosition(), Vector3(0.5, 0.5, 0.5), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
 				}
 			}
 			else
@@ -1090,10 +1090,10 @@ Fires bullet
 /******************************************************************************/
 void mainscene::Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity, float dmg)
 {
-	for(std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
+	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
 		BulletInfo *BI = (BulletInfo *)*it;
-		if(!BI->getStatus())
+		if (!BI->getStatus())
 		{
 			BI->damage = dmg;
 			BI->setLife(Longevity);
@@ -1114,9 +1114,9 @@ Handles weapons firing, reloading, animations and so on
 /******************************************************************************/
 void mainscene::weaponsUpdate(double dt)
 {
-	if(f_curRecoil > 0)
+	if (f_curRecoil > 0)
 	{
-		if(AimDownSight)
+		if (AimDownSight)
 		{
 			f_curRecoil -= static_cast<float>(dt) * f_curRecoil * 4.f;
 		}
@@ -1126,11 +1126,11 @@ void mainscene::weaponsUpdate(double dt)
 		}
 	}
 	//SHOOTING
-	if(Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 	{
-		if(timer - fireRate > fireRateMax && weaponList[currentWeapon].CurrentClip > 0)
+		if (timer - fireRate > fireRateMax && weaponList[currentWeapon].CurrentClip > 0)
 		{
-			if(weaponList[currentWeapon].numBullet == 1)
+			if (weaponList[currentWeapon].numBullet == 1)
 			{
 				Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
 				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
@@ -1138,7 +1138,7 @@ void mainscene::weaponsUpdate(double dt)
 			}
 			else
 			{
-				for(int i = 0; i < weaponList[currentWeapon].numBullet; ++i)
+				for (int i = 0; i < weaponList[currentWeapon].numBullet; ++i)
 				{
 					f_curRecoil = weaponList[currentWeapon].bulletSpread * 0.5f;
 					Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
@@ -1146,7 +1146,7 @@ void mainscene::weaponsUpdate(double dt)
 				}
 				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
 			}
-			if(!AimDownSight)
+			if (!AimDownSight)
 			{
 				f_curRecoil += static_cast<float>(dt) * weaponList[currentWeapon].bulletSpread;//Cursor recoil effect and bullet spread effect
 			}
@@ -1162,31 +1162,31 @@ void mainscene::weaponsUpdate(double dt)
 		}
 	}
 	//RELOADING
-	if(Application::IsKeyPressed(us_control[E_CTRL_RELOAD]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_RELOAD]))
 	{
 		weaponList[currentWeapon].CurrentClip = 0;
 	}
-	if(weaponList[currentWeapon].CurrentClip <= 0)
+	if (weaponList[currentWeapon].CurrentClip <= 0)
 	{
-		if(reloadTimer <= 0)
+		if (reloadTimer <= 0)
 		{
 			engine->play2D(weaponList[currentWeapon].reloadSound);
 		}
 
 		reloadTimer += static_cast<float>(dt);
 
-		if(AimDownSight)
+		if (AimDownSight)
 		{
 			AimDownSight = false;
 		}
 
-		if(weaponList[currentWeapon].currentpos.y > weaponList[currentWeapon].heldpos.y - 8.f)
+		if (weaponList[currentWeapon].currentpos.y > weaponList[currentWeapon].heldpos.y - 8.f)
 		{
 			float f_temp1 = (weaponList[currentWeapon].heldpos.y - 8.f) - weaponList[currentWeapon].currentpos.y;
 			weaponList[currentWeapon].currentpos.y += f_temp1 * static_cast<float>(dt) * 10.f;
 		}
 
-		if(reloadTimer > weaponList[currentWeapon].reloadTime)
+		if (reloadTimer > weaponList[currentWeapon].reloadTime)
 		{
 			reloadTimer = 0.f;
 			weaponList[currentWeapon].CurrentClip = weaponList[currentWeapon].ClipSize;
@@ -1194,11 +1194,11 @@ void mainscene::weaponsUpdate(double dt)
 	}
 
 	//AIM DOWN SIGHT
-	if(Application::IsKeyPressed(us_control[E_CTRL_AIM]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
 	{
-		if(timer - inputDelay > 0.25)
+		if (timer - inputDelay > 0.25)
 		{
-			if(!AimDownSight)
+			if (!AimDownSight)
 			{
 				AimDownSight = true;
 			}
@@ -1211,11 +1211,11 @@ void mainscene::weaponsUpdate(double dt)
 	}
 
 	//SWITCH WEAPONS
-	if(Application::IsKeyPressed(us_control[E_CTRL_NEXT_ITEM]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_NEXT_ITEM]))
 	{
-		if(timer - inputDelay > 0.25)
+		if (timer - inputDelay > 0.25)
 		{
-			if(currentWeapon < WT_TOTAL - 1)
+			if (currentWeapon < WT_TOTAL - 1)
 			{
 				currentWeapon += 1;
 			}
@@ -1226,69 +1226,69 @@ void mainscene::weaponsUpdate(double dt)
 
 			weaponList[currentWeapon].currentpos = weaponList[currentWeapon].heldpos - Vector3(0, 5, 0);
 			AimDownSight = false;
-			fireRateMax = 60.f/static_cast<float>(weaponList[currentWeapon].fireRate);
+			fireRateMax = 60.f / static_cast<float>(weaponList[currentWeapon].fireRate);
 			inputDelay = timer;
 		}
 	}
 
-	if(AimDownSight)//Handle aim down sights
+	if (AimDownSight)//Handle aim down sights
 	{
-		if(f_fov/weaponList[currentWeapon].adsZoom < f_currentfov)
+		if (f_fov / weaponList[currentWeapon].adsZoom < f_currentfov)
 		{
-			f_currentfov -= static_cast<float>(dt) * (f_currentfov - f_fov/weaponList[currentWeapon].adsZoom) * 10;
+			f_currentfov -= static_cast<float>(dt) * (f_currentfov - f_fov / weaponList[currentWeapon].adsZoom) * 10;
 			editFOV(f_currentfov);
 		}
-		if(weaponList[currentWeapon].currentpos != weaponList[currentWeapon].adspos)
+		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].adspos)
 		{
 			Vector3 v3_temp1 = weaponList[currentWeapon].adspos - weaponList[currentWeapon].currentpos;
 			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 12.f;
 		}
-		if(currentWeapon == WT_L11A3)
+		if (currentWeapon == WT_L11A3)
 		{
 			scopeExeTime += static_cast<float>(dt);
-			if(scopeExeTime > 0.25)
+			if (scopeExeTime > 0.25)
 			{
-				if(renderScope)
+				if (renderScope)
 				{
 					renderScope = false;
 				}
-				if(ScopeAnim > 0)
+				if (ScopeAnim > 0)
 				{
 					ScopeAnim -= static_cast<float>(dt) * 10.f * ScopeAnim;
 				}
-				else if(ScopeAnim < 0)
+				else if (ScopeAnim < 0)
 				{
 					ScopeAnim = 0.f;
 				}
 			}
 		}
-		if(FPC.mouseSensitivity == f_mouseSensitivity)
+		if (FPC.mouseSensitivity == f_mouseSensitivity)
 		{
-			FPC.mouseSensitivity = f_mouseSensitivity/weaponList[currentWeapon].adsZoom; 
+			FPC.mouseSensitivity = f_mouseSensitivity / weaponList[currentWeapon].adsZoom;
 		}
 	}
 	else
 	{
-		if(!renderScope)
+		if (!renderScope)
 		{
 			scopeExeTime = 0.f;
 			ScopeAnim = 15.f;
 			renderScope = true;
 		}
 
-		if(f_fov > f_currentfov)
+		if (f_fov > f_currentfov)
 		{
 			f_currentfov += static_cast<float>(dt) * (f_fov - f_currentfov) * 10;
 			editFOV(f_currentfov);
 		}
-		if(weaponList[currentWeapon].currentpos != weaponList[currentWeapon].heldpos)
+		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].heldpos)
 		{
 			Vector3 v3_temp1 = weaponList[currentWeapon].heldpos - weaponList[currentWeapon].currentpos;
 			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 10.f;
 		}
-		if(FPC.mouseSensitivity != f_mouseSensitivity)
+		if (FPC.mouseSensitivity != f_mouseSensitivity)
 		{
-			FPC.mouseSensitivity = f_mouseSensitivity; 
+			FPC.mouseSensitivity = f_mouseSensitivity;
 		}
 	}
 }
@@ -1302,12 +1302,12 @@ Check collision
 bool mainscene::collide(Vector3 &Position, bool bullet)
 {
 	//Game object collisions
-	for(std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
-		if(go->active && go->colEnable && go->pos != Position)
+		if (go->active && go->colEnable && go->pos != Position)
 		{
-			if(intersect(go->pos + go->ColBox, go->pos - go->ColBox, Position))
+			if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, Position))
 			{
 				return true;
 			}
@@ -1342,7 +1342,7 @@ update player sound position
 /******************************************************************************/
 void mainscene::UpdateSound(double dt)
 {
-	engine->setListenerPosition(vec3df(GOp_Player->pos.x, GOp_Player->pos.y, GOp_Player->pos.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0,0,0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
+	engine->setListenerPosition(vec3df(GOp_Player->pos.x, GOp_Player->pos.y, GOp_Player->pos.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
 }
 
 /******************************************************************************/
@@ -1354,12 +1354,12 @@ Animations, controls
 void mainscene::Update(double dt)
 {
 	timer += static_cast<float>(dt);
-	
-	FPScounter = static_cast<float>(1/dt);
 
-	if(Application::IsKeyPressed('1'))
+	FPScounter = static_cast<float>(1 / dt);
+
+	if (Application::IsKeyPressed('1'))
 	{
-		if(!Application::IsKeyPressed(VK_SHIFT))
+		if (!Application::IsKeyPressed(VK_SHIFT))
 		{
 			glDisable(GL_CULL_FACE);
 		}
@@ -1369,9 +1369,9 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	if(Application::IsKeyPressed('2'))
+	if (Application::IsKeyPressed('2'))
 	{
-		if(!Application::IsKeyPressed(VK_SHIFT))
+		if (!Application::IsKeyPressed(VK_SHIFT))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
@@ -1381,21 +1381,21 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	if(Application::IsKeyPressed('3'))
+	if (Application::IsKeyPressed('3'))
 	{
-		if(!Application::IsKeyPressed(VK_SHIFT))
+		if (!Application::IsKeyPressed(VK_SHIFT))
 		{
 			renderAxis = true;
 		}
 		else
 		{
-			renderAxis = false; 
+			renderAxis = false;
 		}
 	}
 
-	if(Application::IsKeyPressed('4'))
+	if (Application::IsKeyPressed('4'))
 	{
-		if(!Application::IsKeyPressed(VK_SHIFT))
+		if (!Application::IsKeyPressed(VK_SHIFT))
 		{
 			DisplayInfo = false;
 		}
@@ -1405,15 +1405,16 @@ void mainscene::Update(double dt)
 		}
 	}
 
+	P_Player.Update(dt);
 	UpdatePlayer(dt);
 	UpdateGO(dt);
 	UpdateParticles(dt);
 	FPC.Update(dt);
 
 
-	if(Application::IsKeyPressed(VK_F1))
+	if (Application::IsKeyPressed(VK_F1))
 	{
-		if(!Application::IsKeyPressed(VK_SHIFT))
+		if (!Application::IsKeyPressed(VK_SHIFT))
 		{
 			mouseEnabled = true;
 			Application::SetCursor(false);
@@ -1425,7 +1426,7 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	if(weaponsEnabled)
+	if (weaponsEnabled)
 	{
 		UpdateBullets(dt);
 		weaponsUpdate(dt);
@@ -1445,7 +1446,7 @@ check if position is in view of the camera
 /******************************************************************************/
 bool mainscene::isVisible(Vector3 &ObjPosition)
 {
-	if((ObjPosition - GOp_Player->pos).Length() < 1900)
+	if ((ObjPosition - GOp_Player->pos).Length() < 1900)
 	{
 		float lookingOBJ = CalAnglefromPosition(ObjPosition, GOp_Player->pos, true);
 		float cameraRotation = CamRotationYaw;
@@ -1453,48 +1454,48 @@ bool mainscene::isVisible(Vector3 &ObjPosition)
 		float viewM = 5.f;
 		bool LO = false, CR = false;
 
-		if(lookingOBJ < 0.f)
+		if (lookingOBJ < 0.f)
 		{
 			lookingOBJ += 360;
 			LO = true;
 		}
 
-		if(cameraRotation < 0.f)
+		if (cameraRotation < 0.f)
 		{
 			cameraRotation += 360;
 			CR = true;
 		}
 
-		if(cameraRotationUp > 30.f || cameraRotationUp < -30.f)
+		if (cameraRotationUp > 30.f || cameraRotationUp < -30.f)
 		{
 			viewM = 30.f;
 		}
 
-		if(cameraRotationUp > 70.f || cameraRotationUp < -70.f)
+		if (cameraRotationUp > 70.f || cameraRotationUp < -70.f)
 		{
 			viewM = 60.f;
 		}
 
-		if(cameraRotation < 0.f)
+		if (cameraRotation < 0.f)
 		{
 			cameraRotation = -cameraRotation;
 		}
 
-		if((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation) || (Vector3(ObjPosition.x - GOp_Player->pos.x, 0, ObjPosition.z - GOp_Player->pos.z)).Length() < 40)
+		if ((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation) || (Vector3(ObjPosition.x - GOp_Player->pos.x, 0, ObjPosition.z - GOp_Player->pos.z)).Length() < 40)
 		{
 			return true;
 		}
 		else
 		{
-			if(CR)
+			if (CR)
 			{
 				cameraRotation -= 360;
 			}
-			if(LO)
+			if (LO)
 			{
 				lookingOBJ -= 360;
 			}
-			if((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation))
+			if ((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation))
 			{
 				return true;
 			}
@@ -1512,9 +1513,9 @@ Rendering of game objects
 /******************************************************************************/
 void mainscene::RenderGO(GameObject *go)
 {
-	switch(go->type)
+	//switch(go->type)
 	{
-	default:
+		//default:
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(go->pos);
@@ -1522,12 +1523,12 @@ void mainscene::RenderGO(GameObject *go)
 			modelStack.Rotate(go->rotationY, 0, 1, 0);
 			modelStack.Rotate(go->rotationZ, 0, 0, 1);
 			modelStack.Scale(go->scale);
-			if(go->mesh)
+			if (go->mesh)
 			{
 				RenderMesh(go->mesh, true, true, &go->material);
 			}
 			modelStack.PopMatrix();
-			break;
+			//break;
 		}
 	}
 }
@@ -1540,22 +1541,22 @@ Rendering of particles
 /******************************************************************************/
 void mainscene::RenderParticles(void)
 {
-	for(std::vector<Particle *>::iterator it = m_ParList.begin(); it != m_ParList.end(); ++it)
+	for (std::vector<Particle *>::iterator it = m_ParList.begin(); it != m_ParList.end(); ++it)
 	{
 		Particle *Par = (Particle *)*it;
-		if(Par->active)
+		if (Par->active)
 		{
-			switch(Par->ParticleType)
+			switch (Par->ParticleType)
 			{
 			case Particle::PAR_DEFAULT:
-				{
-					modelStack.PushMatrix();
-					modelStack.Translate(Par->Pos);
-					modelStack.Scale(Par->Scale);
-					RenderMesh(meshList[GEO_BULLET], false);
-					modelStack.PopMatrix();
-					break;
-				}
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(Par->Pos);
+				modelStack.Scale(Par->Scale);
+				RenderMesh(meshList[GEO_BULLET], false);
+				modelStack.PopMatrix();
+				break;
+			}
 			default:
 				break;
 			}
@@ -1571,10 +1572,10 @@ Rendering of bullets
 /******************************************************************************/
 void mainscene::RenderBullet(void)
 {
-	for(std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
+	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
 		BulletInfo *BI = (BulletInfo *)*it;
-		if(BI->getStatus() && BI->getLife() < 5.95)
+		if (BI->getStatus() && BI->getLife() < 5.95)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(BI->getPosition());
@@ -1604,7 +1605,7 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x
 
 	modelStack.Translate(x, y, 0);
 	modelStack.Rotate(rotation, 0, 0, 1);
-	if(size != 0)
+	if (size != 0)
 	{
 		modelStack.Scale(size, size, size);
 	}
@@ -1613,9 +1614,9 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x
 
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
-	for(unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
+	for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
 	{
-		if(mesh->textureID[i] > 0)
+		if (mesh->textureID[i] > 0)
 		{
 			glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
 			glActiveTexture(GL_TEXTURE0 + i);
@@ -1643,84 +1644,84 @@ Renders mesh
 /******************************************************************************/
 void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Material *material)
 {
-	if(enableFOG && enableFog)
+	if (enableFOG && enableFog)
 	{
 		glUniform1i(m_parameters[U_FOG_ENABLED], 1);
 	}
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 
-	switch(m_renderPass)
+	switch (m_renderPass)
 	{
 	case RENDER_PASS_PRE:
-		{
-			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
-			mesh->Render();
-			break;
-		}
+	{
+		Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
+		mesh->Render();
+		break;
+	}
 	case RENDER_PASS_MAIN:
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+
+		modelView = viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
+
+		if (enableLight)
 		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+			glUniform1i(m_parameters[U_LIGHTENABLED], 1);
 
-			modelView = viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
-			
-			if(enableLight)
+			modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
+			glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
+			//
+			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
+			//
+			//load material
+			glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
+			glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
+			glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
+			glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
+		}
+		else
+		{
+			glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+		}
+
+		for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
+		{
+			if (mesh->textureID[i] > 0)
 			{
-				glUniform1i(m_parameters[U_LIGHTENABLED], 1);
-
-				modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
-				glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
-				//
-				Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-				glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
-				//
-				//load material
-				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
-				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
-				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
-				glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
 			}
 			else
-			{	
-				glUniform1i(m_parameters[U_LIGHTENABLED], 0);
-			}
-
-			for(unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
 			{
-				if(mesh->textureID[i] > 0)
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
-				}
-				else
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
-				}
-
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
-				glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
 			}
-			mesh->Render(); //this line should only be called once
-			break;
+
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
+			glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
 		}
+		mesh->Render(); //this line should only be called once
+		break;
+	}
 	case RENDER_PASS_LIGHT:
-		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
-			mesh->Render();
-			break;
-		}
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
+		mesh->Render();
+		break;
+	}
 	case RENDER_PASS_GBUFFER:
-		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 		glUniformMatrix4fv(m_parameters[U_MVP_GBUFFER], 1, GL_FALSE, &MVP.a[0]);
 
 		modelView = viewStack.Top() * modelStack.Top();
 		glUniformMatrix4fv(m_parameters[U_MODELVIEW_GBUFFER], 1, GL_FALSE, &modelView.a[0]);
 
-		if(enableLight)
+		if (enableLight)
 		{
 			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 1);
 
@@ -1731,7 +1732,7 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Materia
 			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GBUFFER], 1, GL_FALSE, &lightDepthMVP.a[0]);
 
 			//load material
-			if(material == NULL)
+			if (material == NULL)
 			{
 				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &mesh->material.kAmbient.r);
 				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &mesh->material.kDiffuse.r);
@@ -1752,9 +1753,9 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Materia
 		{
 			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 0);
 		}
-		for(int i = 0; i < 1; ++i)
+		for (int i = 0; i < 1; ++i)
 		{
-			if(mesh->textureID[i] > 0)
+			if (mesh->textureID[i] > 0)
 			{
 				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 1);
 
@@ -1770,7 +1771,7 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Materia
 		mesh->Render();
 
 		break;
-		}
+	}
 	}
 }
 
@@ -1782,7 +1783,7 @@ Renders text
 /******************************************************************************/
 void mainscene::RenderText(Mesh* mesh, std::string text, Color color)
 {
-	if(!mesh || mesh->textureID[0] <= 0) //Proper error check
+	if (!mesh || mesh->textureID[0] <= 0) //Proper error check
 		return;
 
 	glDisable(GL_DEPTH_TEST);
@@ -1793,7 +1794,7 @@ void mainscene::RenderText(Mesh* mesh, std::string text, Color color)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mesh->textureID[0]);
 	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
-	for(unsigned i = 0; i < text.length(); ++i)
+	for (unsigned i = 0; i < text.length(); ++i)
 	{
 		Mtx44 characterSpacing;
 		characterSpacing.SetToTranslation(i * 1.0f, 0, 0); //1.0f is the spacing of each character, you may change this value
@@ -1816,7 +1817,7 @@ Renders text on screen
 /******************************************************************************/
 void mainscene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
 {
-	if(!mesh || mesh->textureID[0] <= 0) //Proper error check
+	if (!mesh || mesh->textureID[0] <= 0) //Proper error check
 		return;
 
 	glDisable(GL_DEPTH_TEST);
@@ -1841,7 +1842,7 @@ void mainscene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mesh->textureID[0]);
 	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
-	for(unsigned i = 0; i < text.length(); ++i)
+	for (unsigned i = 0; i < text.length(); ++i)
 	{
 		Mtx44 characterSpacing;
 		characterSpacing.SetToTranslation(i * 1.0f, 0, 0); //1.0f is the spacing of each character, you may change this value
@@ -1921,28 +1922,28 @@ Renders the entire world with shadow
 void mainscene::RenderWorldShadow(void)
 {
 	//Render gameobjects
-	for(std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
-		if(go->active)
+		if (go->active)
 		{
-			if(!go->dynamicRendering)
+			if (!go->dynamicRendering)
 			{
 				RenderGO(go);
 			}
 			else//Dynamic rendering
 			{
-				if(isVisible(go->pos))
+				if (isVisible(go->pos))
 				{
 					RenderGO(go);
 				}
 			}
 		}
 	}
-	
+
 	RenderParticles();
 
-	if(weaponsEnabled)
+	if (weaponsEnabled)
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(GOp_Player->pos);
@@ -1951,7 +1952,7 @@ void mainscene::RenderWorldShadow(void)
 		modelStack.Translate(weaponList[currentWeapon].currentpos);
 		modelStack.Scale(weaponList[currentWeapon].scale);
 		RenderMesh(weaponList[currentWeapon].mesh, true);
-		if(currentWeapon == WT_L11A3 && renderScope == true)
+		if (currentWeapon == WT_L11A3 && renderScope == true)
 		{
 			RenderMesh(meshList[GEO_L11A3_2], true);
 		}
@@ -1967,7 +1968,7 @@ Renders the entire world without shadow
 /******************************************************************************/
 void mainscene::RenderWorldNoShadow(void)
 {
-	if(renderAxis == true)
+	if (renderAxis == true)
 	{
 		modelStack.PushMatrix();
 		modelStack.Scale(10, 10, 10);
@@ -1977,7 +1978,7 @@ void mainscene::RenderWorldNoShadow(void)
 
 	RenderSkybox();
 
-	if(weaponsEnabled)
+	if (weaponsEnabled)
 	{
 		RenderBullet();
 	}
@@ -1998,9 +1999,9 @@ Renders the ingameUI
 /******************************************************************************/
 void mainscene::RenderUI(void)
 {
-	if(weaponsEnabled)
+	if (weaponsEnabled)
 	{
-		if(currentWeapon == WT_L11A3 && renderScope == false)//Scope texture
+		if (currentWeapon == WT_L11A3 && renderScope == false)//Scope texture
 		{
 			RenderMeshin2D(meshList[GEO_SNIPER_CROSSHAIR_1], false, 100, Application::GetWindowWidth()*0.05f + ScopeAnim, Application::GetWindowHeight()*0.05f - ScopeAnim * 0.2f);
 			RenderMeshin2D(meshList[GEO_SNIPER_CROSSHAIR_2], false, 120, Application::GetWindowWidth()*0.05f + ScopeAnim - 100, Application::GetWindowHeight()*0.05f - ScopeAnim * 0.2f);
@@ -2009,7 +2010,7 @@ void mainscene::RenderUI(void)
 		{
 
 		}
-		if(!AimDownSight && currentWeapon != WT_L11A3)
+		if (!AimDownSight && currentWeapon != WT_L11A3)
 		{
 			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
 			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
@@ -2017,7 +2018,7 @@ void mainscene::RenderUI(void)
 			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
 		}
 
-		if(weaponList[currentWeapon].CurrentClip == 0)
+		if (weaponList[currentWeapon].CurrentClip == 0)
 		{
 			RenderTextOnScreen(meshList[GEO_TEXT], "R", Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
 		}
@@ -2026,8 +2027,8 @@ void mainscene::RenderUI(void)
 			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(weaponList[currentWeapon].CurrentClip)), Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
 		}
 	}
-	
-	if(DisplayInfo == true)
+
+	if (DisplayInfo == true)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
 	}
@@ -2065,8 +2066,8 @@ void mainscene::RenderPassMain(void)
 	RenderMeshin2D(meshList[GEO_DIFFUSE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.045f);
 	RenderMeshin2D(meshList[GEO_SPECULAR_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.03f);
 	RenderMeshin2D(meshList[GEO_EMISSIVE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.015f);//*/
-	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false, 5,  Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f);
-	
+	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false, 5, Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f);
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2093,7 +2094,7 @@ void mainscene::RenderPassGPass(void)
 
 	glUseProgram(m_gPassShaderID);
 
-	if(lights[0].type == LIGHT_DIRECTIONAL)
+	if (lights[0].type == LIGHT_DIRECTIONAL)
 	{
 		//m_lightDepthProj.SetToOrtho(-100 - FPC.position.z*0.1, 100 - FPC.position.z*0.1, -100 - FPC.position.x*0.1, 100 - FPC.position.x*0.1, -200 + FPC.position.y*0.1, 400 + FPC.position.y*0.1);
 		m_lightDepthProj.SetToOrtho(-100 - FPC.position.z*0.1, 100 - FPC.position.z*0.1, -100 - FPC.position.x*0.1, 100 - FPC.position.x*0.1, 0, 600);
@@ -2117,7 +2118,7 @@ Render light
 void mainscene::RenderPassLight(void)
 {
 	m_renderPass = RENDER_PASS_LIGHT;
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, Application::GetWindowWidth(), Application::GetWindowHeight());
 
@@ -2129,18 +2130,18 @@ void mainscene::RenderPassLight(void)
 	glDisable(GL_CULL_FACE);
 
 	glUseProgram(m_lightShaderID);
-	
-	for(unsigned i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
+
+	for (unsigned i = 0; i < GBuffer::GBUFFER_NUM_TEXTURES; ++i)
 	{
 		m_gBuffer.BindForReading(GL_TEXTURE0 + i, i);
 		glUniform1i(m_parameters[U_POSITION_MAP_LIGHTPASS + i], 0 + i);
 	}
 
-	float screenSize[2] = {(float)Application::GetWindowWidth(), (float)Application::GetWindowHeight()};
+	float screenSize[2] = { (float)Application::GetWindowWidth(), (float)Application::GetWindowHeight() };
 	glUniform2fv(m_parameters[U_SCREEN_SIZE_LIGHTPASS], 1, &screenSize[0]);
 
 	//Point light - local light without shadow
-	for(std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = static_cast<GameObject *>(*it);
 		Position pos(go->pos.x, go->pos.y, go->pos.z);
@@ -2202,7 +2203,7 @@ void mainscene::RenderPassGBuffer(void)
 	m_lightDepthFBO.BindForReading(GL_TEXTURE8);
 	glUniform1i(m_parameters[U_SHADOW_MAP_GBUFFER], 8);
 
-	
+
 	//RenderWorldShadow();
 	//RenderWorldNoShadow();
 }
@@ -2215,15 +2216,15 @@ Renders the scene
 /******************************************************************************/
 void mainscene::Render(void)
 {
-	for(unsigned i = 0; i < 1; ++i)
+	for (unsigned i = 0; i < 1; ++i)
 	{
-		if(lights[i].type == LIGHT_DIRECTIONAL)
+		if (lights[i].type == LIGHT_DIRECTIONAL)
 		{
 			Vector3 lightDir(lights[i].position.x, lights[i].position.y, lights[i].position.z);
 			Vector3 lightDirection_cameraspace = viewStack.Top() * lightDir;
 			glUniform3fv(m_parameters[U_LIGHT0_POSITION + (i * NUM_LIGHT_PARAM)], 1, &lightDirection_cameraspace.x);
 		}
-		else if(lights[i].type == LIGHT_SPOT)
+		else if (lights[i].type == LIGHT_SPOT)
 		{
 			Position lightPosition_cameraspace = viewStack.Top() * lights[i].position;
 			glUniform3fv(m_parameters[U_LIGHT0_POSITION + (i * NUM_LIGHT_PARAM)], 1, &lightPosition_cameraspace.x);
@@ -2240,7 +2241,7 @@ void mainscene::Render(void)
 	viewStack.LoadIdentity();
 
 	viewStack.LookAt(
-		FPC.position.x +  V3_CamShaker.x, FPC.position.y + V3_CamShaker.y, FPC.position.z +  V3_CamShaker.z,
+		FPC.position.x + V3_CamShaker.x, FPC.position.y + V3_CamShaker.y, FPC.position.z + V3_CamShaker.z,
 		FPC.target.x, FPC.target.y, FPC.target.z,
 		FPC.up.x, FPC.up.y, FPC.up.z
 		);
@@ -2260,33 +2261,33 @@ Clears memory upon exit
 /******************************************************************************/
 void mainscene::Exit(void)
 {
-	if(engine != NULL)
+	if (engine != NULL)
 	{
 		engine->drop();
 	}
 
-	while(BIv_BulletList.size() > 0)
+	while (BIv_BulletList.size() > 0)
 	{
 		BulletInfo *BI = BIv_BulletList.back();
 		delete BI;
 		BIv_BulletList.pop_back();
 	}
 
-	while(m_goList.size() > 0)
+	while (m_goList.size() > 0)
 	{
 		GameObject *go = m_goList.back();
 		delete go;
 		m_goList.pop_back();
 	}
 
-	while(m_ParList.size() > 0)
+	while (m_ParList.size() > 0)
 	{
 		Particle *Par = m_ParList.back();
 		delete Par;
 		m_ParList.pop_back();
 	}
 
-	if(GOp_Player)
+	if (GOp_Player)
 	{
 		delete GOp_Player;
 		GOp_Player = NULL;

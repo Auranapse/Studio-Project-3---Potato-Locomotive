@@ -1013,7 +1013,7 @@ void MenuScene::Render()
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1, 1, Application::GetWindowWidth() / 2, Application::GetWindowHeight() / 2);
+		RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1.f, 1.f, Application::GetWindowWidth() / 2.f, Application::GetWindowHeight() / 2.f);
 		//RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "Press a key", Color(0.f, 0.f, 0.f), 30, Application::GetWindowWidth()/2 - 100, Application::GetWindowHeight()/2);
 		break;
 	}

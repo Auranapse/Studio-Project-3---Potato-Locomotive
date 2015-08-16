@@ -41,7 +41,7 @@ if true will run, else walk
 /******************************************************************************/
 void Player::movementRW(bool run)
 {
-	if(run)
+	if (run)
 	{
 		f_movementSpeed = f_move_run;
 	}
@@ -61,7 +61,7 @@ if true will move forward, else back
 /******************************************************************************/
 void Player::movementFB(double &dt, bool forward)
 {
-	if(forward)
+	if (forward)
 	{
 		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}

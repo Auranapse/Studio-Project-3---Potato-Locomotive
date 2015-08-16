@@ -11,6 +11,9 @@ Character Object used by AI and player
 #define CHARACTEROBJECT_H
 
 #include "Mesh.h"
+#include "MeshBuilder.h"
+#include "LoadOBJ.h"
+#include "LoadTGA.h"
 #include "Vector3.h"
 #include "Anim4.h"
 
@@ -18,18 +21,85 @@ Character Object used by AI and player
 class CharacterObject
 {
 protected:
+	/******************************************************************************/
+	/*!
+	\brief
+	Player animation
+	*/
+	/******************************************************************************/
 	Anim4 Animation;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Position of the character
+	*/
+	/******************************************************************************/
 	Vector3 Position;
 
+	/******************************************************************************/
+	/*!
+	\brief
+	Head Position offset relative to Position
+	*/
+	/******************************************************************************/
+	Vector3 HeadPos;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Chest Position offset relative to Position
+	*/
+	/******************************************************************************/
+	Vector3 ChestPos;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Arm Position offset relative to Position
+	*/
+	/******************************************************************************/
+	Vector3 ArmPos;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Leg Position offset relative to Position
+	*/
+	/******************************************************************************/
+	Vector3 LegPos;
+
 public:
+	/******************************************************************************/
+	/*!
+	\brief
+	What the character is looking at
+	*/
+	/******************************************************************************/
 	Vector3 Lookat;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Character velocity
+	*/
+	/******************************************************************************/
 	Vector3 Velocity;
+
+	/******************************************************************************/
+	/*!
+	\brief
+	Scale of the character
+	*/
+	/******************************************************************************/
 	Vector3 Scale;
 
 	Mesh *Head;
 	Mesh *Chest;
-	Mesh *Arms;
-	Mesh *Legs;
+	Mesh *Arm_left;
+	Mesh *Arm_right;
+	Mesh *Leg_left;
+	Mesh *Leg_right;
 
 	float f_move_crawl;
 	float f_move_walk;
@@ -41,6 +111,7 @@ public:
 	Vector3 getPosition(void);
 	Vector3 getDirection(void);
 
+	virtual void Init(Vector3 Pos, Vector3 Lookat, const char* texturedir);
 	virtual void Update(double &dt);
 
 	CharacterObject();

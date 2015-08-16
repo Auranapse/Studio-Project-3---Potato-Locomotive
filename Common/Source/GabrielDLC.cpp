@@ -1,9 +1,24 @@
+/****************************************************************************/
+/*!
+\file GabrielDLC.cpp
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Useful functions that I use often in my work
+!*/
+/****************************************************************************/
 #include "GabrielDLC.h"
 
 /******************************************************************************/
 /*!
 \brief
 Check if position intersects with another in 2D
+\param TopLeft
+top left of box
+\param BottomRight
+bottom right of box
+\param Position
+the position to check if it's inside the box
 */
 /******************************************************************************/
 bool intersect2D(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
@@ -22,15 +37,21 @@ bool intersect2D(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
 /*!
 \brief
 Check if position intersects with another in 3D
+\param TopLeft
+top left of box
+\param BottomRight
+bottom right of box
+\param Position
+the position to check if it's inside the box
 */
 /******************************************************************************/
-bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &PosTCF)
+bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
 {
-	if(PosTCF.x <= TopLeft.x && PosTCF.x >= BottomRight.x)
+	if(Position.x <= TopLeft.x && Position.x >= BottomRight.x)
 	{
-		if(PosTCF.y <= TopLeft.y && PosTCF.y >= BottomRight.y)
+		if(Position.y <= TopLeft.y && Position.y >= BottomRight.y)
 		{
-			if(PosTCF.z <= TopLeft.z && PosTCF.z >= BottomRight.z)
+			if(Position.z <= TopLeft.z && Position.z >= BottomRight.z)
 			{
 				return true;
 			}
@@ -43,15 +64,19 @@ bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &PosTCF)
 /*!
 \brief
 Calculates angle between vectors using their position
+\param Target
+the target object
+\param Origin
+the orgin of the angle
+\param XZ
+if true, checks for yaw rotation, else will check pitch rotation
 */
 /******************************************************************************/
 float CalAnglefromPosition(Vector3 Target, Vector3 Origin, bool XZ)
 {
 	if(XZ == true)
 	{
-		float deltaX = Target.x - Origin.x;
-		float deltaZ = Target.z - Origin.z;
-		return (atan2(deltaX, deltaZ) * 180 / Math::PI);
+		return Math::RadianToDegree(atan2(Target.x - Origin.x, Target.z - Origin.z));
 	}
 	else
 	{	
@@ -67,7 +92,11 @@ float CalAnglefromPosition(Vector3 Target, Vector3 Origin, bool XZ)
 /******************************************************************************/
 /*!
 \brief
-Calculates angle between vectors using their position
+Calculates angle between vectors using their position on Z axis
+\param Target
+the target object
+\param Origin
+the origin of the angle
 */
 /******************************************************************************/
 float CalAnglefromPosition2D(Vector3 &Target, Vector3 &Origin)

@@ -49,7 +49,7 @@ class mainscene : public Scene
 		GEO_SNIPER_CROSSHAIR_2,
 		GEO_SKYPLANE,
 		GEO_FLOOR_TILE,
-		
+
 		GEO_LIGHT,
 		GEO_TEXT,
 
@@ -60,7 +60,7 @@ class mainscene : public Scene
 		E_GEO_FRONT,
 		E_GEO_BACK,
 		E_GEO_SKYPLANE,
-		
+
 
 		//OBJ MODELS--------------
 		GEO_OBJCAKE,
@@ -288,7 +288,7 @@ class mainscene : public Scene
 		irrklang::ISoundSource* shootSound;
 		irrklang::ISoundSource* reloadSound;
 	};
-	
+
 	enum WEAPON_TYPE
 	{
 		WT_M9,
@@ -338,7 +338,7 @@ private:
 	DepthFBO m_lightDepthFBO;
 	unsigned m_gBufferShaderID;
 	GBuffer m_gBuffer;
-	
+
 	unsigned m_lightShaderID;
 
 
@@ -350,15 +350,16 @@ private:
 	bool enableFOG;
 	const bool TESTMODE;
 	Vector3 gravity_force;
-	
+
 	irrklang::ISoundSource *soundList[ST_TOTAL];
-	
+
 	Mesh* meshList[NUM_GEOMETRY];
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
-	
+
 	GameObject *GOp_Player;
+	Player P_Player;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -369,7 +370,7 @@ private:
 	float f_mouseSensitivity;
 	Vector3 V3_CamShaker;
 	bool ShakeState;
-	
+
 	//******************************************************************************/
 	/*!
 	unsigned short us_control:
@@ -382,7 +383,7 @@ private:
 
 	SaveFile SF_1;
 	void assignSave(void);
-	
+
 	float f_fov;
 	float f_currentfov;
 	float FPScounter;
@@ -391,7 +392,7 @@ private:
 
 	bool DisplayInfo;
 
-	
+
 	bool weaponsEnabled;
 	bool renderScope;
 	float ScopeAnim;
@@ -404,7 +405,7 @@ private:
 	float fireRate;
 	float fireRateMax;
 	int currentWeapon;
-	
+
 	Particle* FetchParticle(void);
 
 	void UpdateSound(double dt);
@@ -429,14 +430,13 @@ private:
 	void generateRoom1(void);
 
 	bool isVisible(Vector3 &ObjPosition);
-	
+
 
 	void RenderGO(GameObject *go);
 	void RenderParticles(void);
 	void RenderBullet(void);
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, Material *material = NULL);
 	void RenderSkybox(void);
-	void RenderObjectsAlpha(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);
 	MS modelStack, viewStack, projectionStack;
