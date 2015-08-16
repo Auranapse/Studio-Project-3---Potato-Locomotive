@@ -144,6 +144,9 @@
     <ClCompile Include="Source\maploader.cpp">
       <Filter>Source Files\Save/Load</Filter>
     </ClCompile>
+    <ClCompile Include="Source\WorldObject.cpp">
+      <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="Source\Scene.h">
       <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WorldObject.h">
+      <Filter>Header Files\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

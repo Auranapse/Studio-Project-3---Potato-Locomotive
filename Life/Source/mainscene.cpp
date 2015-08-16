@@ -521,15 +521,13 @@ void mainscene::Init()
 
 	generateRoom1();
 
-	GOp_Player = new GameObject(GameObject::GO_PLAYER_CHAR);
+	GOp_Player = new GameObject();
 	GOp_Player->active = true;
 	GOp_Player->mass = 50;
 	GOp_Player->scale.Set(10.f, 10.f, 10.f);
 	GOp_Player->pos.Set(0.f, 100.f, 0.f);
 	f_step = 0.f;
 
-	ShakeState = false;
-	V3_CamShaker.Set(0.f, 0.f, 0.f);
 	FPC.Init(GOp_Player->pos, GOp_Player->pos + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
@@ -726,18 +724,18 @@ Generate collision boxes and positions of objects in room 1
 /******************************************************************************/
 void mainscene::generateRoom1(void)
 {
-	GameObject *go;
+	WorldObject *wo;
 
-	go = new GameObject(GameObject::GOW_FLOOR_TILE);
-	go->pos.Set(0, 0, 0);
-	go->rotationX = -90;
-	go->scale.Set(400, 400, 400);
-	go->ColBox.Set(400, 2, 400);
-	go->active = true;
-	go->enablePhysics = false;
-	go->colEnable = true;
-	go->mesh = meshList[GEO_FLOOR_TILE];
-	m_goList.push_back(go);
+	wo = new WorldObject();
+	wo->pos.Set(0, 0, 0);
+	wo->rotationX = -90;
+	wo->scale.Set(400, 400, 400);
+	wo->ColBox.Set(400, 2, 400);
+	wo->active = true;
+	wo->enablePhysics = false;
+	wo->colEnable = true;
+	wo->mesh = meshList[GEO_FLOOR_TILE];
+	m_goList.push_back(wo);
 }
 
 /******************************************************************************/
@@ -903,52 +901,7 @@ void mainscene::UpdatePlayer(double dt)
 			float SForceZ = 0 - GOp_Player->vel.z;
 			GOp_Player->vel.z += SForceZ * 0.1f;
 		}
-
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
-		{
-			if (ShakeState)
-			{
-				V3_CamShaker.y += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-				V3_CamShaker.x += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-				V3_CamShaker.z += 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-
-				if (V3_CamShaker.y >= (0.006f))
-				{
-					ShakeState = false;
-				}
-			}
-			else
-			{
-				V3_CamShaker.y -= 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-				V3_CamShaker.x -= 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-				V3_CamShaker.z -= 0.03f * static_cast<float>(dt) * ShakeMultiplier;
-
-				if (V3_CamShaker.y <= (-0.006f))
-				{
-					ShakeState = true;
-				}
-			}
-		}
-		else
-		{
-			if (V3_CamShaker.x != 0)
-			{
-				float SForceX = 0 - V3_CamShaker.x;
-				V3_CamShaker.x += SForceX * 0.1f;
-			}
-
-			if (V3_CamShaker.y != 0)
-			{
-				float SForceY = 0 - V3_CamShaker.y;
-				V3_CamShaker.y += SForceY * 0.1f;
-			}
-
-			if (V3_CamShaker.z != 0)
-			{
-				float SForceZ = 0 - V3_CamShaker.z;
-				V3_CamShaker.z += SForceZ * 0.1f;
-			}
-		}
+		
 
 		//Collision handling
 		if (collide(Vector3(GOp_Player->pos + Vector3(10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(10.f, 5.f, 0.f))))
@@ -1353,6 +1306,16 @@ Animations, controls
 /******************************************************************************/
 void mainscene::Update(double dt)
 {
+	d_dt = dt;
+
+	/*dt *= 0.2;
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+	{
+		dt *= 5.0;
+	}*/
+	
+
 	timer += static_cast<float>(dt);
 
 	FPScounter = static_cast<float>(1 / dt);
@@ -2241,7 +2204,7 @@ void mainscene::Render(void)
 	viewStack.LoadIdentity();
 
 	viewStack.LookAt(
-		FPC.position.x + V3_CamShaker.x, FPC.position.y + V3_CamShaker.y, FPC.position.z + V3_CamShaker.z,
+		FPC.position.x, FPC.position.y, FPC.position.z,
 		FPC.target.x, FPC.target.y, FPC.target.z,
 		FPC.up.x, FPC.up.y, FPC.up.z
 		);

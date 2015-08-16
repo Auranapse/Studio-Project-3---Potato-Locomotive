@@ -20,8 +20,11 @@ Main scene
 #include "MatrixStack.h"
 #include "Light.h"
 #include "LoadTGA.h"
+
 #include "BulletInfo.h"
 #include "GameObject.h"
+#include "WorldObject.h"
+
 #include "SpriteAnimation.h"
 #include "particle.h"
 #include "savefile.h"
@@ -341,6 +344,7 @@ private:
 
 	unsigned m_lightShaderID;
 
+	double d_dt;
 
 	Mtx44 m_lightDepthProj;
 	Mtx44 m_lightDepthView;
@@ -368,10 +372,8 @@ private:
 	CustomCam1 FPC;
 	float f_step;
 	float f_mouseSensitivity;
-	Vector3 V3_CamShaker;
-	bool ShakeState;
 
-	//******************************************************************************/
+	/******************************************************************************/
 	/*!
 	unsigned short us_control:
 	\brief	To store the virtual keycodes for the controls
