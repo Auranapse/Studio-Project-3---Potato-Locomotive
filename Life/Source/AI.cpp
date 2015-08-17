@@ -15,7 +15,10 @@ Handles AI position and physics
 Default constructor
 */
 /******************************************************************************/
-AI::AI()
+AI::AI(): 
+	alert(false),
+	WOR(true),
+	attack(false)
 {
 
 }
@@ -94,5 +97,60 @@ delta time
 /******************************************************************************/
 void AI::Update(double &dt)
 {
+	
+	if(attack == true)
+	{
+		e_AI = ATTACK;
+	}
+
+	else
+	{
+		e_AI = WALKING;
+	}
+
+	if(WOR == true)
+	{
+		e_AI = WALKING;
+	}
+
+	else
+	{
+		e_AI = RUN;
+	}
+
+	if(alert == true)
+	{
+		e_AI = ALERT;
+	}
+
+	else
+	{
+		e_AI = WALKING;
+	}
+
+	switch(e_AI)
+	{
+	case ALERT:
+		{
+		}
+		break;
+
+	case WALKING:
+		{
+		}
+		break;
+
+	case RUN:
+		{
+		}
+		break;
+
+	case ATTACK:
+		{
+		}
+		break;
+	}
+
 	Position += Velocity * static_cast<float>(dt);
+
 }

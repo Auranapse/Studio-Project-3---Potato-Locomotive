@@ -14,17 +14,33 @@ Handles AI position and physics
 
 class AI : public CharacterObject
 {
-private:
+
 
 public:
 	AI();
 	virtual ~AI();
 	
+	enum E_AI_STATE
+	{
+		WALKING,
+		ALERT,
+		ATTACK,
+		RUN,
+	};
+
 	void movementRW(bool run = true);
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true);
 
 	virtual void Update(double &dt);
+
+private:
+	//-------------------------------------Variables------------------------------------------------
+	E_AI_STATE e_AI;
+	bool alert;
+	//Walk Or Run
+	bool WOR;
+	bool attack;
 };
 
 #endif
