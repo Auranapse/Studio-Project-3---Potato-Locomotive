@@ -131,11 +131,11 @@ void mainscene::Init()
 
 	//Load vertex and fragment shaders
 	m_gPassShaderID = LoadShaders("GameData//Shader//GPass.vertexshader", "GameData//Shader//GPass.fragmentshader");
-	m_parameters[U_LIGHT_DEPTH_MVP_GPASS] = glGetUniformLocation(m_gPassShaderID, "lightDepthMVP");
 	m_programID = LoadShaders("GameData//Shader//Shadow.vertexshader", "GameData//Shader//Shadow.fragmentshader");
 	m_gBufferShaderID = LoadShaders("GameData//Shader//GBuffer.vertexshader", "GameData//Shader//GBuffer.fragmentshader");
 	m_lightShaderID = LoadShaders("GameData//Shader//LightPass.vertexshader", "GameData//Shader//LightPass.fragmentshader");
 
+	m_parameters[U_LIGHT_DEPTH_MVP_GPASS] = glGetUniformLocation(m_gPassShaderID, "lightDepthMVP");
 	m_parameters[U_MVP_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MVP");
 	m_parameters[U_MODELVIEW_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MV");
 	m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER] = glGetUniformLocation(m_gBufferShaderID, "MV_inverse_transpose");
@@ -164,10 +164,7 @@ void mainscene::Init()
 	m_parameters[U_LIGHT_COLOR_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.color");
 	m_parameters[U_LIGHT_POWER_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.power");
 	m_parameters[U_LIGHT_RADIUS_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.radius");
-
-
-
-
+	
 	// Get a handle for our "colorTexture" uniform
 	m_parameters[U_LIGHT_DEPTH_MVP] = glGetUniformLocation(m_programID, "lightDepthMVP");
 	m_parameters[U_SHADOW_MAP] = glGetUniformLocation(m_programID, "shadowMap");
@@ -448,9 +445,7 @@ void mainscene::Init()
 
 	meshList[GEO_EMISSIVE_QUAD] = MeshBuilder::GenerateQuad("Specular map", Color(1, 1, 1), 1.f, 1.f, 1.f);
 	meshList[GEO_EMISSIVE_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_EMISSIVE);
-	/*
-	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false, 20, 50, 50);
-	//*/
+	
 	//Lighting-------------------------------------------------------------------------------
 
 	meshList[GEO_FLOOR_TILE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
@@ -521,17 +516,12 @@ void mainscene::Init()
 
 	generateRoom1();
 
-	P_Player.Init(Vector3(0, 10, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
+	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
 
-	GOp_Player = new GameObject();
-	GOp_Player->active = true;
-	GOp_Player->mass = 50;
-	GOp_Player->scale.Set(10.f, 10.f, 10.f);
-	GOp_Player->pos.Set(0.f, 100.f, 0.f);
 	f_step = 0.f;
 
-	FPC.Init(GOp_Player->pos, GOp_Player->pos + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
+	FPC.Init(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(0, 5, 0), P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(1.f, 5.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
 
@@ -763,49 +753,44 @@ Handles player physics and movement
 void mainscene::UpdatePlayer(double dt)
 {
 	float walkSoundDelay = 0.7f;
-	float ShakeMultiplier = 0.f;
 	bool inAir = false;
-	if (GOp_Player->active)
-	{
+	
 		//Y axis collision handling
-		if (!collide(Vector3(GOp_Player->pos - Vector3(0.f, 42.f, 0.f))))
+		if (!collide(Vector3(P_Player.getPosition())))
 		{
-			if (collide(Vector3(GOp_Player->pos + Vector3(0.f, 8.f, 0.f))))
+			if (collide(Vector3(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos)))
 			{
-				GOp_Player->vel.y = -10;
-			}
-			else if (collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 0.f))))
-			{
-				GOp_Player->vel.y = 0;
+				if(P_Player.Velocity.y > 0)
+				P_Player.Velocity.y = 0;
 			}
 
-			GOp_Player->vel += gravity_force * static_cast<float>(dt);
+			P_Player.Velocity += gravity_force * static_cast<float>(dt);
 			inAir = true;
 		}
 		else
 		{
-			if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 36.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
+			if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 			{
-				GOp_Player->vel.y = 100;
+				P_Player.Velocity.y = 100;
 			}
 
-			else if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 38.f, 0.f))))
+			else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 2.f, 0.f))))
 			{
-				GOp_Player->vel.y = 50;
+				P_Player.Velocity.y = 50;
 			}
 
-			else if (collide(Vector3(GOp_Player->pos - Vector3(0.f, 40.f, 0.f))))
+			else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 1.f, 0.f))))
 			{
-				GOp_Player->vel.y = 10;
+				P_Player.Velocity.y = 10;
 			}
 
 			else
 			{
-				if (GOp_Player->vel.y < -100)
+				if (P_Player.Velocity.y < -100)
 				{
 					engine->play2D(soundList[ST_STEP_2]);
 				}
-				GOp_Player->vel.y = 0;
+				P_Player.Velocity.y = 0;
 			}
 		}
 
@@ -820,7 +805,6 @@ void mainscene::UpdatePlayer(double dt)
 		{
 			LookDir *= 18;
 			RightDir *= 12;
-			ShakeMultiplier = 1.6f;
 			walkSoundDelay /= 2;
 		}
 		else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
@@ -833,14 +817,13 @@ void mainscene::UpdatePlayer(double dt)
 		{
 			LookDir *= 9;
 			RightDir *= 9;
-			ShakeMultiplier = 0.4f;
 		}
 
 		//Player movement
 		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 		{
-			GOp_Player->vel.x += LookDir.x;
-			GOp_Player->vel.z += LookDir.z;
+			P_Player.Velocity.x += LookDir.x;
+			P_Player.Velocity.z += LookDir.z;
 
 			if (walkSoundDelay + f_step < timer && !inAir)
 			{
@@ -851,8 +834,8 @@ void mainscene::UpdatePlayer(double dt)
 
 		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 		{
-			GOp_Player->vel.x -= LookDir.x;
-			GOp_Player->vel.z -= LookDir.z;
+			P_Player.Velocity.x -= LookDir.x;
+			P_Player.Velocity.z -= LookDir.z;
 
 			if (walkSoundDelay + f_step < timer && !inAir)
 			{
@@ -863,7 +846,7 @@ void mainscene::UpdatePlayer(double dt)
 
 		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
 		{
-			GOp_Player->vel -= RightDir;
+			P_Player.Velocity -= RightDir;
 
 			if (walkSoundDelay + f_step < timer && !inAir)
 			{
@@ -874,7 +857,7 @@ void mainscene::UpdatePlayer(double dt)
 
 		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
 		{
-			GOp_Player->vel += RightDir;
+			P_Player.Velocity += RightDir;
 
 			if (walkSoundDelay + f_step < timer && !inAir)
 			{
@@ -887,66 +870,65 @@ void mainscene::UpdatePlayer(double dt)
 		{
 			if (inAir == false)
 			{
-				GOp_Player->vel.y += 120;
+				P_Player.Velocity.y += 120;
 				engine->play2D(soundList[ST_STEP]);
 			}
 		}
 
 		//smooth slowing down
-		if (GOp_Player->vel.x != 0)
+		if (P_Player.Velocity.x != 0)
 		{
-			float SForceX = 0 - GOp_Player->vel.x;
-			GOp_Player->vel.x += SForceX * 0.1f;
+			float SForceX = 0 - P_Player.Velocity.x;
+			P_Player.Velocity.x += SForceX * 0.1f;
 		}
 
-		if (GOp_Player->vel.z != 0)
+		if (P_Player.Velocity.z != 0)
 		{
-			float SForceZ = 0 - GOp_Player->vel.z;
-			GOp_Player->vel.z += SForceZ * 0.1f;
+			float SForceZ = 0 - P_Player.Velocity.z;
+			P_Player.Velocity.z += SForceZ * 0.1f;
 		}
 		
 
 		//Collision handling
-		if (collide(Vector3(GOp_Player->pos + Vector3(10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(10.f, 5.f, 0.f))))
+		if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 50.f, 0.f))))
 		{
-			if (GOp_Player->vel.x > 0)
+			if (P_Player.Velocity.x > 0)
 			{
-				GOp_Player->vel.x = 0;
+				P_Player.Velocity.x = 0;
 			}
 		}
 
-		if (collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, 10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, 10.f))))
+		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, 10.f))))
 		{
-			if (GOp_Player->vel.z > 0)
+			if (P_Player.Velocity.z > 0)
 			{
-				GOp_Player->vel.z = 0;
+				P_Player.Velocity.z = 0;
 			}
 		}
 
-		if (collide(Vector3(GOp_Player->pos + Vector3(-10.f, -30.f, 0.f))) || collide(Vector3(GOp_Player->pos + Vector3(-10.f, 5.f, 0.f))))
+		if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 50.f, 0.f))))
 		{
-			if (GOp_Player->vel.x < 0)
+			if (P_Player.Velocity.x < 0)
 			{
-				GOp_Player->vel.x = 0;
+				P_Player.Velocity.x = 0;
 			}
 		}
 
-		if (collide(Vector3(GOp_Player->pos + Vector3(0.f, -30.f, -10.f))) || collide(Vector3(GOp_Player->pos + Vector3(0.f, 5.f, -10.f))))
+		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, -10.f))))
 		{
-			if (GOp_Player->vel.z < 0)
+			if (P_Player.Velocity.z < 0)
 			{
-				GOp_Player->vel.z = 0;
+				P_Player.Velocity.z = 0;
 			}
 		}
 
-		GOp_Player->pos += GOp_Player->vel * static_cast<float>(dt);
-		FPC = FPC + (GOp_Player->vel * static_cast<float>(dt));
-	}
+		FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
+		P_Player.Update(dt);
 }
 
 void mainscene::UpdatePlayerControl(double &dt)
 {
-	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
+	/*if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 	{
 		P_Player.movementFB(dt, true);
 	}
@@ -964,7 +946,7 @@ void mainscene::UpdatePlayerControl(double &dt)
 		P_Player.movementLR(dt, false);
 	}
 
-	P_Player.Update(dt);
+	P_Player.Update(dt);*/
 }
 
 /******************************************************************************/
@@ -1113,7 +1095,7 @@ void mainscene::weaponsUpdate(double dt)
 			{
 				Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
 				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
-				Shoot(GOp_Player->pos, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
+				Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
 			}
 			else
 			{
@@ -1121,7 +1103,7 @@ void mainscene::weaponsUpdate(double dt)
 				{
 					f_curRecoil = weaponList[currentWeapon].bulletSpread * 0.5f;
 					Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
-					Shoot(GOp_Player->pos, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
+					Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
 				}
 				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
 			}
@@ -1321,7 +1303,7 @@ update player sound position
 /******************************************************************************/
 void mainscene::UpdateSound(double dt)
 {
-	engine->setListenerPosition(vec3df(GOp_Player->pos.x, GOp_Player->pos.y, GOp_Player->pos.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
+	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
 }
 
 /******************************************************************************/
@@ -1910,12 +1892,12 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderParticles();
 
-	RenderCharacter(&P_Player);
+	//RenderCharacter(&P_Player);
 
 	if (weaponsEnabled)
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(GOp_Player->pos);
+		modelStack.Translate(FPC.position);
 		modelStack.Rotate(CamRotationYaw, 0, 1, 0);
 		modelStack.Rotate(-CamRotationPitch, 1, 0, 0);
 		modelStack.Translate(weaponList[currentWeapon].currentpos);
@@ -2209,11 +2191,19 @@ void mainscene::Render(void)
 
 	viewStack.LoadIdentity();
 
-	viewStack.LookAt(
-		FPC.position.x, FPC.position.y, FPC.position.z,
-		FPC.target.x, FPC.target.y, FPC.target.z,
-		FPC.up.x, FPC.up.y, FPC.up.z
-		);
+	if (DisplayInfo)
+	{
+		viewStack.LookAt(
+			FPC.position.x, FPC.position.y, FPC.position.z,
+			FPC.target.x, FPC.target.y, FPC.target.z,
+			FPC.up.x, FPC.up.y, FPC.up.z
+			);
+	}
+	else
+	{
+		//viewStack.LookAt();
+	}
+
 	modelStack.LoadIdentity();
 
 	RenderPassGPass();
@@ -2254,12 +2244,6 @@ void mainscene::Exit(void)
 		Particle *Par = m_ParList.back();
 		delete Par;
 		m_ParList.pop_back();
-	}
-
-	if (GOp_Player)
-	{
-		delete GOp_Player;
-		GOp_Player = NULL;
 	}
 
 	glDeleteProgram(m_gPassShaderID);

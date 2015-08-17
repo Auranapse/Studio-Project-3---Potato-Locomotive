@@ -363,7 +363,6 @@ private:
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
 
-	GameObject *GOp_Player;
 	Player P_Player;
 
 	unsigned m_programID;
