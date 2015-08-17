@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Anim4.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
@@ -109,8 +110,10 @@
     <ClCompile Include="Source\SpriteAnimation.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
     <ClCompile Include="Source\WorldObject.cpp" />
+    <ClCompile Include="Strategy.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\Anim4.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BulletInfo.h" />
@@ -144,6 +147,7 @@
     <ClInclude Include="Source\Utility.h" />
     <ClInclude Include="Source\Vertex.h" />
     <ClInclude Include="Source\WorldObject.h" />
+    <ClInclude Include="Strategy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GameData\Shader\comg.fragmentshader" />

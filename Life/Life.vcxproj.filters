@@ -147,8 +147,11 @@
     <ClCompile Include="Source\WorldObject.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ItemObject.cpp">
-      <Filter>Source Files\GameObject</Filter>
+    <ClCompile Include="Source\AI.cpp">
+      <Filter>Source Files\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Strategy.cpp">
+      <Filter>Source Files\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,8 +251,11 @@
     <ClInclude Include="Source\WorldObject.h">
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ItemObject.h">
-      <Filter>Header Files\GameObject</Filter>
+    <ClInclude Include="Source\AI.h">
+      <Filter>Header Files\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Strategy.h">
+      <Filter>Header Files\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
