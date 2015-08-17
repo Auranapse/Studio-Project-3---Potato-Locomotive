@@ -33,7 +33,7 @@ public:
 	irrklang::ISoundSource* reloadSound;
 
 	void toggleAnimation(void);
-	void Update(double &dt);
+	virtual void Update(double &dt);
 };
 
 #endif

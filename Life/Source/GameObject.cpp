@@ -25,7 +25,8 @@ GameObject::GameObject()
 	colEnable(false),
 	dynamicRendering(false),
 	mass(1.f),
-	rotation(0, 0, 0)
+	rotation(0, 0, 0),
+	isHeld(false)
 {
 	mesh = NULL;
 }
@@ -37,6 +38,11 @@ Default destructor
 */
 /******************************************************************************/
 GameObject::~GameObject()
+{
+
+}
+
+void GameObject::Update(double &dt)
 {
 
 }

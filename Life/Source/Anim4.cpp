@@ -159,28 +159,28 @@ void Anim4::Update(double dt, float MOVE_SPEED)
 	case AS_WALK_1:
 		if (MOVE_SPEED > 0)
 		{
-			LEFT_LEG += static_cast<float>(dt)*MOVE_SPEED*12.f;
-			if (LEFT_LEG > 15)
+			LEFT_LEG += static_cast<float>(dt)*MOVE_SPEED;
+			if (LEFT_LEG > 30)
 				ASTATE = AS_WALK_2;
 		}
 		else
 		{
-			LEFT_LEG -= static_cast<float>(dt)*MOVE_SPEED*12.f;
-			if (LEFT_LEG > 15)
+			LEFT_LEG -= static_cast<float>(dt)*MOVE_SPEED;
+			if (LEFT_LEG > 30)
 				ASTATE = AS_WALK_2;
 		}
 		break;
 	case AS_WALK_2:
 		if (MOVE_SPEED > 0)
 		{
-			LEFT_LEG -= static_cast<float>(dt)*MOVE_SPEED*12.f;
-			if (LEFT_LEG < -15)
+			LEFT_LEG -= static_cast<float>(dt)*MOVE_SPEED;
+			if (LEFT_LEG < -30)
 				ASTATE = AS_WALK_1;
 		}
 		else
 		{
-			LEFT_LEG += static_cast<float>(dt)*MOVE_SPEED*12.f;
-			if (LEFT_LEG < -15)
+			LEFT_LEG += static_cast<float>(dt)*MOVE_SPEED;
+			if (LEFT_LEG < -30)
 				ASTATE = AS_WALK_1;
 		}
 		break;

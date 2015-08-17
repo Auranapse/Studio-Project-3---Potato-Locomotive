@@ -76,8 +76,6 @@ class mainscene : public Scene
 		GEO_MP5K,
 		GEO_SPAS12,
 		GEO_M4A1,
-		GEO_L11A3_1,
-		GEO_L11A3_2,
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,
@@ -301,7 +299,6 @@ class mainscene : public Scene
 		WT_SPAS12,
 		WT_MP5K,
 		WT_M4A1,
-		WT_L11A3,
 
 		WT_TOTAL,
 	};
@@ -319,7 +316,6 @@ class mainscene : public Scene
 	};
 
 	weaponStats weaponList[WT_TOTAL];
-	WeaponsObject A;
 
 public:
 	mainscene();
@@ -368,6 +364,7 @@ private:
 	std::vector<BulletInfo*> BIv_BulletList;
 
 	Player P_Player;
+	WeaponsObject *B;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -400,16 +397,10 @@ private:
 
 
 	bool weaponsEnabled;
-	bool renderScope;
-	float ScopeAnim;
-	float scopeExeTime;
 	float f_curRecoil;
+	float firerate;
 	float timer;
 	float inputDelay;
-	bool AimDownSight;
-	float reloadTimer;
-	float fireRate;
-	float fireRateMax;
 	int currentWeapon;
 
 	Particle* FetchParticle(void);

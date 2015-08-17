@@ -94,6 +94,8 @@ public:
 	/******************************************************************************/
 	Vector3 LegPos;
 
+	Vector3 CamOffset;
+
 	Mesh *Head;
 	Mesh *Chest;
 	Mesh *Arm_left;
@@ -114,6 +116,8 @@ public:
 	ItemObject *holding;
 
 	virtual void Init(Vector3 Pos, Vector3 Lookat, const char* texturedir);
+	void HoldObject(ItemObject *obj);
+	void UpdateHold(double &dt);
 	virtual void Update(double &dt);
 
 	CharacterObject();
