@@ -609,10 +609,22 @@ void mainscene::initWeapons(void)
 		weaponList[i].shootSound = NULL;
 	}
 
+	/*A.mesh = meshList[GEO_M9];
+	A.attackRate = 0.2f;
+	A.scale.Set(0.03f, 0.03f, 0.03f);
+	A.pos1.Set(-5, -4, 9);
+	A.pos2.Set(0, -2.1f, 8);
+	A.ClipSize = 15;
+	A.CurrentClip = 15;
+	A.recoilEffect = 50.f;
+	A.isGun = true;
+	A.isWeapon = true;
+	P_Player.holding = &A;*/
+
 	weaponList[WT_M9].mesh = meshList[GEO_M9];
 	weaponList[WT_M9].damage = 40;
 	weaponList[WT_M9].fireRate = 100;
-	weaponList[WT_M9].bulletvelocity = 300.f;
+	weaponList[WT_M9].bulletvelocity = 50.f;
 	weaponList[WT_M9].name = "M9 Beretta";
 	weaponList[WT_M9].recoilEffect = 50;
 	weaponList[WT_M9].reloadTime = 1.2f;
@@ -629,8 +641,8 @@ void mainscene::initWeapons(void)
 
 	weaponList[WT_SPAS12].mesh = meshList[GEO_SPAS12];
 	weaponList[WT_SPAS12].damage = 10;
-	weaponList[WT_SPAS12].fireRate = 1200;
-	weaponList[WT_SPAS12].bulletvelocity = 305.f;
+	weaponList[WT_SPAS12].fireRate = 120;
+	weaponList[WT_SPAS12].bulletvelocity = 50.f;
 	weaponList[WT_SPAS12].name = "SPAS-12";
 	weaponList[WT_SPAS12].recoilEffect = 1;
 	weaponList[WT_SPAS12].reloadTime = 3.2f;
@@ -642,14 +654,14 @@ void mainscene::initWeapons(void)
 	weaponList[WT_SPAS12].currentpos = weaponList[WT_SPAS12].heldpos;
 	weaponList[WT_SPAS12].adsZoom = 1.4f;
 	weaponList[WT_SPAS12].bulletSpread = 10.f;
-	weaponList[WT_SPAS12].numBullet = 1002;
+	weaponList[WT_SPAS12].numBullet = 12;
 	weaponList[WT_SPAS12].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//RELOAD.wav", ESM_AUTO_DETECT, true);
 	weaponList[WT_SPAS12].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//FIRE.wav", ESM_AUTO_DETECT, true);
 
 	weaponList[WT_MP5K].mesh = meshList[GEO_MP5K];
 	weaponList[WT_MP5K].damage = 40;
 	weaponList[WT_MP5K].fireRate = 950;
-	weaponList[WT_MP5K].bulletvelocity = 305.f;
+	weaponList[WT_MP5K].bulletvelocity = 50.f;
 	weaponList[WT_MP5K].name = "MP5K";
 	weaponList[WT_MP5K].recoilEffect = 50;
 	weaponList[WT_MP5K].reloadTime = 1.2f;
@@ -667,7 +679,7 @@ void mainscene::initWeapons(void)
 	weaponList[WT_M4A1].mesh = meshList[GEO_M4A1];
 	weaponList[WT_M4A1].damage = 55;
 	weaponList[WT_M4A1].fireRate = 700;
-	weaponList[WT_M4A1].bulletvelocity = 320.f;
+	weaponList[WT_M4A1].bulletvelocity = 50.f;
 	weaponList[WT_M4A1].name = "M4A1 Carbine";
 	weaponList[WT_M4A1].recoilEffect = 90;
 	weaponList[WT_M4A1].reloadTime = 2.8f;
@@ -685,7 +697,7 @@ void mainscene::initWeapons(void)
 	weaponList[WT_L11A3].mesh = meshList[GEO_L11A3_1];
 	weaponList[WT_L11A3].damage = 150;
 	weaponList[WT_L11A3].fireRate = 50;
-	weaponList[WT_L11A3].bulletvelocity = 320.f;
+	weaponList[WT_L11A3].bulletvelocity = 50.f;
 	weaponList[WT_L11A3].name = "L11A3";
 	weaponList[WT_L11A3].recoilEffect = 300;
 	weaponList[WT_L11A3].reloadTime = 2.2f;
@@ -721,7 +733,7 @@ void mainscene::generateRoom1(void)
 
 	wo = new WorldObject();
 	wo->pos.Set(0, 0, 0);
-	wo->rotationX = -90;
+	wo->rotation.x = -90;
 	wo->scale.Set(400, 400, 400);
 	wo->ColBox.Set(400, 2, 400);
 	wo->active = true;
@@ -750,7 +762,7 @@ void mainscene::editFOV(float &newFOV)
 Handles player physics and movement
 */
 /******************************************************************************/
-void mainscene::UpdatePlayer(double dt)
+void mainscene::UpdatePlayer(double &dt)
 {
 	float walkSoundDelay = 0.7f;
 	bool inAir = false;
@@ -926,36 +938,13 @@ void mainscene::UpdatePlayer(double dt)
 		P_Player.Update(dt);
 }
 
-void mainscene::UpdatePlayerControl(double &dt)
-{
-	/*if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
-	{
-		P_Player.movementFB(dt, true);
-	}
-	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
-	{
-		P_Player.movementFB(dt, false);
-	}
-
-	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
-	{
-		P_Player.movementLR(dt, true);
-	}
-	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
-	{
-		P_Player.movementLR(dt, false);
-	}
-
-	P_Player.Update(dt);*/
-}
-
 /******************************************************************************/
 /*!
 \brief
 Handles game object physics
 */
 /******************************************************************************/
-void mainscene::UpdateGO(double dt)
+void mainscene::UpdateGO(double &dt)
 {
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -993,7 +982,7 @@ void mainscene::generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity
 Handles particle physics
 */
 /******************************************************************************/
-void mainscene::UpdateParticles(double dt)
+void mainscene::UpdateParticles(double &dt)
 {
 	for (std::vector<Particle *>::iterator it = m_ParList.begin(); it != m_ParList.end(); ++it)
 	{
@@ -1019,7 +1008,7 @@ void mainscene::UpdateParticles(double dt)
 Updates bullet
 */
 /******************************************************************************/
-void mainscene::UpdateBullets(double dt)
+void mainscene::UpdateBullets(double &dt)
 {
 	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
@@ -1037,7 +1026,7 @@ void mainscene::UpdateBullets(double dt)
 			}
 			else
 			{
-				BI->Update(dt * 0.8);
+				BI->Update(dt);
 			}
 		}
 	}
@@ -1073,7 +1062,7 @@ void mainscene::Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity, fl
 Handles weapons firing, reloading, animations and so on
 */
 /******************************************************************************/
-void mainscene::weaponsUpdate(double dt)
+void mainscene::weaponsUpdate(double &dt)
 {
 	if (f_curRecoil > 0)
 	{
@@ -1301,7 +1290,7 @@ bool mainscene::collide(Vector3 &Position, bool bullet)
 update player sound position
 */
 /******************************************************************************/
-void mainscene::UpdateSound(double dt)
+void mainscene::UpdateSound(double &dt)
 {
 	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
 }
@@ -1318,7 +1307,7 @@ void mainscene::Update(double dt)
 
 	if (Application::IsKeyPressed('X'))
 	{
-		dt *= 0.1;
+		dt *= 0.05;
 	}
 	
 
@@ -1375,7 +1364,6 @@ void mainscene::Update(double dt)
 	}
 	
 	UpdatePlayer(dt);
-	UpdatePlayerControl(dt);
 	UpdateGO(dt);
 	UpdateParticles(dt);
 	FPC.Update(dt);
@@ -1421,9 +1409,9 @@ void mainscene::RenderGO(GameObject *go)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(go->pos);
-			modelStack.Rotate(go->rotationX, 1, 0, 0);
-			modelStack.Rotate(go->rotationY, 0, 1, 0);
-			modelStack.Rotate(go->rotationZ, 0, 0, 1);
+			modelStack.Rotate(go->rotation.x, 1, 0, 0);
+			modelStack.Rotate(go->rotation.y, 0, 1, 0);
+			modelStack.Rotate(go->rotation.z, 0, 0, 1);
 			modelStack.Scale(go->scale);
 			if (go->mesh)
 			{
@@ -1482,6 +1470,15 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	RenderMesh(CO->Leg_right, false);
 	modelStack.PopMatrix();
 
+	if (CO->holding != NULL)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(CO->holding->pos);
+		modelStack.Scale(CO->holding->scale);
+		RenderMesh(CO->holding->mesh, false);
+		modelStack.PopMatrix();
+	}
+
 	modelStack.PopMatrix();
 }
 
@@ -1527,7 +1524,7 @@ void mainscene::RenderBullet(void)
 	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
 		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus() && BI->getLife() < 5.95)
+		if (BI->getStatus())
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(BI->getPosition());

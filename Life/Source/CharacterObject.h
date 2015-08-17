@@ -16,6 +16,7 @@ Character Object used by AI and player
 #include "LoadTGA.h"
 #include "Vector3.h"
 #include "Anim4.h"
+#include "ItemObject.h"
 
 
 class CharacterObject
@@ -109,6 +110,8 @@ public:
 	void setPosition(Vector3 &newpos);
 	Vector3 getPosition(void);
 	Vector3 getDirection(void);
+
+	ItemObject *holding;
 
 	virtual void Init(Vector3 Pos, Vector3 Lookat, const char* texturedir);
 	virtual void Update(double &dt);

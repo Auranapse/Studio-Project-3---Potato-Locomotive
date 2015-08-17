@@ -17,6 +17,10 @@ class ItemObject : public GameObject
 public:
 	ItemObject();
 	~ItemObject();
+
+	bool pickupable;
+	bool isWeapon;
+	bool isGun;
 };
 
 #endif

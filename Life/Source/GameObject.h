@@ -19,6 +19,7 @@ public:
 	Vector3 pos;
 	Vector3 vel;
 	Vector3 scale;
+	Vector3 rotation;
 	Vector3 ColBox;
 	Vector3 ColBoxOffset;
 	bool active;
@@ -26,7 +27,6 @@ public:
 	bool colEnable;
 	bool dynamicRendering;
 	float mass;
-	float rotationX, rotationY, rotationZ;
 	Mesh* mesh;
 
 	Material material;

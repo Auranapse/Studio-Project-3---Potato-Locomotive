@@ -25,6 +25,8 @@ Main scene
 #include "BulletInfo.h"
 #include "GameObject.h"
 #include "WorldObject.h"
+#include "ItemObject.h"
+#include "WeaponsObject.h"
 
 #include "SpriteAnimation.h"
 #include "particle.h"
@@ -317,6 +319,7 @@ class mainscene : public Scene
 	};
 
 	weaponStats weaponList[WT_TOTAL];
+	WeaponsObject A;
 
 public:
 	mainscene();
@@ -359,6 +362,7 @@ private:
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 
 	Mesh* meshList[NUM_GEOMETRY];
+	std::vector<ItemObject*> m_itemList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
@@ -410,16 +414,15 @@ private:
 
 	Particle* FetchParticle(void);
 
-	void UpdateSound(double dt);
-	void UpdatePlayer(double dt);
-	void UpdatePlayerControl(double &dt);
-	void UpdateGO(double dt);
+	void UpdateSound(double &dt);
+	void UpdatePlayer(double &dt);
+	void UpdateGO(double &dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type = Particle::PAR_DEFAULT, float lifetime = 5.f);
-	void UpdateParticles(double dt);
-	void UpdateBullets(double dt);
+	void UpdateParticles(double &dt);
+	void UpdateBullets(double &dt);
 
 	void Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity = 10, float dmg = 100);
-	void weaponsUpdate(double dt);
+	void weaponsUpdate(double &dt);
 
 	const int NUM_LIGHT_PARAM;
 	Light lights[4];

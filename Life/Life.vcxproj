@@ -110,6 +110,7 @@
     <ClCompile Include="Source\SpriteAnimation.cpp" />
     <ClCompile Include="Source\Strategy.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
+    <ClCompile Include="Source\WeaponsObject.cpp" />
     <ClCompile Include="Source\WorldObject.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +148,7 @@
     <ClInclude Include="Source\Strategy.h" />
     <ClInclude Include="Source\Utility.h" />
     <ClInclude Include="Source\Vertex.h" />
+    <ClInclude Include="Source\WeaponsObject.h" />
     <ClInclude Include="Source\WorldObject.h" />
   </ItemGroup>
   <ItemGroup>

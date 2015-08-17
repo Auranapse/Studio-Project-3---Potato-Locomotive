@@ -25,9 +25,7 @@ GameObject::GameObject()
 	colEnable(false),
 	dynamicRendering(false),
 	mass(1.f),
-	rotationX(0.f),
-	rotationY(0.f),
-	rotationZ(0.f)
+	rotation(0, 0, 0)
 {
 	mesh = NULL;
 }

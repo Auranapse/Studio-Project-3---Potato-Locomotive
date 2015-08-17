@@ -1,7 +1,7 @@
 #include "BulletInfo.h"
 
 
-BulletInfo::BulletInfo(void) : gravitationalforce(-9.82f), verticalvelocity(0.f)
+BulletInfo::BulletInfo(void) : gravitationalforce(-9.82f)
 {
 	b_Status = false;
 	position = 0.f;
@@ -32,20 +32,12 @@ void BulletInfo::Update(double dt)
 	if(b_Status)
 	{
 		position += direction * static_cast<float>(dt) * speed;
-		position.y += verticalvelocity * static_cast<float>(dt);
-		verticalvelocity += (gravitationalforce/(speed/100.f));
-		speed -= static_cast<float>(dt);
 		lifetime -= static_cast<float>(dt);
 
 		if(lifetime < 0.f)
 		{
-			verticalvelocity = 0.f;
 			b_Status = false;
 		}
-	}
-	else
-	{
-		verticalvelocity = 0.f;
 	}
 }
 
