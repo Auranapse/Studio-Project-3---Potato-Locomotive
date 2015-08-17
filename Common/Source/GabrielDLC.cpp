@@ -23,9 +23,9 @@ the position to check if it's inside the box
 /******************************************************************************/
 bool intersect2D(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
 {
-	if(Position.x <= TopLeft.x && Position.x >= BottomRight.x)
+	if (Position.x <= TopLeft.x && Position.x >= BottomRight.x)
 	{
-		if(Position.y <= TopLeft.y && Position.y >= BottomRight.y)
+		if (Position.y <= TopLeft.y && Position.y >= BottomRight.y)
 		{
 			return true;
 		}
@@ -47,11 +47,11 @@ the position to check if it's inside the box
 /******************************************************************************/
 bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
 {
-	if(Position.x <= TopLeft.x && Position.x >= BottomRight.x)
+	if (Position.x <= TopLeft.x && Position.x >= BottomRight.x)
 	{
-		if(Position.y <= TopLeft.y && Position.y >= BottomRight.y)
+		if (Position.y <= TopLeft.y && Position.y >= BottomRight.y)
 		{
-			if(Position.z <= TopLeft.z && Position.z >= BottomRight.z)
+			if (Position.z <= TopLeft.z && Position.z >= BottomRight.z)
 			{
 				return true;
 			}
@@ -74,18 +74,18 @@ if true, checks for yaw rotation, else will check pitch rotation
 /******************************************************************************/
 float CalAnglefromPosition(Vector3 Target, Vector3 Origin, bool XZ)
 {
-	if(XZ == true)
+	if (XZ == true)
 	{
 		return Math::RadianToDegree(atan2(Target.x - Origin.x, Target.z - Origin.z));
 	}
 	else
-	{	
+	{
 		float O = Target.y - Origin.y;
 
 		Target.y = Origin.y = 0;
 
 		float A = (Target - Origin).Length();
-		return (atan(O/A) * 180 / Math::PI);
+		return (atan(O / A) * 180 / Math::PI);
 	}
 }
 
@@ -102,4 +102,65 @@ the origin of the angle
 float CalAnglefromPosition2D(Vector3 &Target, Vector3 &Origin)
 {
 	return Math::RadianToDegree(atan2(Target.y - Origin.y, Target.x - Origin.x));
+}
+
+/******************************************************************************/
+/*!
+\brief
+Calculates if something is within the FOV
+\param Position
+the origin to calculate from
+\param Target
+the position the object is looking at
+\param FOV
+the field of view of the object
+\return
+returns true if object is in the FOV, if not returns false
+*/
+/******************************************************************************/
+bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition)
+{
+	float lookingOBJ = CalAnglefromPosition(ObjectPosition, Position, true);
+	float cameraRotation = CalAnglefromPosition(Target, Position, true);;
+	bool LO = false, CR = false;
+
+	if (lookingOBJ < 0.f)
+	{
+		lookingOBJ += 360;
+		LO = true;
+	}
+
+	if (cameraRotation < 0.f)
+	{
+		cameraRotation += 360;
+		CR = true;
+	}
+
+
+	if (cameraRotation < 0.f)
+	{
+		cameraRotation = -cameraRotation;
+	}
+
+	if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation) || (Vector3(ObjectPosition.x - Position.x, 0, ObjectPosition.z - Position.z)).LengthSquared() < 1600)
+	{
+		return true;
+	}
+	else
+	{
+		if (CR)
+		{
+			cameraRotation -= 360;
+		}
+		if (LO)
+		{
+			lookingOBJ -= 360;
+		}
+		if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

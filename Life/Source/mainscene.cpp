@@ -521,6 +521,9 @@ void mainscene::Init()
 
 	generateRoom1();
 
+	P_Player.Init(Vector3(0, 10, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
+	P_Player.Scale.Set(10, 10, 10);
+
 	GOp_Player = new GameObject();
 	GOp_Player->active = true;
 	GOp_Player->mass = 50;
@@ -545,14 +548,14 @@ void mainscene::Init()
 	backgroundAmbience->setDefaultVolume(0.8f);
 	engine->play2D(backgroundAmbience, true);
 
-	soundList[ST_PANEL] = engine->addSoundSourceFromFile("GameData//sounds//other//panel.wav");
+	soundList[ST_PANEL] = engine->addSoundSourceFromFile("GameData//sounds//other//panel.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_PANEL]->setDefaultVolume(4.5f);
 	soundList[ST_PANEL]->setDefaultMinDistance(100.f);
-	soundList[ST_STEP] = engine->addSoundSourceFromFile("GameData//sounds//other//step1.wav");
-	soundList[ST_STEP_2] = engine->addSoundSourceFromFile("GameData//sounds//other//step2.wav");
-	soundList[ST_KILL] = engine->addSoundSourceFromFile("GameData//sounds//other//kill.wav");
-	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav");
-	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav");
+	soundList[ST_STEP] = engine->addSoundSourceFromFile("GameData//sounds//other//step1.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_STEP_2] = engine->addSoundSourceFromFile("GameData//sounds//other//step2.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_KILL] = engine->addSoundSourceFromFile("GameData//sounds//other//kill.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
 }
 
 void mainscene::InitShaders()
@@ -631,8 +634,8 @@ void mainscene::initWeapons(void)
 	weaponList[WT_M9].currentpos = weaponList[WT_M9].heldpos;
 	weaponList[WT_M9].adsZoom = 1.4f;
 	weaponList[WT_M9].bulletSpread = 10.f;
-	weaponList[WT_M9].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//RELOAD.wav");
-	weaponList[WT_M9].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav");
+	weaponList[WT_M9].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//RELOAD.wav", ESM_AUTO_DETECT, true);
+	weaponList[WT_M9].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
 
 	weaponList[WT_SPAS12].mesh = meshList[GEO_SPAS12];
 	weaponList[WT_SPAS12].damage = 10;
@@ -650,8 +653,8 @@ void mainscene::initWeapons(void)
 	weaponList[WT_SPAS12].adsZoom = 1.4f;
 	weaponList[WT_SPAS12].bulletSpread = 10.f;
 	weaponList[WT_SPAS12].numBullet = 1002;
-	weaponList[WT_SPAS12].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//RELOAD.wav");
-	weaponList[WT_SPAS12].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//FIRE.wav");
+	weaponList[WT_SPAS12].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//RELOAD.wav", ESM_AUTO_DETECT, true);
+	weaponList[WT_SPAS12].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//FIRE.wav", ESM_AUTO_DETECT, true);
 
 	weaponList[WT_MP5K].mesh = meshList[GEO_MP5K];
 	weaponList[WT_MP5K].damage = 40;
@@ -668,8 +671,8 @@ void mainscene::initWeapons(void)
 	weaponList[WT_MP5K].currentpos = weaponList[WT_MP5K].heldpos;
 	weaponList[WT_MP5K].adsZoom = 1.4f;
 	weaponList[WT_MP5K].bulletSpread = 125.f;
-	weaponList[WT_MP5K].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//RELOAD.wav");
-	weaponList[WT_MP5K].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//FIRE.wav");
+	weaponList[WT_MP5K].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//RELOAD.wav", ESM_AUTO_DETECT, true);
+	weaponList[WT_MP5K].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//FIRE.wav", ESM_AUTO_DETECT, true);
 
 	weaponList[WT_M4A1].mesh = meshList[GEO_M4A1];
 	weaponList[WT_M4A1].damage = 55;
@@ -686,8 +689,8 @@ void mainscene::initWeapons(void)
 	weaponList[WT_M4A1].currentpos = weaponList[WT_M4A1].heldpos;
 	weaponList[WT_M4A1].adsZoom = 1.4f;
 	weaponList[WT_M4A1].bulletSpread = 70.f;
-	weaponList[WT_M4A1].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//RELOAD.wav");
-	weaponList[WT_M4A1].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//FIRE.wav");
+	weaponList[WT_M4A1].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//RELOAD.wav", ESM_AUTO_DETECT, true);
+	weaponList[WT_M4A1].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//FIRE.wav", ESM_AUTO_DETECT, true);
 
 	weaponList[WT_L11A3].mesh = meshList[GEO_L11A3_1];
 	weaponList[WT_L11A3].damage = 150;
@@ -704,8 +707,8 @@ void mainscene::initWeapons(void)
 	weaponList[WT_L11A3].currentpos = weaponList[WT_L11A3].heldpos;
 	weaponList[WT_L11A3].adsZoom = 8.f;
 	weaponList[WT_L11A3].bulletSpread = 1.f;
-	weaponList[WT_L11A3].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//RELOAD.wav");
-	weaponList[WT_L11A3].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//FIRE.wav");
+	weaponList[WT_L11A3].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//RELOAD.wav", ESM_AUTO_DETECT, true);
+	weaponList[WT_L11A3].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//FIRE.wav", ESM_AUTO_DETECT, true);
 	renderScope = true;
 	ScopeAnim = 15.f;
 	scopeExeTime = 0.f;
@@ -939,6 +942,29 @@ void mainscene::UpdatePlayer(double dt)
 		GOp_Player->pos += GOp_Player->vel * static_cast<float>(dt);
 		FPC = FPC + (GOp_Player->vel * static_cast<float>(dt));
 	}
+}
+
+void mainscene::UpdatePlayerControl(double &dt)
+{
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
+	{
+		P_Player.movementFB(dt, true);
+	}
+	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+	{
+		P_Player.movementFB(dt, false);
+	}
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
+	{
+		P_Player.movementLR(dt, true);
+	}
+	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
+	{
+		P_Player.movementLR(dt, false);
+	}
+
+	P_Player.Update(dt);
 }
 
 /******************************************************************************/
@@ -1308,12 +1334,10 @@ void mainscene::Update(double dt)
 {
 	d_dt = dt;
 
-	/*dt *= 0.2;
-
-	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+	if (Application::IsKeyPressed('X'))
 	{
-		dt = d_dt;
-	}*/
+		dt *= 0.1;
+	}
 	
 
 	timer += static_cast<float>(dt);
@@ -1367,9 +1391,9 @@ void mainscene::Update(double dt)
 			DisplayInfo = true;
 		}
 	}
-
-	P_Player.Update(dt);
+	
 	UpdatePlayer(dt);
+	UpdatePlayerControl(dt);
 	UpdateGO(dt);
 	UpdateParticles(dt);
 	FPC.Update(dt);
@@ -1404,73 +1428,6 @@ void mainscene::Update(double dt)
 /******************************************************************************/
 /*!
 \brief
-check if position is in view of the camera
-*/
-/******************************************************************************/
-bool mainscene::isVisible(Vector3 &ObjPosition)
-{
-	if ((ObjPosition - GOp_Player->pos).Length() < 1900)
-	{
-		float lookingOBJ = CalAnglefromPosition(ObjPosition, GOp_Player->pos, true);
-		float cameraRotation = CamRotationYaw;
-		float cameraRotationUp = CamRotationPitch;
-		float viewM = 5.f;
-		bool LO = false, CR = false;
-
-		if (lookingOBJ < 0.f)
-		{
-			lookingOBJ += 360;
-			LO = true;
-		}
-
-		if (cameraRotation < 0.f)
-		{
-			cameraRotation += 360;
-			CR = true;
-		}
-
-		if (cameraRotationUp > 30.f || cameraRotationUp < -30.f)
-		{
-			viewM = 30.f;
-		}
-
-		if (cameraRotationUp > 70.f || cameraRotationUp < -70.f)
-		{
-			viewM = 60.f;
-		}
-
-		if (cameraRotation < 0.f)
-		{
-			cameraRotation = -cameraRotation;
-		}
-
-		if ((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation) || (Vector3(ObjPosition.x - GOp_Player->pos.x, 0, ObjPosition.z - GOp_Player->pos.z)).Length() < 40)
-		{
-			return true;
-		}
-		else
-		{
-			if (CR)
-			{
-				cameraRotation -= 360;
-			}
-			if (LO)
-			{
-				lookingOBJ -= 360;
-			}
-			if ((lookingOBJ + f_fov + viewM > cameraRotation && lookingOBJ - f_fov - viewM < cameraRotation))
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-/******************************************************************************/
-/*!
-\brief
 Rendering of game objects
 */
 /******************************************************************************/
@@ -1494,6 +1451,56 @@ void mainscene::RenderGO(GameObject *go)
 			//break;
 		}
 	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Rendering of character objects
+*/
+/******************************************************************************/
+void mainscene::RenderCharacter(CharacterObject *CO)
+{
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->getPosition());
+	modelStack.Translate(CO->ModelPos);
+
+	modelStack.PushMatrix();
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Chest, false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->HeadPos);
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Head, false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Arm_left, false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->ArmPos);
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Arm_right, false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->LegPos);
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Leg_left, false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->LegPos);
+	modelStack.Scale(CO->Scale);
+	RenderMesh(CO->Leg_right, false);
+	modelStack.PopMatrix();
+
+	modelStack.PopMatrix();
 }
 
 /******************************************************************************/
@@ -1896,15 +1903,14 @@ void mainscene::RenderWorldShadow(void)
 			}
 			else//Dynamic rendering
 			{
-				if (isVisible(go->pos))
-				{
-					RenderGO(go);
-				}
+				RenderGO(go);
 			}
 		}
 	}
 
 	RenderParticles();
+
+	RenderCharacter(&P_Player);
 
 	if (weaponsEnabled)
 	{

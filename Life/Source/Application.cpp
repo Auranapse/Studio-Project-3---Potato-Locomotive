@@ -26,7 +26,7 @@ GLFWwindow* m_window;
 const unsigned char FPS = 120; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 bool FULL_SCREEN = false;
-const char* WIN_NAME = "Hole in the Wall";
+const char* WIN_NAME = "GENE";
 const int initWidth = 1280;
 const int initHeight = 720;
 int Application::i_WINDOW_WIDTH = initWidth;

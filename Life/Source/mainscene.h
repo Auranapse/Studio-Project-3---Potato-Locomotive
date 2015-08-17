@@ -11,6 +11,7 @@ Main scene
 #define MAINSCENE_H
 
 #include <irrKlang.h>
+#include <ik_ISoundEffectControl.h>
 #include <vector>
 #include <iostream>
 #include "Scene.h"
@@ -412,6 +413,7 @@ private:
 
 	void UpdateSound(double dt);
 	void UpdatePlayer(double dt);
+	void UpdatePlayerControl(double &dt);
 	void UpdateGO(double dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type = Particle::PAR_DEFAULT, float lifetime = 5.f);
 	void UpdateParticles(double dt);
@@ -431,10 +433,8 @@ private:
 	void initWeapons(void);
 	void generateRoom1(void);
 
-	bool isVisible(Vector3 &ObjPosition);
-
-
 	void RenderGO(GameObject *go);
+	void RenderCharacter(CharacterObject *CO);
 	void RenderParticles(void);
 	void RenderBullet(void);
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, Material *material = NULL);

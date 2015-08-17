@@ -17,9 +17,10 @@ Default constructor
 /******************************************************************************/
 CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.f, 1.f), Velocity(0.f, 0.f, 0.f), Scale(1.f, 1.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(35.f), f_movementSpeed(f_move_walk)
 {
-	HeadPos.Set(0.f, 0.6f, 0.f);
-	ArmPos.Set(0.4f, 0.4f, 0.f);
-	LegPos.Set(0.f, -0.6f, 0.f);
+	HeadPos.Set(0.f, 6.f, 0.f);
+	ArmPos.Set(4.f, 4.f, 0.f);
+	LegPos.Set(0.f, -6.f, 0.f);
+	ModelPos.Set(0.f, 8.f, 0.f);
 }
 
 /******************************************************************************/
@@ -145,7 +146,7 @@ void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
 	Leg_left = MeshBuilder::GenerateOBJ("Leg Left", "GameData//OBJ//character//Person_Leg_Left.obj");
 	Leg_right = MeshBuilder::GenerateOBJ("Leg Right", "GameData//OBJ//character//Person_Leg_Right.obj");
 
-	Head->textureID[0] = LoadTGA(texturedir);
+	Head->textureID[0] = LoadTGA(texturedir, true, false);
 	Chest->textureID[0] = Head->textureID[0];
 	Arm_left->textureID[0] = Head->textureID[0];
 	Arm_right->textureID[0] = Head->textureID[0];
