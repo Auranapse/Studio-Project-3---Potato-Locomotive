@@ -1312,7 +1312,7 @@ void mainscene::Update(double dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) || Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 	{
-		dt *= 5.0;
+		dt = d_dt;
 	}*/
 	
 
