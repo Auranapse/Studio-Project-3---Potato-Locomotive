@@ -390,9 +390,6 @@ void mainscene::Init()
 
 		meshList[GEO_MP5K] = MeshBuilder::GenerateOBJ("MP5K", "GameData//OBJ//weapons//MP5K.obj");
 		meshList[GEO_MP5K]->textureID[0] = LoadTGA("GameData//Image//weapons//MP5K.tga", true);
-
-		meshList[GEO_M4A1] = MeshBuilder::GenerateOBJ("M4A1", "GameData//OBJ//weapons//M4A1.obj");
-		meshList[GEO_M4A1]->textureID[0] = LoadTGA("GameData//Image//weapons//M4A1.tga", true);
 		
 		meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
 		meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
@@ -465,12 +462,7 @@ void mainscene::Init()
 		meshList[GEO_MP5K]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
 		meshList[GEO_MP5K]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
 		meshList[GEO_MP5K]->material.kShininess = 10.0f;
-
-		meshList[GEO_M4A1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_M4A1]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_M4A1]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_M4A1]->material.kShininess = 10.0f;
-
+		
 		meshList[GEO_SPAS12]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPAS12]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
 		meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
@@ -532,10 +524,13 @@ void mainscene::Init()
 	soundList[ST_KILL] = engine->addSoundSourceFromFile("GameData//sounds//other//kill.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
+
+	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
 }
 
 void mainscene::InitShaders()
 {
+	Application::SetCursor(true);
 	e_nextScene = Application::E_SCENE_MENU;
 }
 
@@ -571,123 +566,27 @@ Intialize weapon stats, sounds, meshes
 void mainscene::initWeapons(void)
 {
 	firerate = 0.f;
-	for (unsigned i = 0; i < WT_TOTAL; ++i)
-	{
-		weaponList[i].mesh = NULL;
-		weaponList[i].damage = 10;
-		weaponList[i].fireRate = 1000;
-		weaponList[i].bulletvelocity = 200;
-		weaponList[i].name = "Gun";
-		weaponList[i].recoilEffect = 2;
-		weaponList[i].reloadTime = 1.2f;
-		weaponList[i].ClipSize = 30;
-		weaponList[i].CurrentClip = weaponList[i].ClipSize;
-		weaponList[i].heldpos.Set(-4, -3, 12);
-		weaponList[i].adspos.Set(0, -4, 12);
-		weaponList[i].scale.Set(1, 1, 1);
-		weaponList[i].currentpos = weaponList[i].heldpos;
-		weaponList[i].adsZoom = 0.f;
-		weaponList[i].bulletSpread = 0.f;
-		weaponList[i].numBullet = 1;
-		weaponList[i].reloadSound = NULL;
-		weaponList[i].shootSound = NULL;
-	}
+	
+	WeaponsObject *WPO;
+	WPO = new WeaponsObject();
+	WPO->active = true;
+	WPO->mesh = meshList[GEO_M9];
+	WPO->attackRate = 0.5f;
+	WPO->scale.Set(0.03f, 0.03f, 0.03f);
+	WPO->pos.Set(0, 10, 0);
+	WPO->pos1.Set(-5, -4, 9);
+	WPO->pos2.Set(0, -2.1f, 8);
+	WPO->ClipSize = 15;
+	WPO->CurrentClip = 15;
+	WPO->recoilEffect = 50.f;
+	WPO->isGun = true;
+	WPO->isWeapon = true;
+	WPO->enablePhysics = true;
+	WPO->colEnable = true;
+	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
+	B = WPO;
+	m_goList.push_back(WPO);
 
-	WeaponsObject *LOL;
-	LOL = new WeaponsObject();
-	LOL->active = true;
-	LOL->mesh = meshList[GEO_M9];
-	LOL->attackRate = 0.5f;
-	LOL->scale.Set(0.03f, 0.03f, 0.03f);
-	LOL->pos.Set(0, 10, 0);
-	LOL->pos1.Set(-5, -4, 9);
-	LOL->pos2.Set(0, -2.1f, 8);
-	LOL->ClipSize = 15;
-	LOL->CurrentClip = 15;
-	LOL->recoilEffect = 50.f;
-	LOL->isGun = true;
-	LOL->isWeapon = true;
-	LOL->enablePhysics = true;
-	LOL->colEnable = true;
-	LOL->AttackSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
-	B = LOL;
-	m_goList.push_back(LOL);
-
-
-	weaponList[WT_M9].mesh = meshList[GEO_M9];
-	weaponList[WT_M9].damage = 40;
-	weaponList[WT_M9].fireRate = 100;
-	weaponList[WT_M9].bulletvelocity = 50.f;
-	weaponList[WT_M9].name = "M9 Beretta";
-	weaponList[WT_M9].recoilEffect = 50;
-	weaponList[WT_M9].reloadTime = 1.2f;
-	weaponList[WT_M9].ClipSize = 15;
-	weaponList[WT_M9].CurrentClip = weaponList[WT_M9].ClipSize;
-	weaponList[WT_M9].heldpos.Set(-5, -4, 9);
-	weaponList[WT_M9].adspos.Set(0, -2.1f, 8);
-	weaponList[WT_M9].scale.Set(0.03f, 0.03f, 0.03f);
-	weaponList[WT_M9].currentpos = weaponList[WT_M9].heldpos;
-	weaponList[WT_M9].adsZoom = 1.4f;
-	weaponList[WT_M9].bulletSpread = 10.f;
-	weaponList[WT_M9].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_M9].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_SPAS12].mesh = meshList[GEO_SPAS12];
-	weaponList[WT_SPAS12].damage = 10;
-	weaponList[WT_SPAS12].fireRate = 120;
-	weaponList[WT_SPAS12].bulletvelocity = 50.f;
-	weaponList[WT_SPAS12].name = "SPAS-12";
-	weaponList[WT_SPAS12].recoilEffect = 1;
-	weaponList[WT_SPAS12].reloadTime = 3.2f;
-	weaponList[WT_SPAS12].ClipSize = 6;
-	weaponList[WT_SPAS12].CurrentClip = weaponList[WT_SPAS12].ClipSize;
-	weaponList[WT_SPAS12].heldpos.Set(-4.5f, -3.5f, 9);
-	weaponList[WT_SPAS12].adspos.Set(0, -2.f, 8);
-	weaponList[WT_SPAS12].scale.Set(0.2f, 0.2f, 0.2f);
-	weaponList[WT_SPAS12].currentpos = weaponList[WT_SPAS12].heldpos;
-	weaponList[WT_SPAS12].adsZoom = 1.4f;
-	weaponList[WT_SPAS12].bulletSpread = 10.f;
-	weaponList[WT_SPAS12].numBullet = 12;
-	weaponList[WT_SPAS12].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_SPAS12].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_MP5K].mesh = meshList[GEO_MP5K];
-	weaponList[WT_MP5K].damage = 40;
-	weaponList[WT_MP5K].fireRate = 950;
-	weaponList[WT_MP5K].bulletvelocity = 50.f;
-	weaponList[WT_MP5K].name = "MP5K";
-	weaponList[WT_MP5K].recoilEffect = 50;
-	weaponList[WT_MP5K].reloadTime = 1.2f;
-	weaponList[WT_MP5K].ClipSize = 30;
-	weaponList[WT_MP5K].CurrentClip = weaponList[WT_MP5K].ClipSize;
-	weaponList[WT_MP5K].heldpos.Set(-4.5f, -3.5f, 9);
-	weaponList[WT_MP5K].adspos.Set(0, -2.95f, 8);
-	weaponList[WT_MP5K].scale.Set(0.2f, 0.2f, 0.2f);
-	weaponList[WT_MP5K].currentpos = weaponList[WT_MP5K].heldpos;
-	weaponList[WT_MP5K].adsZoom = 1.4f;
-	weaponList[WT_MP5K].bulletSpread = 125.f;
-	weaponList[WT_MP5K].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_MP5K].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_M4A1].mesh = meshList[GEO_M4A1];
-	weaponList[WT_M4A1].damage = 55;
-	weaponList[WT_M4A1].fireRate = 700;
-	weaponList[WT_M4A1].bulletvelocity = 50.f;
-	weaponList[WT_M4A1].name = "M4A1 Carbine";
-	weaponList[WT_M4A1].recoilEffect = 90;
-	weaponList[WT_M4A1].reloadTime = 2.8f;
-	weaponList[WT_M4A1].ClipSize = 30;
-	weaponList[WT_M4A1].CurrentClip = weaponList[WT_M4A1].ClipSize;
-	weaponList[WT_M4A1].heldpos.Set(-4.2f, -3.2f, 10);
-	weaponList[WT_M4A1].adspos.Set(0, -2.98f, 10);
-	weaponList[WT_M4A1].scale.Set(0.8f, 0.8f, 0.8f);
-	weaponList[WT_M4A1].currentpos = weaponList[WT_M4A1].heldpos;
-	weaponList[WT_M4A1].adsZoom = 1.4f;
-	weaponList[WT_M4A1].bulletSpread = 70.f;
-	weaponList[WT_M4A1].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_M4A1].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	currentWeapon = WT_M9;
 	f_curRecoil = 0.f;
 }
 
@@ -1103,7 +1002,7 @@ void mainscene::weaponsUpdate(double &dt)
 						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
 						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
 						WO->rotation.x -= WO->recoilEffect *0.25f;
-						engine->play2D(WO->AttackSound);
+						engine->play2D(soundList[WO->AttackSound]);
 						--WO->ClipSize;
 					}
 					else
@@ -1114,7 +1013,7 @@ void mainscene::weaponsUpdate(double &dt)
 				else
 				{
 					WO->toggleAnimation();
-					engine->play2D(WO->AttackSound);
+					engine->play2D(soundList[WO->AttackSound]);
 				}
 			}
 
@@ -1127,184 +1026,6 @@ void mainscene::weaponsUpdate(double &dt)
 			}
 		}
 	}
-
-/*if (f_curRecoil > 0)
-	{
-		if (AimDownSight)
-		{
-			f_curRecoil -= static_cast<float>(dt) * f_curRecoil * 4.f;
-		}
-		else
-		{
-			f_curRecoil -= static_cast<float>(dt) * f_curRecoil * 2.f;
-		}
-	}
-	//SHOOTING
-	if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
-	{
-		if (timer - fireRate > fireRateMax && weaponList[currentWeapon].CurrentClip > 0)
-		{
-			if (weaponList[currentWeapon].numBullet == 1)
-			{
-				Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
-				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
-				Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
-			}
-			else
-			{
-				for (int i = 0; i < weaponList[currentWeapon].numBullet; ++i)
-				{
-					f_curRecoil = weaponList[currentWeapon].bulletSpread * 0.5f;
-					Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
-					Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
-				}
-				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
-			}
-			if (!AimDownSight)
-			{
-				f_curRecoil += static_cast<float>(dt) * weaponList[currentWeapon].bulletSpread;//Cursor recoil effect and bullet spread effect
-			}
-			else
-			{
-				f_curRecoil += static_cast<float>(dt) * weaponList[currentWeapon].bulletSpread * 0.5f;//Aiming down sights reduce spread
-			}
-			engine->play2D(weaponList[currentWeapon].shootSound);
-
-			weaponList[currentWeapon].currentpos.z -= static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect;
-			fireRate = timer;
-			--weaponList[currentWeapon].CurrentClip;
-		}
-	}
-	//RELOADING
-	if (Application::IsKeyPressed(us_control[E_CTRL_RELOAD]))
-	{
-		weaponList[currentWeapon].CurrentClip = 0;
-	}
-	if (weaponList[currentWeapon].CurrentClip <= 0)
-	{
-		if (reloadTimer <= 0)
-		{
-			engine->play2D(weaponList[currentWeapon].reloadSound);
-		}
-
-		reloadTimer += static_cast<float>(dt);
-
-		if (AimDownSight)
-		{
-			AimDownSight = false;
-		}
-
-		if (weaponList[currentWeapon].currentpos.y > weaponList[currentWeapon].heldpos.y - 8.f)
-		{
-			float f_temp1 = (weaponList[currentWeapon].heldpos.y - 8.f) - weaponList[currentWeapon].currentpos.y;
-			weaponList[currentWeapon].currentpos.y += f_temp1 * static_cast<float>(dt) * 10.f;
-		}
-
-		if (reloadTimer > weaponList[currentWeapon].reloadTime)
-		{
-			reloadTimer = 0.f;
-			weaponList[currentWeapon].CurrentClip = weaponList[currentWeapon].ClipSize;
-		}
-	}
-
-	//AIM DOWN SIGHT
-	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
-	{
-		if (timer - inputDelay > 0.25)
-		{
-			if (!AimDownSight)
-			{
-				AimDownSight = true;
-			}
-			else
-			{
-				AimDownSight = false;
-			}
-			inputDelay = timer;
-		}
-	}
-
-	//SWITCH WEAPONS
-	if (Application::IsKeyPressed(us_control[E_CTRL_NEXT_ITEM]))
-	{
-		if (timer - inputDelay > 0.25)
-		{
-			if (currentWeapon < WT_TOTAL - 1)
-			{
-				currentWeapon += 1;
-			}
-			else
-			{
-				currentWeapon = 0;
-			}
-
-			weaponList[currentWeapon].currentpos = weaponList[currentWeapon].heldpos - Vector3(0, 5, 0);
-			AimDownSight = false;
-			fireRateMax = 60.f / static_cast<float>(weaponList[currentWeapon].fireRate);
-			inputDelay = timer;
-		}
-	}
-
-	if (AimDownSight)//Handle aim down sights
-	{
-		if (f_fov / weaponList[currentWeapon].adsZoom < f_currentfov)
-		{
-			f_currentfov -= static_cast<float>(dt) * (f_currentfov - f_fov / weaponList[currentWeapon].adsZoom) * 10;
-			editFOV(f_currentfov);
-		}
-		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].adspos)
-		{
-			Vector3 v3_temp1 = weaponList[currentWeapon].adspos - weaponList[currentWeapon].currentpos;
-			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 12.f;
-		}
-		if (currentWeapon == WT_L11A3)
-		{
-			scopeExeTime += static_cast<float>(dt);
-			if (scopeExeTime > 0.25)
-			{
-				if (renderScope)
-				{
-					renderScope = false;
-				}
-				if (ScopeAnim > 0)
-				{
-					ScopeAnim -= static_cast<float>(dt) * 10.f * ScopeAnim;
-				}
-				else if (ScopeAnim < 0)
-				{
-					ScopeAnim = 0.f;
-				}
-			}
-		}
-		if (FPC.mouseSensitivity == f_mouseSensitivity)
-		{
-			FPC.mouseSensitivity = f_mouseSensitivity / weaponList[currentWeapon].adsZoom;
-		}
-	}
-	else
-	{
-		if (!renderScope)
-		{
-			scopeExeTime = 0.f;
-			ScopeAnim = 15.f;
-			renderScope = true;
-		}
-
-		if (f_fov > f_currentfov)
-		{
-			f_currentfov += static_cast<float>(dt) * (f_fov - f_currentfov) * 10;
-			editFOV(f_currentfov);
-		}
-		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].heldpos)
-		{
-			Vector3 v3_temp1 = weaponList[currentWeapon].heldpos - weaponList[currentWeapon].currentpos;
-			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 10.f;
-		}
-		if (FPC.mouseSensitivity != f_mouseSensitivity)
-		{
-			FPC.mouseSensitivity = f_mouseSensitivity;
-		}
-	}//*/
 }
 
 /******************************************************************************/
@@ -1961,22 +1682,6 @@ void mainscene::RenderWorldShadow(void)
 	RenderParticles();
 
 	RenderCharacter(&P_Player);
-	/*
-	if (weaponsEnabled)
-	{
-		modelStack.PushMatrix();
-		modelStack.Translate(FPC.position);
-		modelStack.Rotate(CamRotationYaw, 0, 1, 0);
-		modelStack.Rotate(-CamRotationPitch, 1, 0, 0);
-		modelStack.Translate(weaponList[currentWeapon].currentpos);
-		modelStack.Scale(weaponList[currentWeapon].scale);
-		RenderMesh(weaponList[currentWeapon].mesh, true);
-		if (currentWeapon == WT_L11A3 && renderScope == true)
-		{
-			RenderMesh(meshList[GEO_L11A3_2], true);
-		}
-		modelStack.PopMatrix();
-	}*/
 }
 
 /******************************************************************************/
@@ -2020,20 +1725,10 @@ void mainscene::RenderUI(void)
 {
 	if (weaponsEnabled)
 	{
-
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f - 1 - f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
-
-		if (weaponList[currentWeapon].CurrentClip == 0)
-		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "R", Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
-		}
-		else
-		{
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(weaponList[currentWeapon].CurrentClip)), Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
-		}
 	}
 
 	if (DisplayInfo == true)
