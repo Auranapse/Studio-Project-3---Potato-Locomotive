@@ -9,9 +9,7 @@ Handles AI behavior and update
 /****************************************************************************/
 
 #pragma once
-#include "AI.h"
-class Strategy :
-	public AI
+class Strategy
 {
 public:
 
@@ -22,12 +20,12 @@ public:
 	};
 
 	Strategy(void);
-	Strategy(E_AI_TYPE e_type);
 	void Update(double dt);
 	virtual ~Strategy(void);
 
-private:
+	void setState(E_AI_TYPE state);
 
+private:
 	E_AI_TYPE e_type;
 };
 

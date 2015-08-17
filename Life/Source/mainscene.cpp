@@ -519,6 +519,10 @@ void mainscene::Init()
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
 
+
+	ai.Init(Vector3(0, 0, 0), Vector3(0, 0, -1), "GameData//Image//player//PlayerSkin.tga");
+	ai.Scale.Set(10, 10, 10);
+
 	f_step = 0.f;
 
 	FPC.Init(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(0, 5, 0), P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(1.f, 5.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
@@ -1368,6 +1372,7 @@ void mainscene::Update(double dt)
 	UpdateParticles(dt);
 	FPC.Update(dt);
 
+	ai.Update(dt, P_Player.getPosition());
 
 	if (Application::IsKeyPressed(VK_F1))
 	{
@@ -1890,6 +1895,8 @@ void mainscene::RenderWorldShadow(void)
 	RenderParticles();
 
 	//RenderCharacter(&P_Player);
+
+	RenderCharacter(&ai);
 
 	if (weaponsEnabled)
 	{

@@ -37,6 +37,7 @@ Main scene
 
 #include "CharacterObject.h"
 #include "Player.h"
+#include "AI.h"
 
 /******************************************************************************/
 /*!
@@ -368,6 +369,8 @@ private:
 	std::vector<BulletInfo*> BIv_BulletList;
 
 	Player P_Player;
+
+	AI ai;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];

@@ -11,15 +11,13 @@ Handles AI position and physics
 #define AI_H
 
 #include "CharacterObject.h"
+#include "GabrielDLC.h"
 
 class AI : public CharacterObject
 {
 
 
 public:
-	AI();
-	virtual ~AI();
-	
 	enum E_AI_STATE
 	{
 		WALKING,
@@ -28,15 +26,27 @@ public:
 		RUN,
 	};
 
+	enum E_TYPE
+	{
+		AI_SECURITY,
+		AI_SCIENTIST,
+	};
+
+	AI();
+	AI(E_AI_STATE, E_TYPE);
+	virtual ~AI();
+
 	void movementRW(bool run = true);
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true);
 
-	virtual void Update(double &dt);
+	virtual void Update(double &dt, Vector3 playerPos);
 
 private:
 	//-------------------------------------Variables------------------------------------------------
-	E_AI_STATE e_AI;
+	E_AI_STATE e_State;
+	E_TYPE e_Type;
+
 	bool alert;
 	//Walk Or Run
 	bool WOR;

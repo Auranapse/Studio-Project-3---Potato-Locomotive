@@ -21,6 +21,7 @@ CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.
 	ArmPos.Set(4.f, 4.f, 0.f);
 	LegPos.Set(0.f, -6.f, 0.f);
 	ModelPos.Set(0.f, 18.f, 0.f);
+	holding = NULL;
 }
 
 /******************************************************************************/
