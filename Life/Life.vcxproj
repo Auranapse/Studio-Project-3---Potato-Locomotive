@@ -108,9 +108,9 @@
     <ClCompile Include="Source\savefile.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
+    <ClCompile Include="Source\Strategy.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
     <ClCompile Include="Source\WorldObject.cpp" />
-    <ClCompile Include="Strategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AI.h" />
@@ -144,10 +144,10 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\SpriteAnimation.h" />
+    <ClInclude Include="Source\Strategy.h" />
     <ClInclude Include="Source\Utility.h" />
     <ClInclude Include="Source\Vertex.h" />
     <ClInclude Include="Source\WorldObject.h" />
-    <ClInclude Include="Strategy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GameData\Shader\comg.fragmentshader" />

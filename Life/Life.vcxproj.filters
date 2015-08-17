@@ -150,6 +150,9 @@
     <ClCompile Include="Source\AI.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ItemObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Strategy.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
@@ -253,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="Source\AI.h">
       <Filter>Header Files\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ItemObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Strategy.h">
       <Filter>Header Files\Character</Filter>
