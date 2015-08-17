@@ -599,7 +599,7 @@ void mainscene::initWeapons(void)
 	LOL->mesh = meshList[GEO_M9];
 	LOL->attackRate = 0.5f;
 	LOL->scale.Set(0.03f, 0.03f, 0.03f);
-	LOL->pos.Set(0, 1000, 0);
+	LOL->pos.Set(0, 10, 0);
 	LOL->pos1.Set(-5, -4, 9);
 	LOL->pos2.Set(0, -2.1f, 8);
 	LOL->ClipSize = 15;
@@ -607,8 +607,8 @@ void mainscene::initWeapons(void)
 	LOL->recoilEffect = 50.f;
 	LOL->isGun = true;
 	LOL->isWeapon = true;
-	LOL->isHeld = true;
 	LOL->enablePhysics = true;
+	LOL->colEnable = true;
 	LOL->AttackSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
 	B = LOL;
 	m_goList.push_back(LOL);
@@ -908,11 +908,10 @@ void mainscene::UpdatePlayer(double &dt)
 	{
 		if (P_Player.holding == NULL)
 		{
-			Mtx44 tempRotation;
-			tempRotation.SetToRotation(CalAnglefromPosition(B->pos, P_Player.getPosition(), true), 0, 1, 0);
 			P_Player.holding = B;
-			B->pos = B->pos - tempRotation*P_Player.getPosition();
-			B->isHeld = true;
+			P_Player.holding->pos = Vector3(0, -10, 0);
+			P_Player.holding->isHeld = true;
+			P_Player.holding->colEnable = false;
 		}
 	}
 
@@ -1090,32 +1089,46 @@ void mainscene::weaponsUpdate(double &dt)
 			P_Player.holding = NULL;
 		}
 
-		else if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
+		else if (P_Player.holding->isWeapon)
 		{
-			if (P_Player.holding->isWeapon)
+			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 			{
 				if (P_Player.holding->isGun)
 				{
-					WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
 					if (WO->ClipSize > 0 && WO->attackRate + firerate < timer)
 					{
 						firerate = timer;
 						Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
 						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
 						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
-						WO->pos -= ShootVector.Normalized() * WO->recoilEffect * 0.1f;
+						WO->rotation.x -= WO->recoilEffect *0.25f;
 						engine->play2D(WO->AttackSound);
 						--WO->ClipSize;
 					}
 					else
 					{
-
+						//Click sound
 					}
+				}
+				else
+				{
+					WO->toggleAnimation();
+					engine->play2D(WO->AttackSound);
+				}
+			}
+
+			if (P_Player.holding->isGun)
+			{
+				if (Application::IsKeyPressed(VK_MBUTTON))
+				{
+					WO->toggleAnimation();
 				}
 			}
 		}
 	}
-	/*if (f_curRecoil > 0)
+
+/*if (f_curRecoil > 0)
 	{
 		if (AimDownSight)
 		{
@@ -1490,6 +1503,9 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 		modelStack.Rotate(YRotation, 0, 1, 0);
 		modelStack.Rotate(Pitch, 1, 0, 0);
 		modelStack.Translate(CO->holding->pos);
+		modelStack.Rotate(CO->holding->rotation.x, 1, 0, 0);
+		modelStack.Rotate(CO->holding->rotation.y, 0, 1, 0);
+		modelStack.Rotate(CO->holding->rotation.z, 0, 0, 1);
 		modelStack.Scale(CO->holding->scale);
 		RenderMesh(CO->holding->mesh, true);
 		modelStack.PopMatrix();
