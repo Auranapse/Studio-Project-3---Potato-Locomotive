@@ -29,11 +29,10 @@ public:
 	Vector3 Rotation1;//Animation for rotation
 	Vector3 Rotation2;//Rotation final frame
 
-	irrklang::ISoundSource* AttackSound;
-	irrklang::ISoundSource* reloadSound;
+	int AttackSound;
 
 	void toggleAnimation(void);
-	void Update(double &dt);
+	virtual void Update(double &dt);
 };
 
 #endif

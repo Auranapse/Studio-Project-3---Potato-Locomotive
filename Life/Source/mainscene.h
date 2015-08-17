@@ -76,9 +76,6 @@ class mainscene : public Scene
 		GEO_M9,
 		GEO_MP5K,
 		GEO_SPAS12,
-		GEO_M4A1,
-		GEO_L11A3_1,
-		GEO_L11A3_2,
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,
@@ -270,43 +267,7 @@ class mainscene : public Scene
 
 		E_CTRL_TOTAL
 	};
-
-
-	struct weaponStats
-	{
-		std::string name;
-		float fireRate;
-		float damage;
-		float bulletvelocity;
-		float recoilEffect;
-		float reloadTime;
-		float adsZoom;
-		float bulletSpread;
-		int numBullet;
-		int CurrentClip;
-		int ClipSize;
-
-		Vector3 currentpos;
-		Vector3 heldpos;
-		Vector3 adspos;
-		Vector3 scale;
-		Mesh* mesh;
-
-		irrklang::ISoundSource* shootSound;
-		irrklang::ISoundSource* reloadSound;
-	};
-
-	enum WEAPON_TYPE
-	{
-		WT_M9,
-		WT_SPAS12,
-		WT_MP5K,
-		WT_M4A1,
-		WT_L11A3,
-
-		WT_TOTAL,
-	};
-
+	
 	enum SOUND_TYPE
 	{
 		ST_PANEL,
@@ -316,11 +277,11 @@ class mainscene : public Scene
 		ST_BUZZER,
 		ST_ALERT,
 
+		ST_WEAPON_CLICK,
+		ST_WEAPON_M9_SHOOT,
+
 		ST_TOTAL,
 	};
-
-	weaponStats weaponList[WT_TOTAL];
-	WeaponsObject A;
 
 public:
 	mainscene();
@@ -369,6 +330,7 @@ private:
 	std::vector<BulletInfo*> BIv_BulletList;
 
 	Player P_Player;
+	WeaponsObject *B;
 
 	AI ai;
 
@@ -403,16 +365,10 @@ private:
 
 
 	bool weaponsEnabled;
-	bool renderScope;
-	float ScopeAnim;
-	float scopeExeTime;
 	float f_curRecoil;
+	float firerate;
 	float timer;
 	float inputDelay;
-	bool AimDownSight;
-	float reloadTimer;
-	float fireRate;
-	float fireRateMax;
 	int currentWeapon;
 
 	Particle* FetchParticle(void);

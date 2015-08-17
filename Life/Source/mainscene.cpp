@@ -164,7 +164,7 @@ void mainscene::Init()
 	m_parameters[U_LIGHT_COLOR_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.color");
 	m_parameters[U_LIGHT_POWER_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.power");
 	m_parameters[U_LIGHT_RADIUS_LIGHTPASS] = glGetUniformLocation(m_lightShaderID, "light.radius");
-	
+
 	// Get a handle for our "colorTexture" uniform
 	m_parameters[U_LIGHT_DEPTH_MVP] = glGetUniformLocation(m_programID, "lightDepthMVP");
 	m_parameters[U_SHADOW_MAP] = glGetUniformLocation(m_programID, "shadowMap");
@@ -371,7 +371,7 @@ void mainscene::Init()
 	meshList[GEO_SNIPER_CROSSHAIR_1] = MeshBuilder::GenerateQuad("Crosshair Sniper Part 1", Color(0.f, 0.f, 0.f), 1.0f, 1.0f, 1.f);
 	meshList[GEO_SNIPER_CROSSHAIR_1]->textureID[0] = LoadTGA("GameData//Image//weapons//SNIPER_SCOPE.tga", true);
 	meshList[GEO_SNIPER_CROSSHAIR_2] = MeshBuilder::GenerateQuad("Crosshair Sniper Part 2", Color(0.f, 0.f, 0.f), .5f, 1.0f, 1.f);
-	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 1.f, 1.f, 40.f);
+	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
 	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
@@ -390,14 +390,7 @@ void mainscene::Init()
 
 		meshList[GEO_MP5K] = MeshBuilder::GenerateOBJ("MP5K", "GameData//OBJ//weapons//MP5K.obj");
 		meshList[GEO_MP5K]->textureID[0] = LoadTGA("GameData//Image//weapons//MP5K.tga", true);
-
-		meshList[GEO_M4A1] = MeshBuilder::GenerateOBJ("M4A1", "GameData//OBJ//weapons//M4A1.obj");
-		meshList[GEO_M4A1]->textureID[0] = LoadTGA("GameData//Image//weapons//M4A1.tga", true);
-
-		meshList[GEO_L11A3_1] = MeshBuilder::GenerateOBJ("L11A3", "GameData//OBJ//weapons//L11A3BODY.obj");
-		meshList[GEO_L11A3_1]->textureID[0] = LoadTGA("GameData//Image//weapons//L11A3BODY.tga", true);
-		meshList[GEO_L11A3_2] = MeshBuilder::GenerateOBJ("L11A3 Scope", "GameData//OBJ//weapons//L11A3SCOPE.obj");
-		meshList[GEO_L11A3_2]->textureID[0] = LoadTGA("GameData//Image//weapons//L11A3SCOPE.tga", true);
+		
 		meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
 		meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
 	}
@@ -445,7 +438,7 @@ void mainscene::Init()
 
 	meshList[GEO_EMISSIVE_QUAD] = MeshBuilder::GenerateQuad("Specular map", Color(1, 1, 1), 1.f, 1.f, 1.f);
 	meshList[GEO_EMISSIVE_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_EMISSIVE);
-	
+
 	//Lighting-------------------------------------------------------------------------------
 
 	meshList[GEO_FLOOR_TILE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
@@ -469,22 +462,7 @@ void mainscene::Init()
 		meshList[GEO_MP5K]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
 		meshList[GEO_MP5K]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
 		meshList[GEO_MP5K]->material.kShininess = 10.0f;
-
-		meshList[GEO_M4A1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_M4A1]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_M4A1]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_M4A1]->material.kShininess = 10.0f;
-
-		meshList[GEO_L11A3_1]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_L11A3_1]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_L11A3_1]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_L11A3_1]->material.kShininess = 10.0f;
-
-		meshList[GEO_L11A3_2]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_L11A3_2]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_L11A3_2]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_L11A3_2]->material.kShininess = 12.0f;
-
+		
 		meshList[GEO_SPAS12]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPAS12]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
 		meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
@@ -525,7 +503,7 @@ void mainscene::Init()
 
 	f_step = 0.f;
 
-	FPC.Init(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(0, 5, 0), P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos + Vector3(1.f, 5.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
+	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
 
@@ -550,10 +528,13 @@ void mainscene::Init()
 	soundList[ST_KILL] = engine->addSoundSourceFromFile("GameData//sounds//other//kill.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
+
+	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
 }
 
 void mainscene::InitShaders()
 {
+	Application::SetCursor(true);
 	e_nextScene = Application::E_SCENE_MENU;
 }
 
@@ -588,140 +569,28 @@ Intialize weapon stats, sounds, meshes
 /******************************************************************************/
 void mainscene::initWeapons(void)
 {
-	fireRate = 0.f;
-	reloadTimer = 0.f;
+	firerate = 0.f;
+	
+	WeaponsObject *WPO;
+	WPO = new WeaponsObject();
+	WPO->active = true;
+	WPO->mesh = meshList[GEO_M9];
+	WPO->attackRate = 0.5f;
+	WPO->scale.Set(0.03f, 0.03f, 0.03f);
+	WPO->pos.Set(0, 10, 0);
+	WPO->pos1.Set(-5, -4, 9);
+	WPO->pos2.Set(0, -2.1f, 8);
+	WPO->ClipSize = 15;
+	WPO->CurrentClip = 15;
+	WPO->recoilEffect = 50.f;
+	WPO->isGun = true;
+	WPO->isWeapon = true;
+	WPO->enablePhysics = true;
+	WPO->colEnable = true;
+	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
+	B = WPO;
+	m_goList.push_back(WPO);
 
-	for (unsigned i = 0; i < WT_TOTAL; ++i)
-	{
-		weaponList[i].mesh = NULL;
-		weaponList[i].damage = 10;
-		weaponList[i].fireRate = 1000;
-		weaponList[i].bulletvelocity = 200;
-		weaponList[i].name = "Gun";
-		weaponList[i].recoilEffect = 2;
-		weaponList[i].reloadTime = 1.2f;
-		weaponList[i].ClipSize = 30;
-		weaponList[i].CurrentClip = weaponList[i].ClipSize;
-		weaponList[i].heldpos.Set(-4, -3, 12);
-		weaponList[i].adspos.Set(0, -4, 12);
-		weaponList[i].scale.Set(1, 1, 1);
-		weaponList[i].currentpos = weaponList[i].heldpos;
-		weaponList[i].adsZoom = 0.f;
-		weaponList[i].bulletSpread = 0.f;
-		weaponList[i].numBullet = 1;
-		weaponList[i].reloadSound = NULL;
-		weaponList[i].shootSound = NULL;
-	}
-
-	/*A.mesh = meshList[GEO_M9];
-	A.attackRate = 0.2f;
-	A.scale.Set(0.03f, 0.03f, 0.03f);
-	A.pos1.Set(-5, -4, 9);
-	A.pos2.Set(0, -2.1f, 8);
-	A.ClipSize = 15;
-	A.CurrentClip = 15;
-	A.recoilEffect = 50.f;
-	A.isGun = true;
-	A.isWeapon = true;
-	P_Player.holding = &A;*/
-
-	weaponList[WT_M9].mesh = meshList[GEO_M9];
-	weaponList[WT_M9].damage = 40;
-	weaponList[WT_M9].fireRate = 100;
-	weaponList[WT_M9].bulletvelocity = 50.f;
-	weaponList[WT_M9].name = "M9 Beretta";
-	weaponList[WT_M9].recoilEffect = 50;
-	weaponList[WT_M9].reloadTime = 1.2f;
-	weaponList[WT_M9].ClipSize = 15;
-	weaponList[WT_M9].CurrentClip = weaponList[WT_M9].ClipSize;
-	weaponList[WT_M9].heldpos.Set(-5, -4, 9);
-	weaponList[WT_M9].adspos.Set(0, -2.1f, 8);
-	weaponList[WT_M9].scale.Set(0.03f, 0.03f, 0.03f);
-	weaponList[WT_M9].currentpos = weaponList[WT_M9].heldpos;
-	weaponList[WT_M9].adsZoom = 1.4f;
-	weaponList[WT_M9].bulletSpread = 10.f;
-	weaponList[WT_M9].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_M9].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_SPAS12].mesh = meshList[GEO_SPAS12];
-	weaponList[WT_SPAS12].damage = 10;
-	weaponList[WT_SPAS12].fireRate = 120;
-	weaponList[WT_SPAS12].bulletvelocity = 50.f;
-	weaponList[WT_SPAS12].name = "SPAS-12";
-	weaponList[WT_SPAS12].recoilEffect = 1;
-	weaponList[WT_SPAS12].reloadTime = 3.2f;
-	weaponList[WT_SPAS12].ClipSize = 6;
-	weaponList[WT_SPAS12].CurrentClip = weaponList[WT_SPAS12].ClipSize;
-	weaponList[WT_SPAS12].heldpos.Set(-4.5f, -3.5f, 9);
-	weaponList[WT_SPAS12].adspos.Set(0, -2.f, 8);
-	weaponList[WT_SPAS12].scale.Set(0.2f, 0.2f, 0.2f);
-	weaponList[WT_SPAS12].currentpos = weaponList[WT_SPAS12].heldpos;
-	weaponList[WT_SPAS12].adsZoom = 1.4f;
-	weaponList[WT_SPAS12].bulletSpread = 10.f;
-	weaponList[WT_SPAS12].numBullet = 12;
-	weaponList[WT_SPAS12].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_SPAS12].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//SPAS12//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_MP5K].mesh = meshList[GEO_MP5K];
-	weaponList[WT_MP5K].damage = 40;
-	weaponList[WT_MP5K].fireRate = 950;
-	weaponList[WT_MP5K].bulletvelocity = 50.f;
-	weaponList[WT_MP5K].name = "MP5K";
-	weaponList[WT_MP5K].recoilEffect = 50;
-	weaponList[WT_MP5K].reloadTime = 1.2f;
-	weaponList[WT_MP5K].ClipSize = 30;
-	weaponList[WT_MP5K].CurrentClip = weaponList[WT_MP5K].ClipSize;
-	weaponList[WT_MP5K].heldpos.Set(-4.5f, -3.5f, 9);
-	weaponList[WT_MP5K].adspos.Set(0, -2.95f, 8);
-	weaponList[WT_MP5K].scale.Set(0.2f, 0.2f, 0.2f);
-	weaponList[WT_MP5K].currentpos = weaponList[WT_MP5K].heldpos;
-	weaponList[WT_MP5K].adsZoom = 1.4f;
-	weaponList[WT_MP5K].bulletSpread = 125.f;
-	weaponList[WT_MP5K].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_MP5K].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//MP5K//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_M4A1].mesh = meshList[GEO_M4A1];
-	weaponList[WT_M4A1].damage = 55;
-	weaponList[WT_M4A1].fireRate = 700;
-	weaponList[WT_M4A1].bulletvelocity = 50.f;
-	weaponList[WT_M4A1].name = "M4A1 Carbine";
-	weaponList[WT_M4A1].recoilEffect = 90;
-	weaponList[WT_M4A1].reloadTime = 2.8f;
-	weaponList[WT_M4A1].ClipSize = 30;
-	weaponList[WT_M4A1].CurrentClip = weaponList[WT_M4A1].ClipSize;
-	weaponList[WT_M4A1].heldpos.Set(-4.2f, -3.2f, 10);
-	weaponList[WT_M4A1].adspos.Set(0, -2.98f, 10);
-	weaponList[WT_M4A1].scale.Set(0.8f, 0.8f, 0.8f);
-	weaponList[WT_M4A1].currentpos = weaponList[WT_M4A1].heldpos;
-	weaponList[WT_M4A1].adsZoom = 1.4f;
-	weaponList[WT_M4A1].bulletSpread = 70.f;
-	weaponList[WT_M4A1].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_M4A1].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//M4A1//FIRE.wav", ESM_AUTO_DETECT, true);
-
-	weaponList[WT_L11A3].mesh = meshList[GEO_L11A3_1];
-	weaponList[WT_L11A3].damage = 150;
-	weaponList[WT_L11A3].fireRate = 50;
-	weaponList[WT_L11A3].bulletvelocity = 50.f;
-	weaponList[WT_L11A3].name = "L11A3";
-	weaponList[WT_L11A3].recoilEffect = 300;
-	weaponList[WT_L11A3].reloadTime = 2.2f;
-	weaponList[WT_L11A3].ClipSize = 6;
-	weaponList[WT_L11A3].CurrentClip = weaponList[WT_L11A3].ClipSize;
-	weaponList[WT_L11A3].heldpos.Set(-4, -3, 10);
-	weaponList[WT_L11A3].adspos.Set(0, -1.8f, 8);
-	weaponList[WT_L11A3].scale.Set(2.5f, 2.5f, 2.5f);
-	weaponList[WT_L11A3].currentpos = weaponList[WT_L11A3].heldpos;
-	weaponList[WT_L11A3].adsZoom = 8.f;
-	weaponList[WT_L11A3].bulletSpread = 1.f;
-	weaponList[WT_L11A3].reloadSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//RELOAD.wav", ESM_AUTO_DETECT, true);
-	weaponList[WT_L11A3].shootSound = engine->addSoundSourceFromFile("GameData//sounds//weapons//L11A3//FIRE.wav", ESM_AUTO_DETECT, true);
-	renderScope = true;
-	ScopeAnim = 15.f;
-	scopeExeTime = 0.f;
-
-	currentWeapon = WT_M9;
-	fireRateMax = 60.f / static_cast<float>(weaponList[currentWeapon].fireRate);
-	AimDownSight = false;
 	f_curRecoil = 0.f;
 }
 
@@ -739,7 +608,7 @@ void mainscene::generateRoom1(void)
 	wo->pos.Set(0, 0, 0);
 	wo->rotation.x = -90;
 	wo->scale.Set(400, 400, 400);
-	wo->ColBox.Set(400, 2, 400);
+	wo->ColBox.Set(4000, 5, 4000);
 	wo->active = true;
 	wo->enablePhysics = false;
 	wo->colEnable = true;
@@ -770,176 +639,188 @@ void mainscene::UpdatePlayer(double &dt)
 {
 	float walkSoundDelay = 0.7f;
 	bool inAir = false;
-	
-		//Y axis collision handling
-		if (!collide(Vector3(P_Player.getPosition())))
-		{
-			if (collide(Vector3(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos)))
-			{
-				if(P_Player.Velocity.y > 0)
-				P_Player.Velocity.y = 0;
-			}
 
-			P_Player.Velocity += gravity_force * static_cast<float>(dt);
-			inAir = true;
+	//Y axis collision handling
+	if (!collide(Vector3(P_Player.getPosition())))
+	{
+		if (collide(Vector3(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos)))
+		{
+			if (P_Player.Velocity.y > 0)
+				P_Player.Velocity.y = 0;
 		}
+
+		P_Player.Velocity += gravity_force * static_cast<float>(dt);
+		inAir = true;
+	}
+	else
+	{
+		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
+		{
+			P_Player.Velocity.y = 100;
+		}
+
+		else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 2.f, 0.f))))
+		{
+			P_Player.Velocity.y = 50;
+		}
+
+		else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 1.f, 0.f))))
+		{
+			P_Player.Velocity.y = 10;
+		}
+
 		else
 		{
-			if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
+			if (P_Player.Velocity.y < -100)
 			{
-				P_Player.Velocity.y = 100;
+				engine->play2D(soundList[ST_STEP_2]);
 			}
-
-			else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 2.f, 0.f))))
-			{
-				P_Player.Velocity.y = 50;
-			}
-
-			else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 1.f, 0.f))))
-			{
-				P_Player.Velocity.y = 10;
-			}
-
-			else
-			{
-				if (P_Player.Velocity.y < -100)
-				{
-					engine->play2D(soundList[ST_STEP_2]);
-				}
-				P_Player.Velocity.y = 0;
-			}
+			P_Player.Velocity.y = 0;
 		}
+	}
 
-		//PLAYER MOVEMENT
-		Vector3 LookDir = FPC.target - FPC.position;
-		LookDir.y = 0.f;
-		Vector3 RightDir = LookDir.Cross(Vector3(0, 1, 0));
-		LookDir.Normalize();
-		RightDir.Normalize();
+	//PLAYER MOVEMENT
+	Vector3 LookDir = FPC.target - FPC.position;
+	LookDir.y = 0.f;
+	Vector3 RightDir = LookDir.Cross(Vector3(0, 1, 0));
+	LookDir.Normalize();
+	RightDir.Normalize();
 
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_SPRINT]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_SPRINT]))
+	{
+		LookDir *= 25;
+		RightDir *= 25;
+		walkSoundDelay /= 2;
+	}
+	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
+	{
+		LookDir *= 4.5f;
+		RightDir *= 4.5f;
+		walkSoundDelay *= 2;
+	}
+	else
+	{
+		LookDir *= 15;
+		RightDir *= 15;
+	}
+
+	//Player movement
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+	{
+		P_Player.Velocity.x += LookDir.x;
+		P_Player.Velocity.z += LookDir.z;
+
+		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			LookDir *= 18;
-			RightDir *= 12;
-			walkSoundDelay /= 2;
+			engine->play2D(soundList[ST_STEP]);
+			f_step = timer;
 		}
-		else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
+	}
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
+	{
+		P_Player.Velocity.x -= LookDir.x;
+		P_Player.Velocity.z -= LookDir.z;
+
+		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			LookDir *= 4.5f;
-			RightDir *= 4.5f;
-			walkSoundDelay *= 2;
+			engine->play2D(soundList[ST_STEP]);
+			f_step = timer;
 		}
-		else
+	}
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
+	{
+		P_Player.Velocity -= RightDir;
+
+		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			LookDir *= 9;
-			RightDir *= 9;
+			engine->play2D(soundList[ST_STEP]);
+			f_step = timer;
 		}
+	}
 
-		//Player movement
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
+	{
+		P_Player.Velocity += RightDir;
+
+		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			P_Player.Velocity.x += LookDir.x;
-			P_Player.Velocity.z += LookDir.z;
-
-			if (walkSoundDelay + f_step < timer && !inAir)
-			{
-				engine->play2D(soundList[ST_STEP]);
-				f_step = timer;
-			}
+			engine->play2D(soundList[ST_STEP]);
+			f_step = timer;
 		}
+	}
 
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
+	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_JUMP]))
+	{
+		if (inAir == false)
 		{
-			P_Player.Velocity.x -= LookDir.x;
-			P_Player.Velocity.z -= LookDir.z;
-
-			if (walkSoundDelay + f_step < timer && !inAir)
-			{
-				engine->play2D(soundList[ST_STEP]);
-				f_step = timer;
-			}
+			P_Player.Velocity.y += 120;
+			engine->play2D(soundList[ST_STEP]);
 		}
+	}
 
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
+	//smooth slowing down
+	if (P_Player.Velocity.x != 0)
+	{
+		float SForceX = 0 - P_Player.Velocity.x;
+		P_Player.Velocity.x += SForceX * 0.1f;
+	}
+
+	if (P_Player.Velocity.z != 0)
+	{
+		float SForceZ = 0 - P_Player.Velocity.z;
+		P_Player.Velocity.z += SForceZ * 0.1f;
+	}
+
+
+	//Collision handling
+	if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 50.f, 0.f))))
+	{
+		if (P_Player.Velocity.x > 0)
 		{
-			P_Player.Velocity -= RightDir;
-
-			if (walkSoundDelay + f_step < timer && !inAir)
-			{
-				engine->play2D(soundList[ST_STEP]);
-				f_step = timer;
-			}
+			P_Player.Velocity.x = 0;
 		}
+	}
 
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, 10.f))))
+	{
+		if (P_Player.Velocity.z > 0)
 		{
-			P_Player.Velocity += RightDir;
-
-			if (walkSoundDelay + f_step < timer && !inAir)
-			{
-				engine->play2D(soundList[ST_STEP]);
-				f_step = timer;
-			}
+			P_Player.Velocity.z = 0;
 		}
+	}
 
-		if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_JUMP]))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 50.f, 0.f))))
+	{
+		if (P_Player.Velocity.x < 0)
 		{
-			if (inAir == false)
-			{
-				P_Player.Velocity.y += 120;
-				engine->play2D(soundList[ST_STEP]);
-			}
+			P_Player.Velocity.x = 0;
 		}
+	}
 
-		//smooth slowing down
-		if (P_Player.Velocity.x != 0)
+	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, -10.f))))
+	{
+		if (P_Player.Velocity.z < 0)
 		{
-			float SForceX = 0 - P_Player.Velocity.x;
-			P_Player.Velocity.x += SForceX * 0.1f;
+			P_Player.Velocity.z = 0;
 		}
+	}
 
-		if (P_Player.Velocity.z != 0)
+	if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]))
+	{
+		if (P_Player.holding == NULL)
 		{
-			float SForceZ = 0 - P_Player.Velocity.z;
-			P_Player.Velocity.z += SForceZ * 0.1f;
+			P_Player.holding = B;
+			P_Player.holding->pos = Vector3(0, -10, 0);
+			P_Player.holding->isHeld = true;
+			P_Player.holding->colEnable = false;
 		}
-		
+	}
 
-		//Collision handling
-		if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 50.f, 0.f))))
-		{
-			if (P_Player.Velocity.x > 0)
-			{
-				P_Player.Velocity.x = 0;
-			}
-		}
-
-		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, 10.f))))
-		{
-			if (P_Player.Velocity.z > 0)
-			{
-				P_Player.Velocity.z = 0;
-			}
-		}
-
-		if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 50.f, 0.f))))
-		{
-			if (P_Player.Velocity.x < 0)
-			{
-				P_Player.Velocity.x = 0;
-			}
-		}
-
-		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, -10.f))))
-		{
-			if (P_Player.Velocity.z < 0)
-			{
-				P_Player.Velocity.z = 0;
-			}
-		}
-
-		FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
-		P_Player.Update(dt);
+	FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
+	P_Player.Lookat = FPC.target;
+	P_Player.Update(dt);
 }
 
 /******************************************************************************/
@@ -953,13 +834,40 @@ void mainscene::UpdateGO(double &dt)
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
-		if (go->active && go->enablePhysics)
+		if (go->active)
 		{
+			if (go->enablePhysics && !go->isHeld)
 			{
-				go->vel += gravity_force * static_cast<float>(dt);
+				if (collide(go->pos - go->ColBox))
+				{
+					if (go->vel.y < 0)
+					{
+						go->vel.y = 0.f;
+					}
+
+					if (go->vel.x != 0)
+					{
+						float Friction = 0 - go->vel.x;
+						go->vel.x += Friction * 0.1f;
+					}
+					
+					if (go->vel.z != 0)
+					{
+						float Friction = 0 - go->vel.z;
+						go->vel.z += Friction * 0.1f;
+					}
+				}
+				else
+				{
+					go->vel += gravity_force * static_cast<float>(dt);
+				}
+				go->pos += go->vel * static_cast<float>(dt);
 			}
-			go->pos += go->vel * static_cast<float>(dt);
-		}
+			else
+			{
+				go->Update(dt);
+			}
+		}	
 	}
 }
 
@@ -1068,181 +976,58 @@ Handles weapons firing, reloading, animations and so on
 /******************************************************************************/
 void mainscene::weaponsUpdate(double &dt)
 {
-	if (f_curRecoil > 0)
+	if (P_Player.holding != NULL)
 	{
-		if (AimDownSight)
+		if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) || !P_Player.holding->isWeapon && Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 		{
-			f_curRecoil -= static_cast<float>(dt) * f_curRecoil * 4.f;
+			Mtx44 tempR;
+			tempR.SetToRotation(-CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition() + P_Player.CamOffset, false), 1, 0, 0);
+			tempR.SetToRotation(CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true), 0, 1, 0);
+			P_Player.holding->pos = P_Player.getPosition() + P_Player.CamOffset + tempR*P_Player.holding->pos;
+			P_Player.holding->rotation.y = CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true);
+			P_Player.holding->colEnable = true;
+			P_Player.holding->enablePhysics = true;
+			P_Player.holding->isHeld = false;
+			P_Player.holding->vel = P_Player.getDirection().Normalized() * 400.f;
+			P_Player.holding = NULL;
 		}
-		else
+
+		else if (P_Player.holding->isWeapon)
 		{
-			f_curRecoil -= static_cast<float>(dt) * f_curRecoil * 2.f;
-		}
-	}
-	//SHOOTING
-	if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
-	{
-		if (timer - fireRate > fireRateMax && weaponList[currentWeapon].CurrentClip > 0)
-		{
-			if (weaponList[currentWeapon].numBullet == 1)
+			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 			{
-				Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
-				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
-				Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
-			}
-			else
-			{
-				for (int i = 0; i < weaponList[currentWeapon].numBullet; ++i)
+				if (P_Player.holding->isGun)
 				{
-					f_curRecoil = weaponList[currentWeapon].bulletSpread * 0.5f;
-					Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
-					Shoot(FPC.position, ShootVector.Normalize(), weaponList[currentWeapon].bulletvelocity * 5.f, 6, weaponList[currentWeapon].damage);
+					if (WO->ClipSize > 0 && WO->attackRate + firerate < timer)
+					{
+						firerate = timer;
+						Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
+						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
+						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
+						WO->rotation.x -= WO->recoilEffect *0.25f;
+						engine->play2D(soundList[WO->AttackSound]);
+						--WO->ClipSize;
+					}
+					else
+					{
+						//Click sound
+					}
 				}
-				FPC.rotateCamVertical(static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect);
-			}
-			if (!AimDownSight)
-			{
-				f_curRecoil += static_cast<float>(dt) * weaponList[currentWeapon].bulletSpread;//Cursor recoil effect and bullet spread effect
-			}
-			else
-			{
-				f_curRecoil += static_cast<float>(dt) * weaponList[currentWeapon].bulletSpread * 0.5f;//Aiming down sights reduce spread
-			}
-			engine->play2D(weaponList[currentWeapon].shootSound);
-
-			weaponList[currentWeapon].currentpos.z -= static_cast<float>(dt) * weaponList[currentWeapon].recoilEffect;
-			fireRate = timer;
-			--weaponList[currentWeapon].CurrentClip;
-		}
-	}
-	//RELOADING
-	if (Application::IsKeyPressed(us_control[E_CTRL_RELOAD]))
-	{
-		weaponList[currentWeapon].CurrentClip = 0;
-	}
-	if (weaponList[currentWeapon].CurrentClip <= 0)
-	{
-		if (reloadTimer <= 0)
-		{
-			engine->play2D(weaponList[currentWeapon].reloadSound);
-		}
-
-		reloadTimer += static_cast<float>(dt);
-
-		if (AimDownSight)
-		{
-			AimDownSight = false;
-		}
-
-		if (weaponList[currentWeapon].currentpos.y > weaponList[currentWeapon].heldpos.y - 8.f)
-		{
-			float f_temp1 = (weaponList[currentWeapon].heldpos.y - 8.f) - weaponList[currentWeapon].currentpos.y;
-			weaponList[currentWeapon].currentpos.y += f_temp1 * static_cast<float>(dt) * 10.f;
-		}
-
-		if (reloadTimer > weaponList[currentWeapon].reloadTime)
-		{
-			reloadTimer = 0.f;
-			weaponList[currentWeapon].CurrentClip = weaponList[currentWeapon].ClipSize;
-		}
-	}
-
-	//AIM DOWN SIGHT
-	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
-	{
-		if (timer - inputDelay > 0.25)
-		{
-			if (!AimDownSight)
-			{
-				AimDownSight = true;
-			}
-			else
-			{
-				AimDownSight = false;
-			}
-			inputDelay = timer;
-		}
-	}
-
-	//SWITCH WEAPONS
-	if (Application::IsKeyPressed(us_control[E_CTRL_NEXT_ITEM]))
-	{
-		if (timer - inputDelay > 0.25)
-		{
-			if (currentWeapon < WT_TOTAL - 1)
-			{
-				currentWeapon += 1;
-			}
-			else
-			{
-				currentWeapon = 0;
-			}
-
-			weaponList[currentWeapon].currentpos = weaponList[currentWeapon].heldpos - Vector3(0, 5, 0);
-			AimDownSight = false;
-			fireRateMax = 60.f / static_cast<float>(weaponList[currentWeapon].fireRate);
-			inputDelay = timer;
-		}
-	}
-
-	if (AimDownSight)//Handle aim down sights
-	{
-		if (f_fov / weaponList[currentWeapon].adsZoom < f_currentfov)
-		{
-			f_currentfov -= static_cast<float>(dt) * (f_currentfov - f_fov / weaponList[currentWeapon].adsZoom) * 10;
-			editFOV(f_currentfov);
-		}
-		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].adspos)
-		{
-			Vector3 v3_temp1 = weaponList[currentWeapon].adspos - weaponList[currentWeapon].currentpos;
-			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 12.f;
-		}
-		if (currentWeapon == WT_L11A3)
-		{
-			scopeExeTime += static_cast<float>(dt);
-			if (scopeExeTime > 0.25)
-			{
-				if (renderScope)
+				else
 				{
-					renderScope = false;
-				}
-				if (ScopeAnim > 0)
-				{
-					ScopeAnim -= static_cast<float>(dt) * 10.f * ScopeAnim;
-				}
-				else if (ScopeAnim < 0)
-				{
-					ScopeAnim = 0.f;
+					WO->toggleAnimation();
+					engine->play2D(soundList[WO->AttackSound]);
 				}
 			}
-		}
-		if (FPC.mouseSensitivity == f_mouseSensitivity)
-		{
-			FPC.mouseSensitivity = f_mouseSensitivity / weaponList[currentWeapon].adsZoom;
-		}
-	}
-	else
-	{
-		if (!renderScope)
-		{
-			scopeExeTime = 0.f;
-			ScopeAnim = 15.f;
-			renderScope = true;
-		}
 
-		if (f_fov > f_currentfov)
-		{
-			f_currentfov += static_cast<float>(dt) * (f_fov - f_currentfov) * 10;
-			editFOV(f_currentfov);
-		}
-		if (weaponList[currentWeapon].currentpos != weaponList[currentWeapon].heldpos)
-		{
-			Vector3 v3_temp1 = weaponList[currentWeapon].heldpos - weaponList[currentWeapon].currentpos;
-			weaponList[currentWeapon].currentpos += v3_temp1 * static_cast<float>(dt) * 10.f;
-		}
-		if (FPC.mouseSensitivity != f_mouseSensitivity)
-		{
-			FPC.mouseSensitivity = f_mouseSensitivity;
+			if (P_Player.holding->isGun)
+			{
+				if (Application::IsKeyPressed(VK_MBUTTON))
+				{
+					WO->toggleAnimation();
+				}
+			}
 		}
 	}
 }
@@ -1308,16 +1093,15 @@ Animations, controls
 void mainscene::Update(double dt)
 {
 	d_dt = dt;
+	FPScounter = static_cast<float>(1 / dt);
 
 	if (Application::IsKeyPressed('X'))
 	{
 		dt *= 0.05;
 	}
-	
+
 
 	timer += static_cast<float>(dt);
-
-	FPScounter = static_cast<float>(1 / dt);
 
 	if (Application::IsKeyPressed('1'))
 	{
@@ -1366,7 +1150,7 @@ void mainscene::Update(double dt)
 			DisplayInfo = true;
 		}
 	}
-	
+
 	UpdatePlayer(dt);
 	UpdateGO(dt);
 	UpdateParticles(dt);
@@ -1408,23 +1192,19 @@ Rendering of game objects
 /******************************************************************************/
 void mainscene::RenderGO(GameObject *go)
 {
-	//switch(go->type)
+	if (!go->isHeld)
 	{
-		//default:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos);
+		modelStack.Rotate(go->rotation.x, 1, 0, 0);
+		modelStack.Rotate(go->rotation.y, 0, 1, 0);
+		modelStack.Rotate(go->rotation.z, 0, 0, 1);
+		modelStack.Scale(go->scale);
+		if (go->mesh)
 		{
-			modelStack.PushMatrix();
-			modelStack.Translate(go->pos);
-			modelStack.Rotate(go->rotation.x, 1, 0, 0);
-			modelStack.Rotate(go->rotation.y, 0, 1, 0);
-			modelStack.Rotate(go->rotation.z, 0, 0, 1);
-			modelStack.Scale(go->scale);
-			if (go->mesh)
-			{
-				RenderMesh(go->mesh, true, true, &go->material);
-			}
-			modelStack.PopMatrix();
-			//break;
+			RenderMesh(go->mesh, true, true, &go->material);
 		}
+		modelStack.PopMatrix();
 	}
 }
 
@@ -1436,9 +1216,29 @@ Rendering of character objects
 /******************************************************************************/
 void mainscene::RenderCharacter(CharacterObject *CO)
 {
+	float YRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
+	float Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition() + CO->CamOffset, false);
+
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->getPosition());
+
+	if (CO->holding != NULL)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(CO->CamOffset);
+		modelStack.Rotate(YRotation, 0, 1, 0);
+		modelStack.Rotate(Pitch, 1, 0, 0);
+		modelStack.Translate(CO->holding->pos);
+		modelStack.Rotate(CO->holding->rotation.x, 1, 0, 0);
+		modelStack.Rotate(CO->holding->rotation.y, 0, 1, 0);
+		modelStack.Rotate(CO->holding->rotation.z, 0, 0, 1);
+		modelStack.Scale(CO->holding->scale);
+		RenderMesh(CO->holding->mesh, true);
+		modelStack.PopMatrix();
+	}
+
 	modelStack.Translate(CO->ModelPos);
+	modelStack.Rotate(YRotation, 0, 1, 0);
 
 	modelStack.PushMatrix();
 	modelStack.Scale(CO->Scale);
@@ -1465,25 +1265,17 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
+	modelStack.Rotate(CO->getAnimation().LEFT_LEG, 1, 0, 0);
 	modelStack.Scale(CO->Scale);
 	RenderMesh(CO->Leg_left, false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
+	modelStack.Rotate(CO->getAnimation().RIGHT_LEG, 1, 0, 0);
 	modelStack.Scale(CO->Scale);
 	RenderMesh(CO->Leg_right, false);
 	modelStack.PopMatrix();
-
-	if (CO->holding != NULL)
-	{
-		modelStack.PushMatrix();
-		modelStack.Translate(CO->holding->pos);
-		modelStack.Scale(CO->holding->scale);
-		RenderMesh(CO->holding->mesh, false);
-		modelStack.PopMatrix();
-	}
-
 	modelStack.PopMatrix();
 }
 
@@ -1894,25 +1686,8 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderParticles();
 
-	//RenderCharacter(&P_Player);
-
 	RenderCharacter(&ai);
-
-	if (weaponsEnabled)
-	{
-		modelStack.PushMatrix();
-		modelStack.Translate(FPC.position);
-		modelStack.Rotate(CamRotationYaw, 0, 1, 0);
-		modelStack.Rotate(-CamRotationPitch, 1, 0, 0);
-		modelStack.Translate(weaponList[currentWeapon].currentpos);
-		modelStack.Scale(weaponList[currentWeapon].scale);
-		RenderMesh(weaponList[currentWeapon].mesh, true);
-		if (currentWeapon == WT_L11A3 && renderScope == true)
-		{
-			RenderMesh(meshList[GEO_L11A3_2], true);
-		}
-		modelStack.PopMatrix();
-	}
+	RenderCharacter(&P_Player);
 }
 
 /******************************************************************************/
@@ -1956,31 +1731,10 @@ void mainscene::RenderUI(void)
 {
 	if (weaponsEnabled)
 	{
-		if (currentWeapon == WT_L11A3 && renderScope == false)//Scope texture
-		{
-			RenderMeshin2D(meshList[GEO_SNIPER_CROSSHAIR_1], false, 100, Application::GetWindowWidth()*0.05f + ScopeAnim, Application::GetWindowHeight()*0.05f - ScopeAnim * 0.2f);
-			RenderMeshin2D(meshList[GEO_SNIPER_CROSSHAIR_2], false, 120, Application::GetWindowWidth()*0.05f + ScopeAnim - 100, Application::GetWindowHeight()*0.05f - ScopeAnim * 0.2f);
-		}
-		else
-		{
-
-		}
-		if (!AimDownSight && currentWeapon != WT_L11A3)
-		{
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f - 1 - f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
-		}
-
-		if (weaponList[currentWeapon].CurrentClip == 0)
-		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "R", Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
-		}
-		else
-		{
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(weaponList[currentWeapon].CurrentClip)), Color(0, 1, 1), 3, Application::GetWindowWidth()*0.1f - 5, 1.5);
-		}
+		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
+		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
+		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f - 1 - f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
+		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
 	}
 
 	if (DisplayInfo == true)
@@ -2195,18 +1949,12 @@ void mainscene::Render(void)
 
 	viewStack.LoadIdentity();
 
-	if (DisplayInfo)
-	{
-		viewStack.LookAt(
-			FPC.position.x, FPC.position.y, FPC.position.z,
-			FPC.target.x, FPC.target.y, FPC.target.z,
-			FPC.up.x, FPC.up.y, FPC.up.z
-			);
-	}
-	else
-	{
-		//viewStack.LookAt();
-	}
+	viewStack.LookAt(
+		FPC.position.x, FPC.position.y, FPC.position.z,
+		FPC.target.x, FPC.target.y, FPC.target.z,
+		FPC.up.x, FPC.up.y, FPC.up.z
+		);
+
 
 	modelStack.LoadIdentity();
 
@@ -2232,21 +1980,35 @@ void mainscene::Exit(void)
 	while (BIv_BulletList.size() > 0)
 	{
 		BulletInfo *BI = BIv_BulletList.back();
-		delete BI;
+		if (BI != NULL)
+		{
+			delete BI;
+			BI = NULL;
+		}
+		
 		BIv_BulletList.pop_back();
 	}
 
 	while (m_goList.size() > 0)
 	{
 		GameObject *go = m_goList.back();
-		delete go;
+		if (go != NULL)
+		{
+			delete go;
+			go = NULL;
+		}
 		m_goList.pop_back();
 	}
 
 	while (m_ParList.size() > 0)
 	{
 		Particle *Par = m_ParList.back();
-		delete Par;
+		if (Par != NULL)
+		{
+			delete Par;
+			Par = NULL;
+		}
+		
 		m_ParList.pop_back();
 	}
 

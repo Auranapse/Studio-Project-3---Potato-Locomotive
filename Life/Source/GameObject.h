@@ -26,6 +26,7 @@ public:
 	bool enablePhysics;
 	bool colEnable;
 	bool dynamicRendering;
+	bool isHeld;
 	float mass;
 	Mesh* mesh;
 
@@ -35,6 +36,8 @@ public:
 
 	GameObject();
 	~GameObject();
+
+	virtual void Update(double &dt);
 };
 
 #endif
