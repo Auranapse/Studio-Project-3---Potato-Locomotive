@@ -38,6 +38,7 @@ Main scene
 #include "CharacterObject.h"
 #include "Player.h"
 #include "AI.h"
+#include "Collision.h"
 
 /******************************************************************************/
 /*!

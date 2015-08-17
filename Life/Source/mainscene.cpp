@@ -1030,6 +1030,14 @@ void mainscene::UpdateBullets(double &dt)
 			}
 			else
 			{
+				static Vector3 result;
+				if (Collision::raySphere(ai.getPosition(), 2, BI->getDirection(), BI->getPosition(), result) == true)
+				{
+					BI->setLife(-1);
+					std::cout << "hit" << std::endl;
+				}
+				else
+					std::cout << " " << std::endl;
 				BI->Update(dt);
 			}
 		}

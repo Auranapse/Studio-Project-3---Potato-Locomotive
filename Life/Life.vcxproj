@@ -85,6 +85,7 @@
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
     <ClCompile Include="Source\CharacterObject.cpp" />
+    <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\CustomCam1.cpp" />
     <ClCompile Include="Source\DepthFBO.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="Source\BulletInfo.h" />
     <ClInclude Include="Source\Button.h" />
     <ClInclude Include="Source\CharacterObject.h" />
+    <ClInclude Include="Source\Collision.h" />
     <ClInclude Include="Source\CustomCam1.h" />
     <ClInclude Include="Source\DepthFBO.h" />
     <ClInclude Include="Source\GameObject.h" />
