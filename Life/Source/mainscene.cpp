@@ -512,10 +512,6 @@ void mainscene::Init()
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
 
-
-	ai.Init(Vector3(0, 0, 0), Vector3(0, 0, -1), "GameData//Image//player//PlayerSkin.tga");
-	ai.Scale.Set(10, 10, 10);
-
 	sc.pos.Set(0, 30, 30);
 	sc.scale.Set(5, 5, 5);
 
@@ -576,6 +572,16 @@ bool mainscene::loadLevel(int level)
 		return false;
 	}
 
+	while (m_charList.size() > 0)
+	{
+		CharacterObject *CO = m_charList.back();
+		if (CO != NULL)
+		{
+			delete CO;
+		}
+		m_charList.pop_back();
+	}
+
 	while (m_goList.size() > 0)
 	{
 		GameObject *go = m_goList.back();
@@ -585,6 +591,17 @@ bool mainscene::loadLevel(int level)
 		}
 		m_goList.pop_back();
 	}
+
+	while (m_ParList.size() > 0)
+	{
+		Particle *Par = m_ParList.back();
+		if (Par != NULL)
+		{
+			delete Par;
+		}
+		m_ParList.pop_back();
+	}
+
 	P_Player.Velocity.SetZero();
 
 	std::cout << "Map Size: ";
@@ -611,6 +628,15 @@ bool mainscene::loadLevel(int level)
 					WO->ColBox.Set(worldsize, worldsize, worldsize);
 					WO->mesh = meshList[GEO_WORLD_CUBE];
 					m_goList.push_back(WO);
+				}
+				else if (GAME_MAP.map_data[y][x][0] == 'A')
+				{
+					AI *ai;
+					ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
+					ai->Init(Vector3(x*worldsize*2.f, 0, (GAME_MAP.map_height - y)*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
+					ai->Lookat = ai->getPosition() + Vector3(0, 0, 1);
+					ai->Scale.Set(10, 10, 10);
+					m_charList.push_back(ai);
 				}
 			}
 		}
@@ -904,6 +930,25 @@ void mainscene::UpdatePlayer(double &dt)
 	FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(dt);
+
+	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	{
+		CharacterObject *CO = (CharacterObject *)*it;
+		AI *ai = dynamic_cast<AI*>(CO);
+		if (ai != NULL)
+		{
+			ai->Update(dt, P_Player.getPosition());
+		}
+		else
+		{
+			if (CO->holding != NULL)
+			{
+				CO->holding->Update(dt);
+			}
+		}
+
+		CO->Update(dt);
+	}
 }
 
 /******************************************************************************/
@@ -1328,7 +1373,6 @@ void mainscene::Update(double dt)
 	UpdateParticles(dt);
 	FPC.Update(dt);
 
-	ai.Update(dt, P_Player.getPosition());
 	sc.update(dt, P_Player.getPosition());
 
 	if (Application::IsKeyPressed(VK_F1))
@@ -1878,7 +1922,13 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderParticles();
 
-	RenderCharacter(&ai);
+	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	{
+		CharacterObject *CO = (CharacterObject *)*it;
+		RenderCharacter(CO);
+	}
+
+
 	RenderCharacter(&P_Player);
 
 	modelStack.PushMatrix();
@@ -2211,6 +2261,16 @@ void mainscene::Exit(void)
 		}
 		
 		m_ParList.pop_back();
+	}
+
+	while (m_charList.size() > 0)
+	{
+		CharacterObject *CO = m_charList.back();
+		if (CO != NULL)
+		{
+			delete CO;
+		}
+		m_charList.pop_back();
 	}
 
 	glDeleteProgram(m_gPassShaderID);

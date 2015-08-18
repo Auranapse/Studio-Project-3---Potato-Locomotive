@@ -332,7 +332,8 @@ private:
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 
 	Mesh* meshList[NUM_GEOMETRY];
-	std::vector<ItemObject*> m_itemList;
+	std::vector<SecurityCam*> m_ScamList;
+	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
@@ -340,7 +341,6 @@ private:
 	Player P_Player;
 	WeaponsObject *B;
 
-	AI ai;
 	SecurityCam sc; 
 
 	unsigned m_programID;
