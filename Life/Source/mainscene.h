@@ -39,7 +39,7 @@ Main scene
 #include "CharacterObject.h"
 #include "Player.h"
 #include "AI.h"
-#include "Collision.h"
+#include "SecurityCam.h"
 
 /******************************************************************************/
 /*!
@@ -74,6 +74,7 @@ class mainscene : public Scene
 
 		//OBJ MODELS--------------
 		GEO_OBJCAKE,
+		GEO_SECURITYCAMERA,
 
 		//GUNS
 		GEO_M9,
@@ -283,6 +284,9 @@ class mainscene : public Scene
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
 
+		ST_CAMERA_SPOTTED,
+		ST_CAMERA_FOUND,
+
 		ST_TOTAL,
 	};
 
@@ -336,6 +340,7 @@ private:
 	WeaponsObject *B;
 
 	AI ai;
+	SecurityCam sc; 
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];

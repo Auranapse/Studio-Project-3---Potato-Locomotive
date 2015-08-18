@@ -383,6 +383,9 @@ void mainscene::Init()
 	meshList[GEO_OBJCAKE] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//CAKE.obj");
 	meshList[GEO_OBJCAKE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Cake_UV.tga", true);
 
+	meshList[GEO_SECURITYCAMERA] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//other//SecurityCamera.obj");
+	meshList[GEO_SECURITYCAMERA]->textureID[0] = LoadTGA("GameData//Image//OBJ//SecurityCamera_UV.tga", true);
+
 	//WEAPONS
 	//if(weaponsEnabled)
 	{
@@ -454,6 +457,8 @@ void mainscene::Init()
 	meshList[GEO_OBJCAKE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
 
+
+
 	//if(weaponsEnabled)
 	{
 		meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
@@ -504,6 +509,9 @@ void mainscene::Init()
 	ai.Init(Vector3(0, 0, 0), Vector3(0, 0, -1), "GameData//Image//player//PlayerSkin.tga");
 	ai.Scale.Set(10, 10, 10);
 
+	sc.pos.Set(0, 30, 30);
+	sc.scale.Set(5, 5, 5);
+
 	f_step = 0.f;
 
 	loadLevel(1);
@@ -536,6 +544,10 @@ void mainscene::Init()
 
 	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//weapons//empty.wav", ESM_AUTO_DETECT, true);
+
+	soundList[ST_CAMERA_SPOTTED] = engine->addSoundSourceFromFile("GameData//sounds//other//EnemySpotted.mp3", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
+
 }
 
 void mainscene::InitShaders()
@@ -1266,6 +1278,7 @@ void mainscene::Update(double dt)
 	FPC.Update(dt);
 
 	ai.Update(dt, P_Player.getPosition());
+	sc.update(dt, P_Player.getPosition());
 
 	if (Application::IsKeyPressed(VK_F1))
 	{
@@ -1804,6 +1817,12 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&ai);
 	RenderCharacter(&P_Player);
+
+	modelStack.PushMatrix();
+	modelStack.Translate(sc.pos.x, sc.pos.y, sc.pos.z);
+	modelStack.Scale(sc.scale.x, sc.scale.y, sc.scale.z);
+	RenderMesh(meshList[GEO_SECURITYCAMERA], false);
+	modelStack.PopMatrix();
 }
 
 /******************************************************************************/
