@@ -281,7 +281,8 @@ Initializes menu
 /******************************************************************************/
 void MenuScene::InitMenu(void)
 {
-	UIColor.Set(0.8f, 0.8f, 0.8f);
+	UIColor.Set(0.1f, 0.1f, 0.1f);
+	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
 
 	v3_Menupos[E_M_SPLASH].Set(-100, -100, 0);
 	v3_Menupos[E_M_MAIN].Set(0, 0, 0);
@@ -370,7 +371,7 @@ void MenuScene::UpdateButtons(void)
 			if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)) + offset, S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0) + offset, Vector3(MousePosX, MousePosY, 0)))
 			{
 				S_MB->active = true;
-				S_MB->color.Set(1, 1, 1);
+				S_MB->color = UIColorPressed;
 			}
 			else
 			{

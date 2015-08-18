@@ -14,6 +14,8 @@ WeaponsObject::WeaponsObject()
 	ClipSize = 10;
 	CurrentClip = ClipSize;
 	animState = true;
+	Rotation1.SetZero();
+	Rotation2.SetZero();
 }
 
 WeaponsObject::~WeaponsObject()
@@ -46,7 +48,7 @@ void WeaponsObject::Update(double &dt)
 		if (rotation != Rotation1)
 		{
 			Vector3 v3_temp1 = Rotation1 - rotation;
-			rotation += v3_temp1 * static_cast<float>(dt) * 12.f;
+			rotation += v3_temp1 * static_cast<float>(dt) * 10.f;
 		}
 	}
 	else
@@ -59,8 +61,8 @@ void WeaponsObject::Update(double &dt)
 
 		if (rotation != Rotation2)
 		{
-			Vector3 v3_temp1 = Rotation2 - pos;
-			rotation += v3_temp1 * static_cast<float>(dt) * 12.f;
+			Vector3 v3_temp1 = Rotation2 - rotation;
+			rotation += v3_temp1 * static_cast<float>(dt) * 10.f;
 		}
 	}
 }

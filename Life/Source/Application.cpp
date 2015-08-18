@@ -359,7 +359,6 @@ void Application::Run()
 			scene = new MenuScene();
 			break;
 		}
-		//SetCursor(true);
 		scene->Init();
 
 		m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
@@ -397,12 +396,10 @@ void Application::Run()
 				if(e_currentScene == E_SCENE_MAIN)
 				{
 					scene->e_nextScene = E_SCENE_MAIN2;
-					SetCursor(true);
 				}
 				else
 				{
 					scene->e_nextScene = E_SCENE_MAIN;
-					SetCursor(true);
 				}
 			}
 			if(IsKeyPressed(VK_F11))
@@ -432,6 +429,7 @@ void Application::Run()
 			}
 		} //Check if the ESC key had been pressed or if the window had been closed
 		e_currentScene = scene->GetNextScene();
+		SetCursor(true);
 		scene->Exit();
 
 		delete scene;

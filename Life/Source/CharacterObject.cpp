@@ -21,6 +21,7 @@ CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.
 	ArmPos.Set(4.f, 4.f, 0.f);
 	LegPos.Set(0.f, -6.f, 0.f);
 	ModelPos.Set(0.f, 18.f, 0.f);
+	CamOffset.Set(0.f, 30.f, 0.f);
 	holding = NULL;
 }
 
@@ -120,7 +121,7 @@ direction vector
 /******************************************************************************/
 Vector3 CharacterObject::getDirection(void)
 {
-	return (Lookat - Position);
+	return (Lookat - (Position + CamOffset));
 }
 
 /******************************************************************************/
@@ -155,6 +156,27 @@ void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
 	Leg_right->textureID[0] = Head->textureID[0];
 }
 
+void CharacterObject::HoldObject(ItemObject *obj)
+{
+	if (obj->pickupable)
+	{
+		holding = obj;
+		obj->colEnable = false;
+	}
+}
+
+void CharacterObject::UpdateHold(double &dt)
+{
+	if (holding != NULL)
+	{
+		
+	}
+	else
+	{
+		
+	}
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -165,7 +187,7 @@ delta time
 /******************************************************************************/
 void CharacterObject::Update(double &dt)
 {
-	Animation.Update(dt, Velocity.LengthSquared());
+	Animation.Update(dt, Velocity.LengthSquared() * 0.03);
 	Lookat += Velocity * static_cast<float>(dt);
 	Position += Velocity * static_cast<float>(dt);
 }
