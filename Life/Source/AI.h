@@ -48,10 +48,7 @@ private:
 	E_AI_STATE e_State;
 	E_TYPE e_Type;
 
-	bool alert;
-	//Walk Or Run
-	bool WOR;
-	bool attack;
+	float f_alert_timer;
 };
 
 #endif

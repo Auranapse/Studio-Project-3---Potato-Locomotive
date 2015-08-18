@@ -16,17 +16,13 @@ Default constructor
 */
 /******************************************************************************/
 AI::AI(): 
-	alert(false),
-	WOR(true),
-	attack(false)
+f_alert_timer(0.f)
 {
 
 }
 
 AI::AI(E_AI_STATE e_State, E_TYPE e_Type):
-	alert(false),
-	WOR(true),
-	attack(false)
+f_alert_timer(0.f)
 {
 	this->e_State = e_State;
 	this->e_Type = e_Type;
@@ -107,7 +103,9 @@ delta time
 void AI::Update(double &dt, Vector3 playerPos)
 {
 	static Vector3 destination;
-	if(e_State != ALERT && e_State != ATTACK)
+
+	//AI does not see you at all
+	if(e_State != ALERT && e_State != ATTACK) 
 	{
 		if(isVisible(Position, Lookat, 65, playerPos))
 		{
@@ -117,6 +115,12 @@ void AI::Update(double &dt, Vector3 playerPos)
 				destination = playerPos;
 			}
 		}
+	}
+
+	//AI NOTICES YOU!
+	else if(e_State == ALERT || e_State == ATTACK)
+	{
+		destination = playerPos;
 	}
 
 	switch(e_State)
@@ -129,8 +133,8 @@ void AI::Update(double &dt, Vector3 playerPos)
 			{
 				Vector3 diff = playerPos - Position;
 				diff.Normalize();
-				Position.x += diff.x * 10 * static_cast<float>(dt);
-				Position.z += diff.z * 10 * static_cast<float>(dt);
+				Position.x += diff.x * f_movementSpeed * static_cast<float>(dt);
+				Position.z += diff.z * f_movementSpeed * static_cast<float>(dt);
 			}
 
 			//Change enemy state to walking if distance from player is more than 50
@@ -150,14 +154,17 @@ void AI::Update(double &dt, Vector3 playerPos)
 			{
 				Vector3 diff = Vector3(0, 0, 0) - Position;
 				diff.Normalize();
-				Position.x += diff.x * 10 * static_cast<float>(dt);
-				Position.z += diff.z * 10 * static_cast<float>(dt);
+
+				Position.x += diff.x * f_movementSpeed * static_cast<float>(dt);
+				Position.z += diff.z * f_movementSpeed * static_cast<float>(dt);
 
 				if(Collision::Length(Position, Vector3(0, 0, 0), 2, false))
 				{
 					Position.SetZero();
 				}
+
 			}
+
 			else
 				Lookat = defaultLookat;
 		}
@@ -166,62 +173,16 @@ void AI::Update(double &dt, Vector3 playerPos)
 	case ALERT:
 		{
 			Lookat = destination;
+			f_alert_timer * dt;
+
+			if(f_alert_timer >= 1000)
+			{
+				e_State = ATTACK;
+			}
+			
 		}
 		break;
 	}
-	/*if(e_State == ATTACK)
-		std::cout << "Hello World" << std::endl;
-	else
-		std::cout << "Bad World" << std::endl;*/
-	/*if(attack == true)
-	{
-		e_AI = ATTACK;
-	}
-	else
-	{
-		e_AI = WALKING;
-	}
-
-	if(WOR == true)
-	{
-		e_AI = WALKING;
-	}
-	else
-	{
-		e_AI = RUN;
-	}
-
-	if(alert == true)
-	{
-		e_AI = ALERT;
-	}
-	else
-	{
-		e_AI = WALKING;
-	}
-
-	switch(e_AI)
-	{
-	case ALERT:
-		{
-		}
-		break;
-
-	case WALKING:
-		{
-		}
-		break;
-
-	case RUN:
-		{
-		}
-		break;
-
-	case ATTACK:
-		{
-		}
-		break;
-	}*/
 
 	//Position += Velocity * static_cast<float>(dt);
 
