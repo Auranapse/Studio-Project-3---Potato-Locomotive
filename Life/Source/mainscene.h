@@ -252,9 +252,9 @@ class mainscene : public Scene
 
 		// -- Interactions
 		E_CTRL_INTERACT,
-		E_CTRL_KICK,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
+		E_CTRL_THROW,
 		E_CTRL_NEXT_ITEM,
 		E_CTRL_RELOAD,
 
@@ -339,7 +339,6 @@ private:
 	std::vector<BulletInfo*> BIv_BulletList;
 
 	Player P_Player;
-	WeaponsObject *B;
 
 	SecurityCam sc; 
 
@@ -371,9 +370,7 @@ private:
 	bool mouseEnabled;
 
 	bool DisplayInfo;
-
-
-	bool weaponsEnabled;
+	
 	float f_curRecoil;
 	float firerate;
 	float timer;
@@ -383,6 +380,7 @@ private:
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);
 	Particle* FetchParticle(void);
+	BulletInfo* FetchBullet(void);
 
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
@@ -413,7 +411,7 @@ private:
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);
-	bool collideGO(GameObject *go);
+	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;
 	irrklang::ISoundEngine* engine;
 };

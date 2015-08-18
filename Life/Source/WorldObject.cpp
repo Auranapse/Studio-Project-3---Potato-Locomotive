@@ -11,6 +11,7 @@ World Object class
 
 WorldObject::WorldObject()
 {
+	holdable = false;
 	enablePhysics = false;
 	mass = 0.f;
 }

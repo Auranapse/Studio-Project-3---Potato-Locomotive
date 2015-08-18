@@ -168,25 +168,44 @@ void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
 	Leg_right->material = Head->material;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Set object to hold
+\param obj
+the object pointer to hold
+*/
+/******************************************************************************/
 void CharacterObject::HoldObject(ItemObject *obj)
 {
-	if (obj->pickupable)
+	if (obj->holdable)
 	{
 		holding = obj;
 		obj->colEnable = false;
+		obj->pos = Vector3(0, -10, 0);
+		obj->isHeld = true;
 	}
 }
 
-void CharacterObject::UpdateHold(double &dt)
+/******************************************************************************/
+/*!
+\brief
+Set object to hold
+\param obj
+the object pointer to hold
+*/
+/******************************************************************************/
+void CharacterObject::DropObject(Vector3 ThrowVel)
 {
-	if (holding != NULL)
-	{
-		
-	}
-	else
-	{
-		
-	}
+	Mtx44 tempR;
+	tempR.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0, 1, 0);
+	holding->pos = Position + CamOffset + tempR*holding->pos;
+	holding->rotation.y = CalAnglefromPosition(Lookat, getPosition(), true);
+	holding->colEnable = true;
+	holding->enablePhysics = true;
+	holding->isHeld = false;
+	holding->vel = Velocity + ThrowVel;
+	holding = NULL;
 }
 
 /******************************************************************************/

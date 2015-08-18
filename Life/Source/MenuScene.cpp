@@ -95,15 +95,15 @@ void MenuScene::assignsave(void)
 		SF_1.Data.push_back(outputData);
 
 		outputData = new std::string;
-		*outputData = "70";
+		*outputData = "2";
 		SF_1.Data.push_back(outputData);
-
+		
 		outputData = new std::string;
 		*outputData = "1";
 		SF_1.Data.push_back(outputData);
 
 		outputData = new std::string;
-		*outputData = "2";
+		*outputData = "4";
 		SF_1.Data.push_back(outputData);
 
 		outputData = new std::string;
@@ -138,7 +138,7 @@ void MenuScene::assignsave(void)
 	CN = std::stoi(*SF_1.Data[8]);
 	us_control[E_CTRL_INTERACT] = CN;
 	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_KICK] = CN;
+	us_control[E_CTRL_THROW] = CN;
 	CN = std::stoi(*SF_1.Data[10]);
 	us_control[E_CTRL_ATTACK] = CN;
 	CN = std::stoi(*SF_1.Data[11]);

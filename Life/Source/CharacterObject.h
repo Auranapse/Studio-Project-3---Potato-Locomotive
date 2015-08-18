@@ -17,7 +17,8 @@ Character Object used by AI and player
 #include "Vector3.h"
 #include "Anim4.h"
 #include "ItemObject.h"
-
+#include "Mtx44.h"
+#include "GabrielDLC.h"
 
 class CharacterObject
 {
@@ -134,7 +135,7 @@ public:
 
 	virtual void Init(Vector3 Pos, Vector3 Lookat, const char* texturedir);
 	void HoldObject(ItemObject *obj);
-	void UpdateHold(double &dt);
+	void DropObject(Vector3 ThrowVel = Vector3(0, 0, 0));
 	virtual void Update(double &dt);
 
 	CharacterObject();

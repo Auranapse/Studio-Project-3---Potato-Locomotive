@@ -26,6 +26,7 @@ public:
 	bool enablePhysics;
 	bool colEnable;
 	bool dynamicRendering;
+	bool holdable;
 	bool isHeld;
 	float mass;
 	Mesh* mesh;

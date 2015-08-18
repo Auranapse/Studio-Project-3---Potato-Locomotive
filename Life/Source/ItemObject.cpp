@@ -14,7 +14,7 @@ ItemObject::ItemObject()
 	colEnable = true;
 	enablePhysics = true;
 	mass = 10.f;
-	pickupable = true;
+	holdable = true;
 	isWeapon = false;
 	isGun = false;
 }

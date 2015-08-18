@@ -81,9 +81,10 @@ float CalAnglefromPosition(Vector3 Target, Vector3 Origin, bool XZ)
 	else
 	{
 		float O = Target.y - Origin.y;
-
+		//O *= O;
 		Target.y = Origin.y = 0;
 
+		//float A = (Target - Origin).LengthSquared();
 		float A = (Target - Origin).Length();
 		return (atan(O / A) * 180 / Math::PI);
 	}
@@ -107,7 +108,7 @@ float CalAnglefromPosition2D(Vector3 &Target, Vector3 &Origin)
 /******************************************************************************/
 /*!
 \brief
-Calculates if something is within the FOV
+Calculates if something is within horizontal FOV
 \param Position
 the origin to calculate from
 \param Target
@@ -115,13 +116,13 @@ the position the object is looking at
 \param FOV
 the field of view of the object
 \return
-returns true if object is in the FOV, if not returns false
+returns true if object is within the horizontal FOV, if not returns false
 */
 /******************************************************************************/
 bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition)
 {
 	float lookingOBJ = CalAnglefromPosition(ObjectPosition, Position, true);
-	float cameraRotation = CalAnglefromPosition(Target, Position, true);;
+	float cameraRotation = CalAnglefromPosition(Target, Position, true);
 	bool LO = false, CR = false;
 
 	if (lookingOBJ < 0.f)
@@ -142,7 +143,7 @@ bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPos
 		cameraRotation = -cameraRotation;
 	}
 
-	if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation) || (Vector3(ObjectPosition.x - Position.x, 0, ObjectPosition.z - Position.z)).LengthSquared() < 1600)
+	if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation))
 	{
 		return true;
 	}
@@ -156,6 +157,40 @@ bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPos
 		{
 			lookingOBJ -= 360;
 		}
+		if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Calculates if something is within Vertical FOV
+\param Position
+the origin to calculate from
+\param Target
+the position the object is looking at
+\param FOV
+the field of view of the object
+\return
+returns true if object is within the horizontal FOV, if not returns false
+*/
+/******************************************************************************/
+bool isVisible2(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition)
+{
+	float lookingOBJ = CalAnglefromPosition(ObjectPosition, Position, false);
+	float cameraRotation = CalAnglefromPosition(Target, Position, false);
+	
+	if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation))
+	{
+		return true;
+	}
+	else
+	{
 		if ((lookingOBJ + FOV > cameraRotation && lookingOBJ - FOV < cameraRotation))
 		{
 			return true;

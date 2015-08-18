@@ -18,7 +18,6 @@ public:
 	ItemObject();
 	~ItemObject();
 
-	bool pickupable;
 	bool isWeapon;
 	bool isGun;
 };

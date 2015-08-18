@@ -63,7 +63,7 @@ class MenuScene : public Scene
 
 		// -- Interactions
 		E_CTRL_INTERACT,
-		E_CTRL_KICK,
+		E_CTRL_THROW,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_NEXT_ITEM,

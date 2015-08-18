@@ -19,5 +19,6 @@ bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position);
 float CalAnglefromPosition(Vector3 Target, Vector3 Origin, bool XZ);
 float CalAnglefromPosition2D(Vector3 &Target, Vector3 &Origin);
 bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition);
+bool isVisible2(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition);
 
 #endif

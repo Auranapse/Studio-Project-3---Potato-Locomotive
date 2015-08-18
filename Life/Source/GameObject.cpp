@@ -26,7 +26,8 @@ GameObject::GameObject()
 	dynamicRendering(false),
 	mass(1.f),
 	rotation(0, 0, 0),
-	isHeld(false)
+	isHeld(false),
+	holdable(false)
 {
 	mesh = NULL;
 }

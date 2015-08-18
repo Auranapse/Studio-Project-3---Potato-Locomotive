@@ -72,7 +72,7 @@ void mainscene::assignSave(void)
 	CN = std::stoi(*SF_1.Data[8]);
 	us_control[E_CTRL_INTERACT] = CN;
 	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_KICK] = CN;
+	us_control[E_CTRL_THROW] = CN;
 	CN = std::stoi(*SF_1.Data[10]);
 	us_control[E_CTRL_ATTACK] = CN;
 	CN = std::stoi(*SF_1.Data[11]);
@@ -93,7 +93,6 @@ Initialize default variables, create meshes, lighting
 void mainscene::Init()
 {
 	engine = createIrrKlangDevice(ESOD_AUTO_DETECT, ESEO_MULTI_THREADED | ESEO_LOAD_PLUGINS | ESEO_USE_3D_BUFFERS);
-	weaponsEnabled = true;
 	//Control initialization--------------
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -343,7 +342,7 @@ void mainscene::Init()
 	m_parameters[U_TRANSPARENCY] = glGetUniformLocation(m_programID, "alpha");
 	m_parameters[U_GLOW] = glGetUniformLocation(m_programID, "glow");
 	m_parameters[U_GLOW_COLOR] = glGetUniformLocation(m_programID, "glowColor");
-	
+
 	m_parameters[U_FOG_COLOR] = glGetUniformLocation(m_programID, "fogParam.color");
 	m_parameters[U_FOG_START] = glGetUniformLocation(m_programID, "fogParam.start");
 	m_parameters[U_FOG_END] = glGetUniformLocation(m_programID, "fogParam.end");
@@ -394,19 +393,17 @@ void mainscene::Init()
 	meshList[GEO_SECURITYCAMERA]->textureID[0] = LoadTGA("GameData//Image//OBJ//SecurityCamera_UV.tga", true);
 
 	//WEAPONS
-	//if(weaponsEnabled)
-	{
-		meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 10, 10, 0.53f);
 
-		meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
-		meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 8, 8, 0.53f);
 
-		meshList[GEO_MP5K] = MeshBuilder::GenerateOBJ("MP5K", "GameData//OBJ//weapons//MP5K.obj");
-		meshList[GEO_MP5K]->textureID[0] = LoadTGA("GameData//Image//weapons//MP5K.tga", true);
-		
-		meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
-		meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
-	}
+	meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
+	meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
+
+	meshList[GEO_MP5K] = MeshBuilder::GenerateOBJ("MP5K", "GameData//OBJ//weapons//MP5K.obj");
+	meshList[GEO_MP5K]->textureID[0] = LoadTGA("GameData//Image//weapons//MP5K.tga", true);
+
+	meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
+	meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
 
 	//----------------------SKYBOX
 	meshList[E_GEO_LEFT] = MeshBuilder::GenerateSkybox("left", Color(0.f, 0.f, 0.f), 1.f);
@@ -465,25 +462,20 @@ void mainscene::Init()
 	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
 
 
+	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_M9]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_M9]->material.kShininess = 10.0f;
 
-	//if(weaponsEnabled)
-	{
-		meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_M9]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_M9]->material.kShininess = 10.0f;
+	meshList[GEO_MP5K]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_MP5K]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_MP5K]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_MP5K]->material.kShininess = 10.0f;
 
-		meshList[GEO_MP5K]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_MP5K]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_MP5K]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_MP5K]->material.kShininess = 10.0f;
-		
-		meshList[GEO_SPAS12]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPAS12]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-		meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPAS12]->material.kShininess = 12.0f;
-	}
-
+	meshList[GEO_SPAS12]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPAS12]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPAS12]->material.kShininess = 12.0f;
 
 	//Starting position of translations and initialize physics
 
@@ -507,7 +499,7 @@ void mainscene::Init()
 		BIv_BulletList.push_back(BI);
 	}
 
-	
+
 
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
@@ -523,10 +515,7 @@ void mainscene::Init()
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
 
-	//if(weaponsEnabled)
-	{
-		initWeapons();
-	}
+	initWeapons();
 
 	inputDelay = 0.f;
 	timer = 0.f;
@@ -626,6 +615,7 @@ bool mainscene::loadLevel(int level)
 					WO->scale.Set(worldsize, worldsize, worldsize);
 					WO->pos.Set(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f);
 					WO->ColBox.Set(worldsize, worldsize, worldsize);
+					WO->dynamicRendering = true;
 					WO->mesh = meshList[GEO_WORLD_CUBE];
 					m_goList.push_back(WO);
 				}
@@ -646,6 +636,14 @@ bool mainscene::loadLevel(int level)
 	return true;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Gets an unsused particle in the vector
+\return
+returns an unactive particle
+*/
+/******************************************************************************/
 Particle* mainscene::FetchParticle(void)
 {
 	for (unsigned i = 0; i < m_ParList.size(); ++i)
@@ -666,7 +664,37 @@ Particle* mainscene::FetchParticle(void)
 		Par->active = false;
 		m_ParList.push_back(Par);
 	}
-	return FetchParticle();
+	return m_ParList.back();
+}
+
+/******************************************************************************/
+/*!
+\brief
+Gets an unsused Bullet in the vector
+\return
+returns an unactive bullet
+*/
+/******************************************************************************/
+BulletInfo* mainscene::FetchBullet(void)
+{
+	for (unsigned i = 0; i < BIv_BulletList.size(); ++i)
+	{
+		if (!BIv_BulletList[i]->getStatus())
+		{
+			BIv_BulletList[i]->setStatus(true);
+			return BIv_BulletList[i];
+			break;
+		}
+	}
+
+	for (unsigned i = 0; i < 10; ++i)
+	{
+		BulletInfo *BI;
+		BI = new BulletInfo();
+		BI->setStatus(false);
+		BIv_BulletList.push_back(BI);
+	}
+	return BIv_BulletList.back();
 }
 
 /******************************************************************************/
@@ -678,7 +706,7 @@ Intialize weapon stats, sounds, meshes
 void mainscene::initWeapons(void)
 {
 	firerate = 0.f;
-	
+
 	WeaponsObject *WPO;
 	WPO = new WeaponsObject();
 	WPO->active = true;
@@ -697,7 +725,25 @@ void mainscene::initWeapons(void)
 	WPO->colEnable = true;
 	WPO->ColBox.Set(3, 3, 3);
 	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
-	B = WPO;
+	m_goList.push_back(WPO);
+
+	WPO = new WeaponsObject();
+	WPO->active = true;
+	WPO->mesh = meshList[GEO_M9];
+	WPO->attackRate = 0.02f;
+	WPO->scale.Set(0.03f, 0.03f, 0.03f);
+	WPO->shootvelocity = 120.f;
+	WPO->pos.Set(0, 10, 10);
+	WPO->pos1.Set(-5, -4, 9);
+	WPO->pos2.Set(0, -2.1f, 8);
+	WPO->CurrentClip = 1500000;
+	WPO->recoilEffect = 100.f;
+	WPO->isGun = true;
+	WPO->isWeapon = true;
+	WPO->enablePhysics = true;
+	WPO->colEnable = true;
+	WPO->ColBox.Set(3, 3, 3);
+	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
 	m_goList.push_back(WPO);
 
 	f_curRecoil = 0.f;
@@ -920,10 +966,24 @@ void mainscene::UpdatePlayer(double &dt)
 	{
 		if (P_Player.holding == NULL)
 		{
-			P_Player.holding = B;
-			P_Player.holding->pos = Vector3(0, -10, 0);
-			P_Player.holding->isHeld = true;
-			P_Player.holding->colEnable = false;
+			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+			{
+				ItemObject *IO = (ItemObject *)*it;
+				if (IO->active && IO->holdable)
+				{
+					if (isVisible(FPC.position, FPC.target, 10, IO->pos))
+					{
+						if (isVisible2(FPC.position, FPC.target, 10, IO->pos))
+						{
+							if ((IO->pos - P_Player.getPosition()).LengthSquared() < 1000)
+							{
+								P_Player.HoldObject(IO);
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -979,7 +1039,7 @@ void mainscene::UpdateGO(double &dt)
 						float Friction = 0 - go->vel.x;
 						go->vel.x += Friction * 0.1f;
 					}
-					
+
 					if (go->vel.z != 0)
 					{
 						float Friction = 0 - go->vel.z;
@@ -1030,7 +1090,7 @@ void mainscene::UpdateGO(double &dt)
 			{
 				go->Update(dt);
 			}
-		}	
+		}
 	}
 }
 
@@ -1115,50 +1175,37 @@ Fires bullet
 /******************************************************************************/
 void mainscene::Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity, float dmg)
 {
-	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
-	{
-		BulletInfo *BI = (BulletInfo *)*it;
-		if (!BI->getStatus())
-		{
-			BI->damage = dmg;
-			BI->setLife(Longevity);
-			BI->setSpeed(Speed);
-			BI->setPosition(Pos);
-			BI->setDirection(Dir);
-			BI->setStatus(true);
-			break;
-		}
-	}
+	BulletInfo *BI;
+	BI = FetchBullet();
+	BI->damage = dmg;
+	BI->setLife(Longevity);
+	BI->setSpeed(Speed);
+	BI->setPosition(Pos);
+	BI->setDirection(Dir);
+	BI->setStatus(true);
 }
 
 /******************************************************************************/
 /*!
 \brief
-Handles weapons firing, reloading, animations and so on
+Handles held items
 */
 /******************************************************************************/
 void mainscene::weaponsUpdate(double &dt)
 {
 	if (P_Player.holding != NULL)
 	{
-		if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) || !P_Player.holding->isWeapon && Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
+		static bool isAttackPressed = false;
+		if (Application::IsKeyPressed(us_control[E_CTRL_THROW]) || !P_Player.holding->isWeapon && Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !isAttackPressed)
 		{
-			Mtx44 tempR;
-			tempR.SetToRotation(CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true), 0, 1, 0);
-			P_Player.holding->pos = P_Player.getPosition() + P_Player.CamOffset + tempR*P_Player.holding->pos;
-			P_Player.holding->rotation.y = CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true);
-			P_Player.holding->colEnable = true;
-			P_Player.holding->enablePhysics = true;
-			P_Player.holding->isHeld = false;
-			P_Player.holding->vel = P_Player.getDirection().Normalized() * 400.f;
-			P_Player.holding = NULL;
+			isAttackPressed = true;
+			P_Player.DropObject(P_Player.getDirection().Normalized() * 400.f);
 		}
 
 		else if (P_Player.holding->isWeapon)
 		{
-			static bool isAttackPressed = false;
 			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !isAttackPressed)
+			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 			{
 				isAttackPressed = true;
 				if (P_Player.holding->isGun)
@@ -1169,20 +1216,20 @@ void mainscene::weaponsUpdate(double &dt)
 						Vector3 ShootVector = FPC.target - FPC.position;
 						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
 						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
-						WO->rotation.x -= WO->recoilEffect *0.25f;
-						WO->pos.z -= WO->recoilEffect*0.05f;
+						WO->rotation.x -= WO->recoilEffect *0.1f;
+						WO->pos.z -= WO->recoilEffect*0.02f;
 						engine->play2D(soundList[WO->AttackSound]);
-						f_curRecoil += WO->recoilEffect * 0.25f;
+						f_curRecoil += WO->recoilEffect * 0.05f;
 						--WO->CurrentClip;
 					}
-					else if (WO->CurrentClip <= 0)
+					else if (WO->CurrentClip <= 0 && !isAttackPressed)
 					{
 						engine->play2D(soundList[ST_WEAPON_CLICK]);
 					}
 				}
 				else
 				{
-					if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState)
+					if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState && !isAttackPressed)
 					{
 						firerate = timer;
 						WO->toggleAnimation();
@@ -1195,12 +1242,17 @@ void mainscene::weaponsUpdate(double &dt)
 				isAttackPressed = false;
 			}
 
-			
 			if (P_Player.holding->isGun)
 			{
-				if (Application::IsKeyPressed(VK_MBUTTON))
+				static bool isAimPressed = false;
+				if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) && !isAimPressed)
 				{
+					isAimPressed = true;
 					WO->toggleAnimation();
+				}
+				else if (!Application::IsKeyPressed(us_control[E_CTRL_AIM]) && isAimPressed)
+				{
+					isAimPressed = false;
 				}
 
 				if (f_curRecoil > 0)
@@ -1260,24 +1312,23 @@ bool mainscene::collide(Vector3 &Position, bool bullet)
 	return false;
 }
 
-bool mainscene::collideGO(GameObject *go)
+/******************************************************************************/
+/*!
+\brief
+Check collision between gameobject
+*/
+/******************************************************************************/
+bool mainscene::collideGO(GameObject *go, GameObject *go2)
 {
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go2 = (GameObject *)*it;
-		if (go2->active && go2->colEnable && go2 != go)
+		if (intersect(go->pos + go->ColBox + go2->ColBox, go->pos - go->ColBox - go2->ColBox, go2->pos))
 		{
-			if (intersect(go2->pos + go2->ColBox, go2->pos - go2->ColBox, go->pos + go->ColBox))
-			{
-				return true;
-			}
-			
-			if (intersect(go2->pos + go2->ColBox, go2->pos - go2->ColBox, go->pos - go->ColBox))
-			{
-				return true;
-			}
+			return true;
 		}
 	}
+	return false;
 }
 
 /******************************************************************************/
@@ -1308,7 +1359,11 @@ void mainscene::Update(double dt)
 
 		if (P_Player.Velocity != 0)
 		{
-			dt *= P_Player.Velocity.LengthSquared() *0.005f;
+			float temp = P_Player.Velocity.LengthSquared() *0.002f;
+			if (temp > 1)
+			{
+				dt *= temp;
+			}
 
 			if (dt > d_dt)
 			{
@@ -1389,11 +1444,8 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	if (weaponsEnabled)
-	{
-		UpdateBullets(dt);
-		weaponsUpdate(dt);
-	}
+	UpdateBullets(dt);
+	weaponsUpdate(dt);
 
 	UpdateSound(dt);
 
@@ -1913,7 +1965,7 @@ void mainscene::RenderWorldShadow(void)
 			{
 				RenderGO(go);
 			}
-			else//Dynamic rendering
+			else if (isVisible(FPC.position, FPC.target, f_fov, go->pos))//Dynamic rendering
 			{
 				RenderGO(go);
 			}
@@ -1921,11 +1973,15 @@ void mainscene::RenderWorldShadow(void)
 	}
 
 	RenderParticles();
+	RenderBullet();
 
 	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
-		RenderCharacter(CO);
+		if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()))
+		{
+			RenderCharacter(CO);
+		}
 	}
 
 
@@ -1956,16 +2012,6 @@ void mainscene::RenderWorldNoShadow(void)
 
 	RenderSkybox();
 
-	if (weaponsEnabled)
-	{
-		RenderBullet();
-	}
-
-	modelStack.PushMatrix();
-	modelStack.Translate(lights[0].position.x, lights[0].position.y, lights[0].position.z);
-	RenderMesh(meshList[GEO_LIGHT], false);
-	modelStack.PopMatrix();
-
 	//RenderObjectsAlpha();//MUST RENDER IN ENVIRONMENT LAST OR WE'LL ALL DIE
 }
 
@@ -1977,7 +2023,7 @@ Renders the ingameUI
 /******************************************************************************/
 void mainscene::RenderUI(void)
 {
-	if (weaponsEnabled)
+	if (P_Player.holding != NULL)
 	{
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
 		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
@@ -2064,7 +2110,7 @@ void mainscene::RenderPassGPass(void)
 	lights[0].position.x = P_Player.getPosition().x;
 	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
-	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y -10, lights[0].position.z + 1, 0, 1, 0);
+	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
 
 	RenderWorldShadow();
 }
@@ -2236,7 +2282,7 @@ void mainscene::Exit(void)
 			delete BI;
 			BI = NULL;
 		}
-		
+
 		BIv_BulletList.pop_back();
 	}
 
@@ -2259,7 +2305,7 @@ void mainscene::Exit(void)
 			delete Par;
 			Par = NULL;
 		}
-		
+
 		m_ParList.pop_back();
 	}
 
