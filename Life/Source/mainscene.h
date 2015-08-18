@@ -54,8 +54,6 @@ class mainscene : public Scene
 	{
 		GEO_AXES,
 		GEO_CROSSHAIR,
-		GEO_SNIPER_CROSSHAIR_1,
-		GEO_SNIPER_CROSSHAIR_2,
 		GEO_SKYPLANE,
 		GEO_FLOOR_TILE,
 		GEO_WORLD_CUBE,
@@ -107,6 +105,9 @@ class mainscene : public Scene
 		U_MATERIAL_DIFFUSE,
 		U_MATERIAL_SPECULAR,
 		U_MATERIAL_SHININESS,
+		U_TRANSPARENCY,
+		U_GLOW,
+		U_GLOW_COLOR,
 
 		U_LIGHT0_POSITION,
 		U_LIGHT0_COLOR,
@@ -408,7 +409,7 @@ private:
 	void RenderCharacter(CharacterObject *CO);
 	void RenderParticles(void);
 	void RenderBullet(void);
-	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, Material *material = NULL);
+	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 10.f, float glow = 0.f, Color glowColor = Color(1, 0, 0), Material *material = NULL);
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);

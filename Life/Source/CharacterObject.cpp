@@ -155,6 +155,17 @@ void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
 	Arm_right->textureID[0] = Head->textureID[0];
 	Leg_left->textureID[0] = Head->textureID[0];
 	Leg_right->textureID[0] = Head->textureID[0];
+
+	Head->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
+	Head->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+	Head->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	Head->material.kShininess = 1.0f;
+
+	Chest->material = Head->material;
+	Arm_left->material = Head->material;
+	Arm_right->material = Head->material;
+	Leg_left->material = Head->material;
+	Leg_right->material = Head->material;
 }
 
 void CharacterObject::HoldObject(ItemObject *obj)

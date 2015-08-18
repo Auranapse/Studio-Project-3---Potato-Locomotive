@@ -254,10 +254,13 @@ void mainscene::Init()
 	lights[0].exponent = 3.f;
 	lights[0].spotDirection.Set(0.f, 1.f, 0.f);//*/
 
-	lights[0].type = LIGHT_DIRECTIONAL;
+	lights[0].type = LIGHT_POINT;
 	lights[0].position.Set(10.f, 100.f, 0.f);
 	lights[0].color.Set(1.f, 1.f, 1.f);
-	lights[0].power = 1.0f;
+	lights[0].kC = 1.f;
+	lights[0].kL = 0.00001f;
+	lights[0].kQ = 0.0000001f;
+	lights[0].power = 1.5f;
 
 
 	//Viewing room 2 light
@@ -337,6 +340,10 @@ void mainscene::Init()
 	glUniform1f(m_parameters[U_LIGHT3_COSINNER], lights[3].cosInner);
 	glUniform1f(m_parameters[U_LIGHT3_EXPONENT], lights[3].exponent);
 
+	m_parameters[U_TRANSPARENCY] = glGetUniformLocation(m_programID, "alpha");
+	m_parameters[U_GLOW] = glGetUniformLocation(m_programID, "glow");
+	m_parameters[U_GLOW_COLOR] = glGetUniformLocation(m_programID, "glowColor");
+	
 	m_parameters[U_FOG_COLOR] = glGetUniformLocation(m_programID, "fogParam.color");
 	m_parameters[U_FOG_START] = glGetUniformLocation(m_programID, "fogParam.start");
 	m_parameters[U_FOG_END] = glGetUniformLocation(m_programID, "fogParam.end");
@@ -368,14 +375,14 @@ void mainscene::Init()
 	//Generate meshes------------------------------------------------------------------------
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", Color(0.f, 1.f, 1.f), 0.1f, 0.5f, 1.f);
-	meshList[GEO_SNIPER_CROSSHAIR_1] = MeshBuilder::GenerateQuad("Crosshair Sniper Part 1", Color(0.f, 0.f, 0.f), 1.0f, 1.0f, 1.f);
-	meshList[GEO_SNIPER_CROSSHAIR_1]->textureID[0] = LoadTGA("GameData//Image//weapons//SNIPER_SCOPE.tga", true);
-	meshList[GEO_SNIPER_CROSSHAIR_2] = MeshBuilder::GenerateQuad("Crosshair Sniper Part 2", Color(0.f, 0.f, 0.f), .5f, 1.0f, 1.f);
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
-	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(1, 1, 1), 1, 1, 1);
-	meshList[GEO_WORLD_CUBE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
+	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(0.7f, 0.7f, 0.7f), 1, 1, 1);
+	meshList[GEO_WORLD_CUBE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
+	meshList[GEO_WORLD_CUBE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+	meshList[GEO_WORLD_CUBE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_WORLD_CUBE]->material.kShininess = 1.0f;
 
 	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
 
@@ -652,6 +659,7 @@ void mainscene::initWeapons(void)
 	WPO->mesh = meshList[GEO_M9];
 	WPO->attackRate = 0.5f;
 	WPO->scale.Set(0.03f, 0.03f, 0.03f);
+	WPO->shootvelocity = 120.f;
 	WPO->pos.Set(0, 10, 0);
 	WPO->pos1.Set(-5, -4, 9);
 	WPO->pos2.Set(0, -2.1f, 8);
@@ -937,6 +945,39 @@ void mainscene::UpdateGO(double &dt)
 				{
 					go->vel += gravity_force * static_cast<float>(dt);
 				}
+
+				if (collide(Vector3(go->pos.x + go->ColBox.x, go->pos.y, go->pos.z)))
+				{
+					if (go->vel.x > 0)
+					{
+						go->vel.x = 0;
+					}
+				}
+
+				if (collide(Vector3(go->pos.x - go->ColBox.x, go->pos.y, go->pos.z)))
+				{
+					if (go->vel.x < 0)
+					{
+						go->vel.x = 0;
+					}
+				}
+
+				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z + go->ColBox.z)))
+				{
+					if (go->vel.z > 0)
+					{
+						go->vel.z = 0;
+					}
+				}
+
+				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z - go->ColBox.z)))
+				{
+					if (go->vel.z < 0)
+					{
+						go->vel.z = 0;
+					}
+				}
+
 				go->colEnable = true;
 				go->pos += go->vel * static_cast<float>(dt);
 			}
@@ -1219,6 +1260,16 @@ void mainscene::Update(double dt)
 	if (Application::IsKeyPressed('X'))
 	{
 		dt *= 0.05;
+
+		if (P_Player.Velocity != 0)
+		{
+			dt *= P_Player.Velocity.LengthSquared() *0.005f;
+
+			if (dt > d_dt)
+			{
+				dt = d_dt;
+			}
+		}
 	}
 
 
@@ -1371,39 +1422,39 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 
 	modelStack.PushMatrix();
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Chest, false);
+	RenderMesh(CO->Chest, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->HeadPos);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Head, false);
+	RenderMesh(CO->Head, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Arm_left, false);
+	RenderMesh(CO->Arm_left, true, true, 10, 10);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->ArmPos);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Arm_right, false);
+	RenderMesh(CO->Arm_right, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
 	modelStack.Rotate(CO->getAnimation().LEFT_LEG, 1, 0, 0);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Leg_left, false);
+	RenderMesh(CO->Leg_left, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
 	modelStack.Rotate(CO->getAnimation().RIGHT_LEG, 1, 0, 0);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Leg_right, false);
+	RenderMesh(CO->Leg_right, true);
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 }
@@ -1468,6 +1519,8 @@ Renders mesh in 3D
 /******************************************************************************/
 void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x, float y, float rotation)
 {
+	glUniform1i(m_parameters[U_GLOW], 0);
+	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
@@ -1517,14 +1570,18 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x
 Renders mesh
 */
 /******************************************************************************/
-void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Material *material)
+void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color glowColor, Material *material)
 {
+	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
+	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
+
 	if (enableFOG && enableFog)
 	{
 		glUniform1i(m_parameters[U_FOG_ENABLED], 1);
 	}
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
-	
+
 	switch (m_renderPass)
 	{
 	case RENDER_PASS_PRE:
@@ -1661,6 +1718,9 @@ void mainscene::RenderText(Mesh* mesh, std::string text, Color color)
 	if (!mesh || mesh->textureID[0] <= 0) //Proper error check
 		return;
 
+	glUniform1i(m_parameters[U_GLOW], 0);
+	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
+
 	glDisable(GL_DEPTH_TEST);
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
 	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
@@ -1694,6 +1754,9 @@ void mainscene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 {
 	if (!mesh || mesh->textureID[0] <= 0) //Proper error check
 		return;
+
+	glUniform1i(m_parameters[U_GLOW], 0);
+	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -1938,17 +2001,20 @@ void mainscene::RenderPassGPass(void)
 
 	glUseProgram(m_gPassShaderID);
 
-	if (lights[0].type == LIGHT_DIRECTIONAL)
+	//if (lights[0].type == LIGHT_DIRECTIONAL)
 	{
 		//m_lightDepthProj.SetToOrtho(-100 - FPC.position.z*0.1, 100 - FPC.position.z*0.1, -100 - FPC.position.x*0.1, 100 - FPC.position.x*0.1, -200 + FPC.position.y*0.1, 400 + FPC.position.y*0.1);
-		m_lightDepthProj.SetToOrtho(-100 - FPC.position.z*0.1, 100 - FPC.position.z*0.1, -100 - FPC.position.x*0.1, 100 - FPC.position.x*0.1, 0, 600);
+		m_lightDepthProj.SetToOrtho(-200, 200, -200, 200, -200, 400);
 	}
-	else
+	//else
 	{
-		m_lightDepthProj.SetToPerspective(90, 1.f, 0.1, 20);
+		//m_lightDepthProj.SetToPerspective(90, 1.f, 0.1, 20);
 	}
+
+	lights[0].position.x = P_Player.getPosition().x;
+	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
-	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, 0, 0, 0, 0, 1, 0);
+	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y -10, lights[0].position.z + 1, 0, 1, 0);
 
 	RenderWorldShadow();
 }
