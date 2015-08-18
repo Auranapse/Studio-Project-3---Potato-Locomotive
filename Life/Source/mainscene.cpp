@@ -516,7 +516,7 @@ void mainscene::Init()
 	timer = 0.f;
 
 	ISoundSource* backgroundAmbience;
-	backgroundAmbience = engine->addSoundSourceFromFile("GameData//sounds//ambience//background.ogg");
+	backgroundAmbience = engine->addSoundSourceFromFile("GameData//sounds//ambience//background.wav");
 	backgroundAmbience->setDefaultVolume(0.8f);
 	engine->play2D(backgroundAmbience, true);
 
@@ -530,6 +530,7 @@ void mainscene::Init()
 	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
 
 	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//weapons//empty.wav", ESM_AUTO_DETECT, true);
 }
 
 void mainscene::InitShaders()
@@ -580,7 +581,6 @@ void mainscene::initWeapons(void)
 	WPO->pos.Set(0, 10, 0);
 	WPO->pos1.Set(-5, -4, 9);
 	WPO->pos2.Set(0, -2.1f, 8);
-	WPO->ClipSize = 15;
 	WPO->CurrentClip = 15;
 	WPO->recoilEffect = 50.f;
 	WPO->isGun = true;
@@ -981,7 +981,6 @@ void mainscene::weaponsUpdate(double &dt)
 		if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) || !P_Player.holding->isWeapon && Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 		{
 			Mtx44 tempR;
-			tempR.SetToRotation(-CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition() + P_Player.CamOffset, false), 1, 0, 0);
 			tempR.SetToRotation(CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true), 0, 1, 0);
 			P_Player.holding->pos = P_Player.getPosition() + P_Player.CamOffset + tempR*P_Player.holding->pos;
 			P_Player.holding->rotation.y = CalAnglefromPosition(P_Player.Lookat, P_Player.getPosition(), true);
@@ -994,36 +993,61 @@ void mainscene::weaponsUpdate(double &dt)
 
 		else if (P_Player.holding->isWeapon)
 		{
+			static bool isAttackPressed = false;
 			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
+			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !isAttackPressed)
 			{
+				isAttackPressed = true;
 				if (P_Player.holding->isGun)
 				{
-					if (WO->ClipSize > 0 && WO->attackRate + firerate < timer)
+					if (WO->CurrentClip > 0 && WO->attackRate + firerate < timer)
 					{
 						firerate = timer;
-						Vector3 ShootVector = Vector3(Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f), Math::RandFloatMinMax(-f_curRecoil*0.01f, f_curRecoil*0.01f)) + FPC.target - FPC.position;
+						Vector3 ShootVector = FPC.target - FPC.position;
 						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
 						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
 						WO->rotation.x -= WO->recoilEffect *0.25f;
+						WO->pos.z -= WO->recoilEffect*0.05f;
 						engine->play2D(soundList[WO->AttackSound]);
-						--WO->ClipSize;
+						f_curRecoil += WO->recoilEffect * 0.25f;
+						--WO->CurrentClip;
 					}
-					else
+					else if (WO->CurrentClip <= 0)
 					{
-						//Click sound
+						engine->play2D(soundList[ST_WEAPON_CLICK]);
 					}
 				}
 				else
 				{
-					WO->toggleAnimation();
-					engine->play2D(soundList[WO->AttackSound]);
+					if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState)
+					{
+						firerate = timer;
+						WO->toggleAnimation();
+						engine->play2D(soundList[WO->AttackSound]);
+					}
 				}
 			}
+			else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isAttackPressed)
+			{
+				isAttackPressed = false;
+			}
 
+			
 			if (P_Player.holding->isGun)
 			{
 				if (Application::IsKeyPressed(VK_MBUTTON))
+				{
+					WO->toggleAnimation();
+				}
+
+				if (f_curRecoil > 0)
+				{
+					f_curRecoil -= f_curRecoil * 0.1f;
+				}
+			}
+			else
+			{
+				if (WO->isAnimationComplete() && !WO->animState)
 				{
 					WO->toggleAnimation();
 				}
@@ -1219,11 +1243,10 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	float YRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
 	float Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition() + CO->CamOffset, false);
 
-	modelStack.PushMatrix();
-	modelStack.Translate(CO->getPosition());
-
 	if (CO->holding != NULL)
 	{
+		modelStack.PushMatrix();
+		modelStack.Translate(CO->getPosition());
 		modelStack.PushMatrix();
 		modelStack.Translate(CO->CamOffset);
 		modelStack.Rotate(YRotation, 0, 1, 0);
@@ -1235,8 +1258,16 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 		modelStack.Scale(CO->holding->scale);
 		RenderMesh(CO->holding->mesh, true);
 		modelStack.PopMatrix();
+		modelStack.PopMatrix();
 	}
 
+	if (CO == &P_Player)
+	{
+		return;
+	}
+
+	modelStack.PushMatrix();
+	modelStack.Translate(CO->getPosition());
 	modelStack.Translate(CO->ModelPos);
 	modelStack.Rotate(YRotation, 0, 1, 0);
 
