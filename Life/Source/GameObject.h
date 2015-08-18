@@ -30,9 +30,9 @@ public:
 	float mass;
 	Mesh* mesh;
 
-	Material material;
+	/*Material material;
 	float lightRadius;
-	float lightPower;
+	float lightPower;*/
 
 	GameObject();
 	~GameObject();

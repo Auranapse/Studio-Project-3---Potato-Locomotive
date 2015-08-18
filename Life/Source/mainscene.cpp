@@ -374,6 +374,9 @@ void mainscene::Init()
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
+	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(1, 1, 1), 1, 1, 1);
+	meshList[GEO_WORLD_CUBE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
+
 	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
 
 	//Load OBJ Models
@@ -492,7 +495,7 @@ void mainscene::Init()
 		BIv_BulletList.push_back(BI);
 	}
 
-	generateRoom1();
+	
 
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
@@ -503,6 +506,8 @@ void mainscene::Init()
 
 	f_step = 0.f;
 
+	loadLevel(1);
+	generateRoom1();
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
@@ -537,6 +542,63 @@ void mainscene::InitShaders()
 {
 	Application::SetCursor(true);
 	e_nextScene = Application::E_SCENE_MENU;
+}
+
+bool mainscene::loadLevel(int level)
+{
+	float worldsize = 40.f;
+	std::cout << "\nLoading map...\n";
+	std::string MAPLOC = "GameData//Maps//";
+	MAPLOC += std::to_string(static_cast<unsigned long long>(level));
+	MAPLOC += ".csv";
+	if (!GAME_MAP.loadMap(MAPLOC))
+	{
+		std::cout << "!!!ERROR!!! Unable to load map\n";
+		return false;
+	}
+
+	while (m_goList.size() > 0)
+	{
+		GameObject *go = m_goList.back();
+		if (go != NULL)
+		{
+			delete go;
+		}
+		m_goList.pop_back();
+	}
+	P_Player.Velocity.SetZero();
+
+	std::cout << "Map Size: ";
+	std::cout << GAME_MAP.map_width << ", " << GAME_MAP.map_height << "\n";
+
+	for (unsigned y = GAME_MAP.map_height - 1; y > 0; --y)
+	{
+		for (unsigned x = 0; x < GAME_MAP.map_width; ++x)
+		{
+			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
+			{
+				P_Player.setPosition(Vector3(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f));
+			}
+			else if (GAME_MAP.map_data[y][x] != "-")//Generate the rest of the world
+			{
+				if (GAME_MAP.map_data[y][x] == "1")
+				{
+					WorldObject *WO;
+					WO = new WorldObject();
+					WO->active = true;
+					WO->colEnable = true;
+					WO->scale.Set(worldsize, worldsize, worldsize);
+					WO->pos.Set(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f);
+					WO->ColBox.Set(worldsize, worldsize, worldsize);
+					WO->mesh = meshList[GEO_WORLD_CUBE];
+					m_goList.push_back(WO);
+				}
+			}
+		}
+	}
+
+	std::cout << "Map Successfully loaded\n";
+	return true;
 }
 
 Particle* mainscene::FetchParticle(void)
@@ -587,6 +649,7 @@ void mainscene::initWeapons(void)
 	WPO->isWeapon = true;
 	WPO->enablePhysics = true;
 	WPO->colEnable = true;
+	WPO->ColBox.Set(3, 3, 3);
 	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
 	B = WPO;
 	m_goList.push_back(WPO);
@@ -838,9 +901,10 @@ void mainscene::UpdateGO(double &dt)
 		{
 			if (go->enablePhysics && !go->isHeld)
 			{
-				if (collide(go->pos - go->ColBox))
+				go->colEnable = false;
+				if (collide(Vector3(go->pos.x, go->pos.y - go->ColBox.y, go->pos.z)))
 				{
-					if (go->vel.y < 0)
+					if (go->vel.y != 0)
 					{
 						go->vel.y = 0.f;
 					}
@@ -861,6 +925,7 @@ void mainscene::UpdateGO(double &dt)
 				{
 					go->vel += gravity_force * static_cast<float>(dt);
 				}
+				go->colEnable = true;
 				go->pos += go->vel * static_cast<float>(dt);
 			}
 			else
@@ -1097,6 +1162,26 @@ bool mainscene::collide(Vector3 &Position, bool bullet)
 	return false;
 }
 
+bool mainscene::collideGO(GameObject *go)
+{
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go2 = (GameObject *)*it;
+		if (go2->active && go2->colEnable && go2 != go)
+		{
+			if (intersect(go2->pos + go2->ColBox, go2->pos - go2->ColBox, go->pos + go->ColBox))
+			{
+				return true;
+			}
+			
+			if (intersect(go2->pos + go2->ColBox, go2->pos - go2->ColBox, go->pos - go->ColBox))
+			{
+				return true;
+			}
+		}
+	}
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -1226,7 +1311,7 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.Scale(go->scale);
 		if (go->mesh)
 		{
-			RenderMesh(go->mesh, true, true, &go->material);
+			RenderMesh(go->mesh, true, true);
 		}
 		modelStack.PopMatrix();
 	}
@@ -1426,7 +1511,7 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, Materia
 		glUniform1i(m_parameters[U_FOG_ENABLED], 1);
 	}
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
-
+	
 	switch (m_renderPass)
 	{
 	case RENDER_PASS_PRE:
@@ -1881,7 +1966,7 @@ void mainscene::RenderPassLight(void)
 	glUniform2fv(m_parameters[U_SCREEN_SIZE_LIGHTPASS], 1, &screenSize[0]);
 
 	//Point light - local light without shadow
-	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	/*for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = static_cast<GameObject *>(*it);
 		Position pos(go->pos.x, go->pos.y, go->pos.z);
@@ -1896,7 +1981,7 @@ void mainscene::RenderPassLight(void)
 		modelStack.Scale(go->lightRadius, go->lightRadius, go->lightRadius);
 		RenderMesh(meshList[GEO_RENDERING_SPHERE], false);
 		modelStack.PopMatrix();
-	}
+	}*/
 
 	glEnable(GL_CULL_FACE);
 

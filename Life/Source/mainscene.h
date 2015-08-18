@@ -21,6 +21,7 @@ Main scene
 #include "MatrixStack.h"
 #include "Light.h"
 #include "LoadTGA.h"
+#include "maploader.h"
 
 #include "BulletInfo.h"
 #include "GameObject.h"
@@ -57,6 +58,7 @@ class mainscene : public Scene
 		GEO_SNIPER_CROSSHAIR_2,
 		GEO_SKYPLANE,
 		GEO_FLOOR_TILE,
+		GEO_WORLD_CUBE,
 
 		GEO_LIGHT,
 		GEO_TEXT,
@@ -372,6 +374,8 @@ private:
 	float inputDelay;
 	int currentWeapon;
 
+	MapLoader GAME_MAP;
+	bool loadLevel(int level);
 	Particle* FetchParticle(void);
 
 	void UpdateSound(double &dt);
@@ -403,6 +407,7 @@ private:
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);
+	bool collideGO(GameObject *go);
 	MS modelStack, viewStack, projectionStack;
 	irrklang::ISoundEngine* engine;
 };
