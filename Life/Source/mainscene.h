@@ -357,9 +357,7 @@ private:
 	*/
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
-
-	float CamRotationYaw, CamRotationPitch;
-
+	
 	SaveFile SF_1;
 	void assignSave(void);
 
@@ -401,7 +399,6 @@ private:
 	void RenderMeshin2D(Mesh *mesh, bool enableLight, float size = 1.0f, float x = .0f, float y = .0f, float rotation = 0.f);
 
 	void initWeapons(void);
-	void generateRoom1(void);
 
 	void RenderGO(GameObject *go);
 	void RenderCharacter(CharacterObject *CO);

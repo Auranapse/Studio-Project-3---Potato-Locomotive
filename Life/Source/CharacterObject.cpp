@@ -197,15 +197,18 @@ the object pointer to hold
 /******************************************************************************/
 void CharacterObject::DropObject(Vector3 ThrowVel)
 {
-	Mtx44 tempR;
-	tempR.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0, 1, 0);
-	holding->pos = Position + CamOffset + tempR*holding->pos;
-	holding->rotation.y = CalAnglefromPosition(Lookat, getPosition(), true);
-	holding->colEnable = true;
-	holding->enablePhysics = true;
-	holding->isHeld = false;
-	holding->vel = Velocity + ThrowVel;
-	holding = NULL;
+	if (holding != NULL)
+	{
+		Mtx44 tempR;
+		tempR.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0, 1, 0);
+		holding->pos = Position + CamOffset + tempR*holding->pos;
+		holding->rotation.y = CalAnglefromPosition(Lookat, getPosition(), true);
+		holding->colEnable = true;
+		holding->enablePhysics = true;
+		holding->isHeld = false;
+		holding->vel = Velocity + ThrowVel;
+		holding = NULL;
+	}
 }
 
 /******************************************************************************/

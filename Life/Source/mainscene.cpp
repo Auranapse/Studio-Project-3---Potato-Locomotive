@@ -510,7 +510,6 @@ void mainscene::Init()
 	f_step = 0.f;
 
 	loadLevel(1);
-	generateRoom1();
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
@@ -548,6 +547,16 @@ void mainscene::InitShaders()
 	e_nextScene = Application::E_SCENE_MENU;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Loads a level map
+\param level
+the level to load
+\return
+returns true if loadmap is sucessful
+*/
+/******************************************************************************/
 bool mainscene::loadLevel(int level)
 {
 	float worldsize = 40.f;
@@ -559,6 +568,21 @@ bool mainscene::loadLevel(int level)
 	{
 		std::cout << "!!!ERROR!!! Unable to load map\n";
 		return false;
+	}
+
+	P_Player.Velocity.SetZero();
+	P_Player.DropObject();
+
+	while (BIv_BulletList.size() > 0)
+	{
+		BulletInfo *BI = BIv_BulletList.back();
+		if (BI != NULL)
+		{
+			delete BI;
+			BI = NULL;
+		}
+
+		BIv_BulletList.pop_back();
 	}
 
 	while (m_charList.size() > 0)
@@ -590,9 +614,7 @@ bool mainscene::loadLevel(int level)
 		}
 		m_ParList.pop_back();
 	}
-
-	P_Player.Velocity.SetZero();
-
+	
 	std::cout << "Map Size: ";
 	std::cout << GAME_MAP.map_width << ", " << GAME_MAP.map_height << "\n";
 
@@ -602,7 +624,7 @@ bool mainscene::loadLevel(int level)
 		{
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
-				P_Player.setPosition(Vector3(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f));
+				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, (GAME_MAP.map_height - y)*worldsize*2.f));
 			}
 			else if (GAME_MAP.map_data[y][x] != "-")//Generate the rest of the world
 			{
@@ -631,7 +653,19 @@ bool mainscene::loadLevel(int level)
 			}
 		}
 	}
+	WorldObject *WO;
+	WO = new WorldObject();
+	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0, (GAME_MAP.map_height*0.5f)*worldsize);
+	WO->rotation.x = -90;
+	WO->scale.Set(400, 400, 400);
+	WO->ColBox.Set(4000, 5, 4000);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_FLOOR_TILE];
+	m_goList.push_back(WO);
 
+	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
 }
@@ -747,28 +781,6 @@ void mainscene::initWeapons(void)
 	m_goList.push_back(WPO);
 
 	f_curRecoil = 0.f;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Generate collision boxes and positions of objects in room 1
-*/
-/******************************************************************************/
-void mainscene::generateRoom1(void)
-{
-	WorldObject *wo;
-
-	wo = new WorldObject();
-	wo->pos.Set(0, 0, 0);
-	wo->rotation.x = -90;
-	wo->scale.Set(400, 400, 400);
-	wo->ColBox.Set(4000, 5, 4000);
-	wo->active = true;
-	wo->enablePhysics = false;
-	wo->colEnable = true;
-	wo->mesh = meshList[GEO_FLOOR_TILE];
-	m_goList.push_back(wo);
 }
 
 /******************************************************************************/
@@ -1436,6 +1448,7 @@ void mainscene::Update(double dt)
 		{
 			mouseEnabled = true;
 			Application::SetCursor(false);
+			loadLevel(2);
 		}
 		else
 		{
@@ -1448,9 +1461,6 @@ void mainscene::Update(double dt)
 	weaponsUpdate(dt);
 
 	UpdateSound(dt);
-
-	CamRotationYaw = CalAnglefromPosition(FPC.target, FPC.position, true);
-	CamRotationPitch = CalAnglefromPosition(FPC.target, FPC.position, false);
 }
 
 /******************************************************************************/
@@ -1965,7 +1975,7 @@ void mainscene::RenderWorldShadow(void)
 			{
 				RenderGO(go);
 			}
-			else if (isVisible(FPC.position, FPC.target, f_fov, go->pos))//Dynamic rendering
+			else if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos))//Dynamic rendering
 			{
 				RenderGO(go);
 			}
