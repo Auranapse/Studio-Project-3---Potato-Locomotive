@@ -106,15 +106,24 @@ delta time
 /******************************************************************************/
 void AI::Update(double &dt, Vector3 playerPos)
 {
-	if(isVisible(Position, Lookat, 65, playerPos))
+	static Vector3 destination;
+	if(e_State != ALERT && e_State != ATTACK)
 	{
-		e_State = ATTACK;
+		if(isVisible(Position, Lookat, 65, playerPos))
+		{
+			if(Collision::LengthSquared(Position, playerPos, 400, false))
+			{
+				e_State = ALERT;
+				destination = playerPos;
+			}
+		}
 	}
 
 	switch(e_State)
 	{
 	case ATTACK:
 		{
+			this->Lookat = playerPos;
 			//Enemy would only move towards player if the difference between them is 15
 			if((playerPos - Position).LengthSquared() > 225)
 			{
@@ -137,14 +146,28 @@ void AI::Update(double &dt, Vector3 playerPos)
 			static bool patrollingLeft;
 
 			//Ensure that the enemy would move to its default pos for now
-			if(Position != defaultPosition)
+			if(Position != Vector3(0, 0, 0))
 			{
-				Vector3 diff = defaultPosition - Position;
+				Vector3 diff = Vector3(0, 0, 0) - Position;
 				diff.Normalize();
 				Position.x += diff.x * 10 * static_cast<float>(dt);
 				Position.z += diff.z * 10 * static_cast<float>(dt);
+
+				if(Collision::Length(Position, Vector3(0, 0, 0), 2, false))
+				{
+					Position.SetZero();
+				}
 			}
+			else
+				Lookat = defaultLookat;
 		}
+		break;
+
+	case ALERT:
+		{
+			Lookat = destination;
+		}
+		break;
 	}
 	/*if(e_State == ATTACK)
 		std::cout << "Hello World" << std::endl;

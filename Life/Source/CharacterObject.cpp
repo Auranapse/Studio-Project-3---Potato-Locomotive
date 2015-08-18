@@ -140,6 +140,7 @@ void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
 {
 	this->Position = Pos;
 	this->Lookat = Lookat;
+	this->defaultLookat = Lookat;
 
 	Head = MeshBuilder::GenerateOBJ("Head", "GameData//OBJ//character//Person_Head.obj");
 	Chest = MeshBuilder::GenerateOBJ("Chest", "GameData//OBJ//character//Person_Chest.obj");

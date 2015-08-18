@@ -12,6 +12,7 @@ Handles AI position and physics
 
 #include "CharacterObject.h"
 #include "GabrielDLC.h"
+#include "Collision.h"
 
 class AI : public CharacterObject
 {
