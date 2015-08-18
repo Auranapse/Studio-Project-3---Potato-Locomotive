@@ -11,58 +11,38 @@ Collision::~Collision()
 {
 }
 
-bool Collision::raySphere(Vector3 spherePos,float sphereScale, Vector3 rayDirection, Vector3 rayPos, Vector3 result)
+bool Collision::raySphere(Vector3 spherePos,float sphereScale, Vector3 rayDirection, Vector3 rayPos)
 {
-	//float xc,float yc,float zc,			float xd,float yd,float zd,			float xs,float ys,float zs
-	/*float xc = spherePos.x;
-	float yc = spherePos.y;
-	float zc = spherePos.z;
-
-	float xd = rayDirection.x;
-	float yd = rayDirection.y;
-	float zd = rayDirection.z;
-
-	float xs = rayPos.x;
-	float ys = rayPos.y;
-	float zs = rayPos.z;
-
-	float b = 2 * (xd*(xs - xc) + yd*(ys - yc) + zd*(zs - zc));
-	float c = xs*xs - 2 * xs*xc + xc*xc + ys*ys - 2 * ys*yc + yc*yc + zs*zs - 2 * zs*zc + zc*zc - sphereScale * sphereScale;
-	float disc = (b*b - 4 * c);
-
-	if (disc < 0)
-		return false;
-	else
-		return true;*/
-
-	float x1 = rayPos.x;
-	float y1 = rayPos.y;
-	float z1 = rayPos.z;
-
-	float x2 = rayDirection.x;
-	float y2 = rayDirection.y;
-	float z2 = rayDirection.z;
-
-	float x3 = spherePos.x;
-	float y3 = spherePos.y;
-	float z3 = spherePos.z;
-
-	float dx = x2 - x1;
-	float dy = y2 - y1;
-	float dz = z2 - z1;
-
-	float a = dx * dx + dy * dy + dz * dz;
-	float b = 2 * (dx * (x1 - x3) + dy * (y1 - y3) + dz * (z1 * z3));
-	float c = x3*x3 + y3*y3 + z3*z3 + x1*x1 + y1*y1 + z1*z1 - 2.0 * (x3*x1 + y3*y1 + z3*z1) - sphereScale*sphereScale;
-
-	float test = b*b - 4.0*a*c;
-
-	if (test >= 0)
-	{
-		float u = (-b - sqrt(test) / (2.0 * a));
+/*{
+		double u = (-b - sqrt(test) / (2.0 * a));
 		result = rayPos + u * (rayDirection - rayPos);
 		return true;
-	}
+	}*/
+	/**/
+	double x1 = rayPos.x;
+	double y1 = rayPos.y;
+	double z1 = rayPos.z;
+
+	double x2 = rayDirection.x;
+	double y2 = rayDirection.y;
+	double z2 = rayDirection.z;
+
+	double x3 = spherePos.x;
+	double y3 = spherePos.y;
+	double z3 = spherePos.z;
+
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	double dz = z2 - z1;
+
+	double a = dx * dx + dy * dy + dz * dz;
+	double b = 2 * (dx * (x1 - x3) + dy * (y1 - y3) + dz * (z1 * z3));
+	double c = x3*x3 + y3*y3 + z3*z3 + x1*x1 + y1*y1 + z1*z1 - 2.0 * (x3*x1 + y3*y1 + z3*z1) - 1;
+
+	double test = b*b - 4.0*a*c;
+
+	if (test >= 0)
+		return true;
 	else
 		return false;
 }
@@ -77,6 +57,15 @@ bool Collision::AABB(Vector3 pos1, Vector3 pos2, Vector3 pos2Max, Vector3 pos2Mi
 	else
 		return false;
 
+}
+
+bool Collision::SphereSphere(Vector3 pos1, float scale1, Vector3 pos2, float scale2)
+{
+	float dist = Vector3((pos1 - pos2)).LengthSquared();
+	if (dist <= (scale1 + scale2) * (scale1 + scale2))
+		return true;
+	else
+		return false;
 }
 
 bool Collision::Length(Vector3 pos1, Vector3 pos2, float range, bool isMore)
