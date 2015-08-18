@@ -191,49 +191,49 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 
-	v.pos.Set(-0.5f, -0.5f, -0.5f);//Rear bottom left
+	v.pos.Set(-lengthX, -lengthY, -lengthZ);//Rear bottom left
 	v.color = color;
 	v.normal.Set(-1, 0, 0);
 	v.texCoord.Set(0.009997f, 0.386717f);
 	vertex_buffer_data.push_back(v);//0
 
-	v.pos.Set(0.5f, -0.5f, -0.5f);//Rear bottom right
+	v.pos.Set(lengthX, -lengthY, -lengthZ);//Rear bottom right
 	v.color = color;
 	v.normal.Set(1, 0, 0);
 	v.texCoord.Set(0.993279f, 0.379516f);
 	vertex_buffer_data.push_back(v);//1
 
-	v.pos.Set(0.5f, 0.5f, -0.5f);//Rear top right
+	v.pos.Set(lengthX, lengthY, -lengthZ);//Rear top right
 	v.color = color;
 	v.normal.Set(1, 0, 0);
 	v.texCoord.Set(0.993279f, 0.696533f);
 	vertex_buffer_data.push_back(v);//2
 
-	v.pos.Set(-0.5f, 0.5f, -0.5f);//Rear top left
+	v.pos.Set(-lengthX, lengthY, -lengthZ);//Rear top left
 	v.color = color;
 	v.normal.Set(-1, 0, 0);
 	v.texCoord.Set(0.009997f, 0.703734f);
 	vertex_buffer_data.push_back(v);//3
 
-	v.pos.Set(-0.5f, -0.5f, 0.5f);//Front bottom left
+	v.pos.Set(-lengthX, -lengthY, lengthZ);//Front bottom left
 	v.color = color;
 	v.normal.Set(-1, 0, 0);
 	v.texCoord.Set(0.327014f, 0.386717f);
 	vertex_buffer_data.push_back(v);//4
 
-	v.pos.Set(0.5f, -0.5f, 0.5f);//Front bottom right
+	v.pos.Set(lengthX, -lengthY, lengthZ);//Front bottom right
 	v.color = color;
 	v.normal.Set(1, 0, 0);
 	v.texCoord.Set(0.676262f, 0.379516f);
 	vertex_buffer_data.push_back(v);//5
 
-	v.pos.Set(0.5f, 0.5f, 0.5f);//Front top right
+	v.pos.Set(lengthX, lengthY, lengthZ);//Front top right
 	v.color = color;
 	v.normal.Set(1, 0, 0);
 	v.texCoord.Set(0.676262f, 0.696533f);
 	vertex_buffer_data.push_back(v);//6
 
-	v.pos.Set(-0.5f, 0.5f, 0.5f);//Front top left
+	v.pos.Set(-lengthX, lengthY, lengthZ);//Front top left
 	v.color = color;
 	v.normal.Set(-1, 0, 0);
 	v.texCoord.Set(0.327014f, 0.703734f);
@@ -241,49 +241,49 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 
 	//-------------------------------Stage 2
 
-	v.pos.Set(-0.5f, -0.5f, -0.5f);//Rear bottom left
+	v.pos.Set(-lengthX, -lengthY, -lengthZ);//Rear bottom left
 	v.color = color;
 	v.normal.Set(0, -1, 0);
 	v.texCoord.Set(0.346072f, 0.040179f);
 	vertex_buffer_data.push_back(v);//8
 
-	v.pos.Set(0.5f, -0.5f, -0.5f);//Rear bottom right
+	v.pos.Set(lengthX, -lengthY, -lengthZ);//Rear bottom right
 	v.color = color;
 	v.normal.Set(0, -1, 0);
 	v.texCoord.Set(0.663090f, 0.040179f);
 	vertex_buffer_data.push_back(v);//9
 
-	v.pos.Set(0.5f, 0.5f, -0.5f);//Rear top right
+	v.pos.Set(lengthX, lengthY, -lengthZ);//Rear top right
 	v.color = color;
 	v.normal.Set(0, 1, 0);
 	v.texCoord.Set(0.655066f, 0.995437f);
 	vertex_buffer_data.push_back(v);//10
 
-	v.pos.Set(-0.5f, 0.5f, -0.5f);//Rear top left
+	v.pos.Set(-lengthX, lengthY, -lengthZ);//Rear top left
 	v.color = color;
 	v.normal.Set(0, 1, 0);
 	v.texCoord.Set(0.338049f, 0.995437f);
 	vertex_buffer_data.push_back(v);//11
 
-	v.pos.Set(-0.5f, -0.5f, 0.5f);//Front bottom left
+	v.pos.Set(-lengthX, -lengthY, lengthZ);//Front bottom left
 	v.color = color;
 	v.normal.Set(0, -1, 0);
 	v.texCoord.Set(0.346072f, 0.357197f);
 	vertex_buffer_data.push_back(v);//12
 
-	v.pos.Set(0.5f, -0.5f, 0.5f);//Front bottom right
+	v.pos.Set(lengthX, -lengthY, lengthZ);//Front bottom right
 	v.color = color;
 	v.normal.Set(0, -1, 0);
 	v.texCoord.Set(0.663090f, 0.357197f);
 	vertex_buffer_data.push_back(v);//13
 
-	v.pos.Set(0.5f, 0.5f, 0.5f);//Front top right
+	v.pos.Set(lengthX, lengthY, lengthZ);//Front top right
 	v.color = color;
 	v.normal.Set(0, 1, 0);
 	v.texCoord.Set(0.655066f, 0.678420f);
 	vertex_buffer_data.push_back(v);//14
 
-	v.pos.Set(-0.5f, 0.5f, 0.5f);//Front top left
+	v.pos.Set(-lengthX, lengthY, lengthZ);//Front top left
 	v.color = color;
 	v.normal.Set(0, 1, 0);
 	v.texCoord.Set(0.338049f, 0.678420f);
@@ -292,49 +292,49 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 
 	//-------------------------------Stage 3
 
-	v.pos.Set(-0.5f, -0.5f, -0.5f);//Rear bottom left
+	v.pos.Set(-lengthX, -lengthY, -lengthZ);//Rear bottom left
 	v.color = color;
 	v.normal.Set(0, 0, -1);
 	v.texCoord.Set(0.999309f, 0.040441f);
 	vertex_buffer_data.push_back(v);//16
 
-	v.pos.Set(0.5f, -0.5f, -0.5f);//Rear bottom right
+	v.pos.Set(lengthX, -lengthY, -lengthZ);//Rear bottom right
 	v.color = color;
 	v.normal.Set(0, 0, -1);
 	v.texCoord.Set(0.682291f, 0.040441f);
 	vertex_buffer_data.push_back(v);//17
 
-	v.pos.Set(0.5f, 0.5f, -0.5f);//Rear top right
+	v.pos.Set(lengthX, lengthY, -lengthZ);//Rear top right
 	v.color = color;
 	v.normal.Set(0, 0, -1);
 	v.texCoord.Set(0.682291f, 0.357458f);
 	vertex_buffer_data.push_back(v);//18
 
-	v.pos.Set(-0.5f, 0.5f, -0.5f);//Rear top left
+	v.pos.Set(-lengthX, lengthY, -lengthZ);//Rear top left
 	v.color = color;
 	v.normal.Set(0, 0, -1);
 	v.texCoord.Set(0.999309f, 0.357458f);
 	vertex_buffer_data.push_back(v);//19
 
-	v.pos.Set(-0.5f, -0.5f, 0.5f);//Front bottom left
+	v.pos.Set(-lengthX, -lengthY, lengthZ);//Front bottom left
 	v.color = color;
 	v.normal.Set(0, 0, 1);
 	v.texCoord.Set(0.012595f, 0.044471f);
 	vertex_buffer_data.push_back(v);//20
 
-	v.pos.Set(0.5f, -0.5f, 0.5f);//Front bottom right
+	v.pos.Set(lengthX, -lengthY, lengthZ);//Front bottom right
 	v.color = color;
 	v.normal.Set(0, 0, 1);
 	v.texCoord.Set(0.329612f, 0.044471f);
 	vertex_buffer_data.push_back(v);//21
 
-	v.pos.Set(0.5f, 0.5f, 0.5f);//Front top right
+	v.pos.Set(lengthX, lengthY, lengthZ);//Front top right
 	v.color = color;
 	v.normal.Set(0, 0, 1);
 	v.texCoord.Set(0.329612f, 0.361489f);
 	vertex_buffer_data.push_back(v);//22
 
-	v.pos.Set(-0.5f, 0.5f, 0.5f);//Front top left
+	v.pos.Set(-lengthX, lengthY, lengthZ);//Front top left
 	v.color = color;
 	v.normal.Set(0, 0, 1);
 	v.texCoord.Set(0.012595f, 0.361489f);
