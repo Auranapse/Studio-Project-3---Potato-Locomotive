@@ -173,11 +173,12 @@ void AI::Update(double &dt, Vector3 playerPos)
 	case ALERT:
 		{
 			Lookat = destination;
-			f_alert_timer * dt;
+			f_alert_timer += (float)dt;
 
-			if(f_alert_timer >= 1000)
+			if(f_alert_timer >= 5.f)
 			{
 				e_State = ATTACK;
+				f_alert_timer = 0.f;
 			}
 			
 		}
