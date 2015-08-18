@@ -11,11 +11,12 @@ WeaponsObject::WeaponsObject()
 	adsZoom = 2.f;
 	bulletSpread = 0.f;
 	numBullet = 1;
-	ClipSize = 10;
-	CurrentClip = ClipSize;
+	CurrentClip = 10;
 	animState = true;
 	Rotation1.SetZero();
 	Rotation2.SetZero();
+	AnimSpeed = 10.f;
+	animComplete = false;
 }
 
 WeaponsObject::~WeaponsObject()
@@ -33,6 +34,7 @@ void WeaponsObject::toggleAnimation()
 	{
 		animState = true;
 	}
+	animComplete = false;
 }
 
 void WeaponsObject::Update(double &dt)
@@ -42,13 +44,30 @@ void WeaponsObject::Update(double &dt)
 		if (pos != pos1)
 		{
 			Vector3 v3_temp1 = pos1 - pos;
-			pos += v3_temp1 * static_cast<float>(dt) * 12.f;
+			pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+			animComplete = false;
 		}
 
 		if (rotation != Rotation1)
 		{
 			Vector3 v3_temp1 = Rotation1 - rotation;
-			rotation += v3_temp1 * static_cast<float>(dt) * 10.f;
+			rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+			animComplete = false;
+		}
+
+		if (!animComplete)
+		{
+			if (pos.x < pos1.x + 0.01f && pos.x > pos1.x - 0.01f && pos.y < pos1.y + 0.01f && pos.y > pos1.y - 0.01f && pos.z < pos1.z + 0.01f && pos.z > pos1.z - 0.01f)
+			{
+				pos = pos1;
+				animComplete = true;
+			}
+
+			if (rotation.x < Rotation1.x + 0.01f && rotation.x > Rotation1.x - 0.01f && rotation.y < Rotation1.y + 0.01f && rotation.y > Rotation1.y - 0.01f && rotation.z < Rotation1.z + 0.01f && rotation.z > Rotation1.z - 0.01f)
+			{
+				rotation = Rotation1;
+				animComplete = true;
+			}
 		}
 	}
 	else
@@ -56,13 +75,35 @@ void WeaponsObject::Update(double &dt)
 		if (pos != pos2)
 		{
 			Vector3 v3_temp1 = pos2 - pos;
-			pos += v3_temp1 * static_cast<float>(dt) * 12.f;
+			pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+			animComplete = false;
 		}
 
 		if (rotation != Rotation2)
 		{
 			Vector3 v3_temp1 = Rotation2 - rotation;
-			rotation += v3_temp1 * static_cast<float>(dt) * 10.f;
+			rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+			animComplete = false;
+		}
+
+		if (!animComplete)
+		{
+			if (pos.x < pos2.x + 0.01f && pos.x > pos2.x - 0.01f && pos.y < pos2.y + 0.01f && pos.y > pos2.y - 0.01f && pos.z < pos2.z + 0.01f && pos.z > pos2.z - 0.01f)
+			{
+				pos = pos2;
+				animComplete = true;
+			}
+
+			if (rotation.x < Rotation2.x + 0.01f && rotation.x > Rotation2.x - 0.01f && rotation.y < Rotation2.y + 0.01f && rotation.y > Rotation2.y - 0.01f && rotation.z < Rotation2.z + 0.01f && rotation.z > Rotation2.z - 0.01f)
+			{
+				rotation = Rotation2;
+				animComplete = true;
+			}
 		}
 	}
+}
+
+bool WeaponsObject::isAnimationComplete(void)
+{
+	return animComplete;
 }

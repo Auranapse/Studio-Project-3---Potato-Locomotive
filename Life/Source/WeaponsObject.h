@@ -6,6 +6,8 @@
 
 class WeaponsObject : public ItemObject
 {
+private:
+	bool animComplete;
 public:
 	WeaponsObject();
 	~WeaponsObject();
@@ -18,9 +20,9 @@ public:
 	float reloadTime;
 	float adsZoom;
 	float bulletSpread;
+	float AnimSpeed;
 	int numBullet;
 	int CurrentClip;
-	int ClipSize;
 	
 	bool animState;
 
@@ -33,6 +35,7 @@ public:
 
 	void toggleAnimation(void);
 	virtual void Update(double &dt);
+	bool isAnimationComplete(void);
 };
 
 #endif

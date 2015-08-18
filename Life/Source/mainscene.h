@@ -276,7 +276,7 @@ class mainscene : public Scene
 		ST_KILL,
 		ST_BUZZER,
 		ST_ALERT,
-
+		
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
 
