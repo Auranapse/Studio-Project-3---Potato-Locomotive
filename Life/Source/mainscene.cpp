@@ -1004,6 +1004,14 @@ void mainscene::UpdatePlayer(double &dt)
 		AI *ai = dynamic_cast<AI*>(CO);
 		if (ai != NULL)
 		{
+			Mtx44 rotation;
+			rotation.SetToRotation(CalAnglefromPosition(ai->Lookat, ai->getPosition(), true), 0.f, 1.f, 0.f);
+			Vector3 L, R, C;
+			C = rotation * Vector3(0.f, 0.f, 10.f);
+			L = rotation * Vector3(-5.f, 0.f, 7.f);
+			R = rotation * Vector3(5.f, 0.f, 7.f);
+
+			ai->SensorUpdate(dt, collide(ai->getPosition() + L), collide(ai->getPosition() + R), collide(ai->getPosition() + C));
 			ai->Update(dt, P_Player.getPosition());
 		}
 		else
