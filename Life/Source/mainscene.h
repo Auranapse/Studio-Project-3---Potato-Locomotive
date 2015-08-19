@@ -74,10 +74,11 @@ class mainscene : public Scene
 		GEO_OBJCAKE,
 		GEO_SECURITYCAMERA,
 
-		//GUNS
+		//Weapons
 		GEO_M9,
 		GEO_MP5K,
 		GEO_SPAS12,
+		GEO_KATANA,
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,
@@ -281,9 +282,14 @@ class mainscene : public Scene
 		ST_KILL,
 		ST_BUZZER,
 		ST_ALERT,
+		ST_BACKGROUND,
+
+		ST_SLOWMO_ENTER,
+		ST_SLOWMO_EXIT,
 		
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
+		ST_WEAPON_KATANA,
 
 		ST_CAMERA_SPOTTED,
 		ST_CAMERA_FOUND,
@@ -318,7 +324,7 @@ private:
 
 	unsigned m_lightShaderID;
 
-	double d_dt;
+	double d_dt, d_dt2;
 
 	Mtx44 m_lightDepthProj;
 	Mtx44 m_lightDepthView;
@@ -330,6 +336,7 @@ private:
 	Vector3 gravity_force;
 
 	irrklang::ISoundSource *soundList[ST_TOTAL];
+	bool slowmoentrance;
 
 	Mesh* meshList[NUM_GEOMETRY];
 	std::vector<SecurityCam*> m_ScamList;
@@ -380,6 +387,7 @@ private:
 	Particle* FetchParticle(void);
 	BulletInfo* FetchBullet(void);
 
+	void PlaySound2D(irrklang::ISoundSource *source);
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
 	void UpdateGO(double &dt);

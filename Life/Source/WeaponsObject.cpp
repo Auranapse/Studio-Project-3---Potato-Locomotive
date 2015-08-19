@@ -17,6 +17,7 @@ WeaponsObject::WeaponsObject()
 	Rotation2.SetZero();
 	AnimSpeed = 10.f;
 	animComplete = false;
+	timer = 0.f;
 }
 
 WeaponsObject::~WeaponsObject()
@@ -60,44 +61,73 @@ void WeaponsObject::Update(double &dt)
 			if (pos.x < pos1.x + 0.01f && pos.x > pos1.x - 0.01f && pos.y < pos1.y + 0.01f && pos.y > pos1.y - 0.01f && pos.z < pos1.z + 0.01f && pos.z > pos1.z - 0.01f)
 			{
 				pos = pos1;
-				animComplete = true;
-			}
 
-			if (rotation.x < Rotation1.x + 0.01f && rotation.x > Rotation1.x - 0.01f && rotation.y < Rotation1.y + 0.01f && rotation.y > Rotation1.y - 0.01f && rotation.z < Rotation1.z + 0.01f && rotation.z > Rotation1.z - 0.01f)
-			{
-				rotation = Rotation1;
-				animComplete = true;
+				if (rotation.x < Rotation1.x + 0.01f && rotation.x > Rotation1.x - 0.01f && rotation.y < Rotation1.y + 0.01f && rotation.y > Rotation1.y - 0.01f && rotation.z < Rotation1.z + 0.01f && rotation.z > Rotation1.z - 0.01f)
+				{
+					rotation = Rotation1;
+					animComplete = true;
+				}
 			}
 		}
 	}
 	else
 	{
-		if (pos != pos2)
-		{
-			Vector3 v3_temp1 = pos2 - pos;
-			pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-			animComplete = false;
-		}
 
-		if (rotation != Rotation2)
+		if (isGun)
 		{
-			Vector3 v3_temp1 = Rotation2 - rotation;
-			rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-			animComplete = false;
-		}
-
-		if (!animComplete)
-		{
-			if (pos.x < pos2.x + 0.01f && pos.x > pos2.x - 0.01f && pos.y < pos2.y + 0.01f && pos.y > pos2.y - 0.01f && pos.z < pos2.z + 0.01f && pos.z > pos2.z - 0.01f)
+			if (pos != pos2)
 			{
-				pos = pos2;
-				animComplete = true;
+				Vector3 v3_temp1 = pos2 - pos;
+				pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+				animComplete = false;
 			}
 
-			if (rotation.x < Rotation2.x + 0.01f && rotation.x > Rotation2.x - 0.01f && rotation.y < Rotation2.y + 0.01f && rotation.y > Rotation2.y - 0.01f && rotation.z < Rotation2.z + 0.01f && rotation.z > Rotation2.z - 0.01f)
+			if (rotation != Rotation2)
 			{
-				rotation = Rotation2;
-				animComplete = true;
+				Vector3 v3_temp1 = Rotation2 - rotation;
+				rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+				animComplete = false;
+			}
+
+			if (!animComplete)
+			{
+				if (pos.x < pos2.x + 0.01f && pos.x > pos2.x - 0.01f && pos.y < pos2.y + 0.01f && pos.y > pos2.y - 0.01f && pos.z < pos2.z + 0.01f && pos.z > pos2.z - 0.01f)
+				{
+					pos = pos2;
+
+					if (rotation.x < Rotation2.x + 0.01f && rotation.x > Rotation2.x - 0.01f && rotation.y < Rotation2.y + 0.01f && rotation.y > Rotation2.y - 0.01f && rotation.z < Rotation2.z + 0.01f && rotation.z > Rotation2.z - 0.01f)
+					{
+						rotation = Rotation2;
+						animComplete = true;
+					}
+				}
+			}
+		}
+
+		else
+		{
+			if (pos != pos2)
+			{
+				Vector3 v3_temp1 = pos2 - pos;
+				pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+				animComplete = false;
+			}
+
+			if (rotation != Rotation2)
+			{
+				Vector3 v3_temp1 = Rotation2 - rotation;
+				rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+				animComplete = false;
+			}
+
+			if (timer > attackRate)
+			{
+				timer = 0.f;
+				animState = true;
+			}
+			else
+			{
+				timer += static_cast<float>(dt);
 			}
 		}
 	}
@@ -106,4 +136,9 @@ void WeaponsObject::Update(double &dt)
 bool WeaponsObject::isAnimationComplete(void)
 {
 	return animComplete;
+}
+
+void WeaponsObject::isAnimationComplete(bool isitreally)
+{
+	animComplete = isitreally;
 }
