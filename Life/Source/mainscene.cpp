@@ -1023,6 +1023,7 @@ void mainscene::UpdatePlayer(double &dt)
 		AI *ai = dynamic_cast<AI*>(CO);
 		if (ai != NULL)
 		{
+			ai->m_goList = m_goList;
 			if(ai->CollideWithAI == true)
 				ai->Update(dt, P_Player.getPosition());
 		}

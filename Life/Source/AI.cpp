@@ -105,20 +105,26 @@ void AI::Update(double &dt, Vector3 playerPos)
 {
 	static Vector3 destination;
 
+	if(isVisible(Position, Lookat, 50, playerPos) && (Position - playerPos).LengthSquared() <= 144)
+	{
+		e_State = ATTACK;
+	}
+	f_movementSpeed = 1000;
 	switch(e_State)
 	{
 	case ATTACK:
 		{
-			std::cout << "Attack" << std::endl;
 			this->Lookat = playerPos;
 			//Enemy would only move towards player if the difference between them is 15
 			if((playerPos - Position).LengthSquared() > 225)
 			{
 				Vector3 diff = playerPos - Position;
 				diff.Normalize();
-				Position.x += diff.x * f_movementSpeed * static_cast<float>(dt);
-				Position.z += diff.z * f_movementSpeed * static_cast<float>(dt);
+				Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
+				Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
 			}
+			else
+				Velocity = 0;
 
 			//Change enemy state to walking if distance from player is more than 50
 			if((playerPos - Position).LengthSquared() > 10000)
@@ -143,8 +149,8 @@ void AI::Update(double &dt, Vector3 playerPos)
 				Vector3 diff = Vector3(0, 0, 0) - Position;
 				diff.Normalize();
 
-				Position.x += diff.x * f_movementSpeed * static_cast<float>(dt);
-				Position.z += diff.z * f_movementSpeed * static_cast<float>(dt);
+				Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
+				Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
 
 				if(Collision::Length(Position, Vector3(0, 0, 0), 2, false))
 				{
@@ -152,7 +158,6 @@ void AI::Update(double &dt, Vector3 playerPos)
 				}
 
 			}
-
 			else
 				Lookat = defaultLookat;
 		}
@@ -168,8 +173,8 @@ void AI::Update(double &dt, Vector3 playerPos)
 				Vector3 diff = destination - Position;
 				diff.Normalize();
 
-				Position.x += diff.x * f_movementSpeed * static_cast<float>(dt);
-				Position.z += diff.z * f_movementSpeed * static_cast<float>(dt);
+				Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
+				Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
 
 				if((Position - destination).LengthSquared() < 30)
 				{
@@ -192,6 +197,71 @@ void AI::Update(double &dt, Vector3 playerPos)
 		break;
 	}
 
-	//Position += Velocity * static_cast<float>(dt);
 
+	if(collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f))) || collisionChecking(Vector3(Position + Vector3(10.f, 50.f, 0.f))))
+	{
+		if(Velocity.x > 0)
+		{
+			Velocity.x = 0;
+		}
+	}
+
+	if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f))) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, 10.f))))
+	{
+		if(Velocity.z > 0)
+		{
+			Velocity.z = 0;
+		}
+	}
+
+	if(collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f))) || collisionChecking(Vector3(Position + Vector3(-10.f, 50.f, 0.f))))
+	{
+		if(Velocity.x < 0)
+		{
+			Velocity.x = 0;
+		}
+	}
+
+	if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f))) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, -10.f))))
+	{
+		if(Velocity.z < 0)
+		{
+			Velocity.z = 0;
+		}
+	}
+	/*
+	//Collision handling
+
+	if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 50.f, 0.f))))
+	{
+		if (P_Player.Velocity.x < 0)
+		{
+			P_Player.Velocity.x = 0;
+		}
+	}
+
+	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, -10.f))))
+	{
+		if (P_Player.Velocity.z < 0)
+		{
+			P_Player.Velocity.z = 0;
+		}
+	}*/
+	Position += Velocity * static_cast<float>(dt);
+}
+
+bool AI::collisionChecking(Vector3 &Position)
+{
+	for(std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
+	{
+		GameObject* go = (GameObject*)*it;
+		if(go->active && go->colEnable && go->pos != Position)
+		{
+			if(intersect(go->pos + go->ColBox, go->pos - go->ColBox, Position))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }

@@ -43,7 +43,8 @@ public:
 
 	virtual void Update(double &dt, Vector3 playerPos);
 	bool CollideWithAI;
-
+	std::vector<GameObject*> m_goList;
+	bool collisionChecking(Vector3 &Position);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
