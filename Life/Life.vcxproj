@@ -158,7 +158,6 @@
     <ClInclude Include="Source\WorldObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
     <None Include="GameData\Shader\comg.fragmentshader" />
     <None Include="GameData\Shader\comg.vertexshader" />
     <None Include="GameData\Shader\Fog.fragmentshader" />

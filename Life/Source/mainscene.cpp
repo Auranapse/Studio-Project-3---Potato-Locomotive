@@ -405,6 +405,18 @@ void mainscene::Init()
 	meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
 	meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
 
+	meshList[GEO_KATANA] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//Katana.obj");
+	meshList[GEO_KATANA]->textureID[0] = LoadTGA("GameData//Image//weapons//Katana.tga", true);
+
+	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_M9]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_M9]->material.kShininess = 10.0f;
+
+	meshList[GEO_SPAS12]->material = meshList[GEO_M9]->material;
+	meshList[GEO_MP5K]->material = meshList[GEO_M9]->material;
+	meshList[GEO_KATANA]->material = meshList[GEO_M9]->material;
+
 	//----------------------SKYBOX
 	meshList[E_GEO_LEFT] = MeshBuilder::GenerateSkybox("left", Color(0.f, 0.f, 0.f), 1.f);
 	meshList[E_GEO_LEFT]->textureID[0] = LoadTGA("GameData//Image//skybox//plain_sky_left.tga");
@@ -461,22 +473,6 @@ void mainscene::Init()
 	meshList[GEO_OBJCAKE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
 
-
-	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-	meshList[GEO_M9]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_M9]->material.kShininess = 10.0f;
-
-	meshList[GEO_MP5K]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_MP5K]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-	meshList[GEO_MP5K]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_MP5K]->material.kShininess = 10.0f;
-
-	meshList[GEO_SPAS12]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPAS12]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
-	meshList[GEO_SPAS12]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPAS12]->material.kShininess = 12.0f;
-
 	//Starting position of translations and initialize physics
 
 
@@ -519,10 +515,12 @@ void mainscene::Init()
 	inputDelay = 0.f;
 	timer = 0.f;
 
-	ISoundSource* backgroundAmbience;
-	backgroundAmbience = engine->addSoundSourceFromFile("GameData//sounds//ambience//background.wav");
-	backgroundAmbience->setDefaultVolume(0.8f);
-	engine->play2D(backgroundAmbience, true);
+	soundList[ST_BACKGROUND] = engine->addSoundSourceFromFile("GameData//sounds//ambience//background.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_BACKGROUND]->setDefaultVolume(0.3f);
+	engine->play2D(soundList[ST_BACKGROUND], true);
+
+	soundList[ST_SLOWMO_ENTER] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_enter.mp3", ESM_AUTO_DETECT, true);
+	soundList[ST_SLOWMO_EXIT] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_exit.mp3", ESM_AUTO_DETECT, true);
 
 	soundList[ST_PANEL] = engine->addSoundSourceFromFile("GameData//sounds//other//panel.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_PANEL]->setDefaultVolume(4.5f);
@@ -534,11 +532,15 @@ void mainscene::Init()
 	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
 
 	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_M9_SHOOT]->setDefaultVolume(0.3f);
+
+	soundList[ST_WEAPON_KATANA] = engine->addSoundSourceFromFile("GameData//sounds//weapons//Katana.mp3", ESM_AUTO_DETECT, true);
+
 	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//weapons//empty.wav", ESM_AUTO_DETECT, true);
 
 	soundList[ST_CAMERA_SPOTTED] = engine->addSoundSourceFromFile("GameData//sounds//other//EnemySpotted.mp3", ESM_AUTO_DETECT, true);
-	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
-
+	soundList[ST_CAMERA_FOUND] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
+	slowmoentrance = true;
 }
 
 void mainscene::InitShaders()
@@ -614,7 +616,7 @@ bool mainscene::loadLevel(int level)
 		}
 		m_ParList.pop_back();
 	}
-	
+
 	std::cout << "Map Size: ";
 	std::cout << GAME_MAP.map_width << ", " << GAME_MAP.map_height << "\n";
 
@@ -745,14 +747,14 @@ void mainscene::initWeapons(void)
 	WPO = new WeaponsObject();
 	WPO->active = true;
 	WPO->mesh = meshList[GEO_M9];
-	WPO->attackRate = 0.5f;
+	WPO->attackRate = 0.02f;
 	WPO->scale.Set(0.03f, 0.03f, 0.03f);
 	WPO->shootvelocity = 120.f;
 	WPO->pos.Set(0, 10, 0);
 	WPO->pos1.Set(-5, -4, 9);
 	WPO->pos2.Set(0, -2.1f, 8);
-	WPO->CurrentClip = 15;
-	WPO->recoilEffect = 50.f;
+	WPO->CurrentClip = 150000;
+	WPO->recoilEffect = 20.f;
 	WPO->isGun = true;
 	WPO->isWeapon = true;
 	WPO->enablePhysics = true;
@@ -763,21 +765,21 @@ void mainscene::initWeapons(void)
 
 	WPO = new WeaponsObject();
 	WPO->active = true;
-	WPO->mesh = meshList[GEO_M9];
-	WPO->attackRate = 0.02f;
-	WPO->scale.Set(0.03f, 0.03f, 0.03f);
-	WPO->shootvelocity = 120.f;
-	WPO->pos.Set(0, 10, 10);
-	WPO->pos1.Set(-5, -4, 9);
-	WPO->pos2.Set(0, -2.1f, 8);
-	WPO->CurrentClip = 1500000;
-	WPO->recoilEffect = 100.f;
-	WPO->isGun = true;
+	WPO->mesh = meshList[GEO_KATANA];
+	WPO->attackRate = 0.05f;
+	WPO->AnimSpeed = 9.f;
+	WPO->scale.Set(0.1f, 0.1f, 0.1f);
+	WPO->pos.Set(20, 10, 0);
+	WPO->pos1.Set(4, -8.5f, 9);
+	WPO->pos2.Set(10, -10.f, 12);
+	WPO->Rotation1.Set(5, 0, 45);
+	WPO->Rotation2.Set(90, 180, 90);
+	WPO->isGun = false;
 	WPO->isWeapon = true;
 	WPO->enablePhysics = true;
 	WPO->colEnable = true;
 	WPO->ColBox.Set(3, 3, 3);
-	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
+	WPO->AttackSound = ST_WEAPON_KATANA;
 	m_goList.push_back(WPO);
 
 	f_curRecoil = 0.f;
@@ -813,7 +815,9 @@ void mainscene::UpdatePlayer(double &dt)
 		if (collide(Vector3(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos)))
 		{
 			if (P_Player.Velocity.y > 0)
+			{
 				P_Player.Velocity.y = 0;
+			}
 		}
 
 		P_Player.Velocity += gravity_force * static_cast<float>(dt);
@@ -821,28 +825,19 @@ void mainscene::UpdatePlayer(double &dt)
 	}
 	else
 	{
+		if (P_Player.Velocity.y != 0)
+		{
+			P_Player.Velocity.y = 0.f;
+		}
+
 		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 		{
-			P_Player.Velocity.y = 100;
+			P_Player.Velocity.y = 50 * static_cast<float>(dt);
 		}
 
 		else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 2.f, 0.f))))
 		{
-			P_Player.Velocity.y = 50;
-		}
-
-		else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 1.f, 0.f))))
-		{
-			P_Player.Velocity.y = 10;
-		}
-
-		else
-		{
-			if (P_Player.Velocity.y < -100)
-			{
-				engine->play2D(soundList[ST_STEP_2]);
-			}
-			P_Player.Velocity.y = 0;
+			P_Player.Velocity.y = 20 * static_cast<float>(dt);
 		}
 	}
 
@@ -879,7 +874,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			engine->play2D(soundList[ST_STEP]);
+			PlaySound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -891,7 +886,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			engine->play2D(soundList[ST_STEP]);
+			PlaySound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -902,7 +897,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			engine->play2D(soundList[ST_STEP]);
+			PlaySound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -913,7 +908,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			engine->play2D(soundList[ST_STEP]);
+			PlaySound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -923,7 +918,7 @@ void mainscene::UpdatePlayer(double &dt)
 		if (inAir == false)
 		{
 			P_Player.Velocity.y += 120;
-			engine->play2D(soundList[ST_STEP]);
+			PlaySound2D(soundList[ST_STEP]);
 		}
 	}
 
@@ -1219,7 +1214,6 @@ void mainscene::weaponsUpdate(double &dt)
 			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
 			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 			{
-				isAttackPressed = true;
 				if (P_Player.holding->isGun)
 				{
 					if (WO->CurrentClip > 0 && WO->attackRate + firerate < timer)
@@ -1230,22 +1224,24 @@ void mainscene::weaponsUpdate(double &dt)
 						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
 						WO->rotation.x -= WO->recoilEffect *0.1f;
 						WO->pos.z -= WO->recoilEffect*0.02f;
-						engine->play2D(soundList[WO->AttackSound]);
+						PlaySound2D(soundList[WO->AttackSound]);
 						f_curRecoil += WO->recoilEffect * 0.05f;
 						--WO->CurrentClip;
 					}
 					else if (WO->CurrentClip <= 0 && !isAttackPressed)
 					{
-						engine->play2D(soundList[ST_WEAPON_CLICK]);
+						isAttackPressed = true;
+						PlaySound2D(soundList[ST_WEAPON_CLICK]);
 					}
 				}
 				else
 				{
 					if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState && !isAttackPressed)
 					{
+						isAttackPressed = true;
 						firerate = timer;
 						WO->toggleAnimation();
-						engine->play2D(soundList[WO->AttackSound]);
+						PlaySound2D(soundList[WO->AttackSound]);
 					}
 				}
 			}
@@ -1270,13 +1266,6 @@ void mainscene::weaponsUpdate(double &dt)
 				if (f_curRecoil > 0)
 				{
 					f_curRecoil -= f_curRecoil * 0.1f;
-				}
-			}
-			else
-			{
-				if (WO->isAnimationComplete() && !WO->animState)
-				{
-					WO->toggleAnimation();
 				}
 			}
 		}
@@ -1346,6 +1335,27 @@ bool mainscene::collideGO(GameObject *go, GameObject *go2)
 /******************************************************************************/
 /*!
 \brief
+player a 2D sound
+*/
+/******************************************************************************/
+void mainscene::PlaySound2D(irrklang::ISoundSource *source)
+{
+	ISound *snd = engine->play2D(source, false, false, false, true);
+
+	if (snd)
+	{
+		ISoundEffectControl* fx = snd->getSoundEffectControl();
+
+		if (d_dt2 != d_dt)
+		{
+			fx->enableDistortionSoundEffect(d_dt - d_dt2 - 30.f);
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 update player sound position
 */
 /******************************************************************************/
@@ -1384,6 +1394,24 @@ void mainscene::Update(double dt)
 		}
 	}
 
+	d_dt2 = dt;
+
+	if (slowmoentrance)
+	{
+		if (d_dt != d_dt2)
+		{
+			engine->play2D(soundList[ST_SLOWMO_ENTER]);
+			slowmoentrance = false;
+		}
+	}
+	else
+	{
+		if (d_dt == d_dt2)
+		{
+			engine->play2D(soundList[ST_SLOWMO_EXIT]);
+			slowmoentrance = true;
+		}
+	}
 
 	timer += static_cast<float>(dt);
 
@@ -1540,7 +1568,7 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	modelStack.PushMatrix();
 	modelStack.Translate(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	modelStack.Scale(CO->Scale);
-	RenderMesh(CO->Arm_left, true, true, 10, 10);
+	RenderMesh(CO->Arm_left, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
@@ -1607,7 +1635,7 @@ void mainscene::RenderBullet(void)
 	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
 	{
 		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus())
+		if (BI->getStatus() && BI->getLife() < 5.9f)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(BI->getPosition());
@@ -1975,7 +2003,7 @@ void mainscene::RenderWorldShadow(void)
 			{
 				RenderGO(go);
 			}
-			else if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos))//Dynamic rendering
+			else if (isVisible(FPC.position, FPC.target, f_fov, go->pos))//Dynamic rendering
 			{
 				RenderGO(go);
 			}

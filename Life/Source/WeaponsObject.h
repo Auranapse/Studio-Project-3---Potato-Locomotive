@@ -8,6 +8,7 @@ class WeaponsObject : public ItemObject
 {
 private:
 	bool animComplete;
+	float timer;
 public:
 	WeaponsObject();
 	~WeaponsObject();
@@ -36,6 +37,7 @@ public:
 	void toggleAnimation(void);
 	virtual void Update(double &dt);
 	bool isAnimationComplete(void);
+	void isAnimationComplete(bool isitreally);
 };
 
 #endif
