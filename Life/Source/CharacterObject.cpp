@@ -136,7 +136,7 @@ what character is looking at
 the texture location
 */
 /******************************************************************************/
-void CharacterObject::Init(Vector3 Pos, Vector3 Lookat, const char* texturedir)
+void CharacterObject::Init(const Vector3 &Pos, const Vector3 &Lookat, const char* texturedir)
 {
 	this->Position = Pos;
 	this->Lookat = Lookat;
@@ -195,7 +195,7 @@ Set object to hold
 the object pointer to hold
 */
 /******************************************************************************/
-void CharacterObject::DropObject(Vector3 ThrowVel)
+void CharacterObject::DropObject(const Vector3 &ThrowVel)
 {
 	if (holding != NULL)
 	{
@@ -219,7 +219,7 @@ Updates the charater
 delta time
 */
 /******************************************************************************/
-void CharacterObject::Update(double &dt)
+void CharacterObject::Update(const double &dt)
 {
 	Animation.Update(dt, Velocity.LengthSquared() * 0.03);
 	Lookat += Velocity * static_cast<float>(dt);

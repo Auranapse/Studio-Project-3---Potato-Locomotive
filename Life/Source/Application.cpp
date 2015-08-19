@@ -154,14 +154,14 @@ Sets the cursor type
 /******************************************************************************/
 void Application::SetCursor(bool enable)
 {
-	if(enable)
+	if (enable)
 	{
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 	else
 	{
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		SetMouseinput(GetWindowWidth()/2, GetWindowHeight()/2);
+		SetMouseinput(GetWindowWidth() / 2, GetWindowHeight() / 2);
 	}
 }
 /******************************************************************************/
@@ -172,16 +172,16 @@ Calculates the distance moved by mouse from the center. !!Will recenter the curs
 /******************************************************************************/
 void Application::GetMouseChange(float &x, float &y)
 {
-	double midScreenX = (Application::GetWindowWidth()/2);
-	double midScreenY = (Application::GetWindowHeight()/2);
+	double midScreenX = (Application::GetWindowWidth() / 2);
+	double midScreenY = (Application::GetWindowHeight() / 2);
 
 	double mousePosX;
 	double mousePosY;
 
 	GetMousePos(mousePosX, mousePosY);
 
-	x = static_cast<float>((midScreenX - mousePosX) /32);
-	y = static_cast<float>((midScreenY - mousePosY) /32);
+	x = static_cast<float>((midScreenX - mousePosX) / 32);
+	y = static_cast<float>((midScreenY - mousePosY) / 32);
 
 	SetMouseinput(midScreenX, midScreenY);
 }
@@ -287,10 +287,10 @@ void Application::Init()
 	glfwWindowHint(GLFW_BLUE_BITS, win_data->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, win_data->refreshRate);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	
-	
+
+
 	//Create a window and create its OpenGL context
-	if(FULL_SCREEN)
+	if (FULL_SCREEN)
 	{
 		i_WINDOW_WIDTH = win_data->width;
 		i_WINDOW_HEIGHT = win_data->height;
@@ -305,7 +305,7 @@ void Application::Init()
 	//If the window couldn't be created
 	if (!m_window)
 	{
-		fprintf( stderr, "Failed to open GLFW window.\n" );
+		fprintf(stderr, "Failed to open GLFW window.\n");
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -321,7 +321,7 @@ void Application::Init()
 	GLenum err = glewInit();
 
 	//If GLEW hasn't initialized
-	if (err != GLEW_OK) 
+	if (err != GLEW_OK)
 	{
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
@@ -342,7 +342,7 @@ void Application::Run()
 	// Scene Loop
 	bool b_quitProgram = false;
 	E_SCENE_TYPE e_currentScene = E_SCENE_MENU;
-	while(e_currentScene < E_SCENE_TOTAL && !b_quitProgram)
+	while (e_currentScene < E_SCENE_TOTAL && !b_quitProgram)
 	{
 		Scene *scene;
 		//Main Loop
@@ -369,7 +369,7 @@ void Application::Run()
 			m_dElapsedTime = m_timer.getElapsedTime();
 			m_dAccumulatedTime_Thread += m_dElapsedTime;
 
-			if(m_dAccumulatedTime_Thread > 0.016)
+			if (m_dAccumulatedTime_Thread > 0.016)
 			{
 				scene->Update(m_dAccumulatedTime_Thread);
 				m_dAccumulatedTime_Thread = 0.0;
@@ -384,16 +384,16 @@ void Application::Run()
 			m_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.
 
 			// Quits program if window is closed or esc is pressed
-			if(IsKeyPressed(VK_ESCAPE))
+			if (IsKeyPressed(VK_ESCAPE))
 			{
-				if(e_currentScene == E_SCENE_MENU)
+				if (e_currentScene == E_SCENE_MENU)
 				{
 					b_quitProgram = true;
 				}
 			}
-			if(IsKeyPressed(VK_F10))
+			if (IsKeyPressed(VK_F10))
 			{
-				if(e_currentScene == E_SCENE_MAIN)
+				if (e_currentScene == E_SCENE_MAIN)
 				{
 					scene->e_nextScene = E_SCENE_MAIN2;
 				}
@@ -402,9 +402,9 @@ void Application::Run()
 					scene->e_nextScene = E_SCENE_MAIN;
 				}
 			}
-			if(IsKeyPressed(VK_F11))
+			if (IsKeyPressed(VK_F11))
 			{
-				if(!FULL_SCREEN)
+				if (!FULL_SCREEN)
 				{
 					FULL_SCREEN = true;
 					glfwDestroyWindow(m_window);
