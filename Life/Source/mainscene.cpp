@@ -1003,7 +1003,7 @@ void mainscene::UpdatePlayer(double &dt)
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(dt);
 
-	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	/*for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
 		AI *ai = dynamic_cast<AI*>(CO);
@@ -1020,6 +1020,42 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 
 		CO->Update(dt);
+	}*/
+
+	for(std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it ++)
+	{
+		CharacterObject *CO = (CharacterObject *)*it;
+		AI *ai = dynamic_cast<AI*>(CO);
+		if (ai != NULL)
+		{
+			if(ai->CollideWithAI == true)
+				ai->Update(dt, P_Player.getPosition());
+		}
+		else
+		{
+			if (CO->holding != NULL)
+			{
+				CO->holding->Update(dt);
+			}
+		}
+
+		CO->Update(dt);
+
+		for(std::vector<CharacterObject*>::iterator it2 = it + 1; it2 != m_charList.end(); it2++)
+		{
+			
+			CharacterObject *CO2 = (CharacterObject *)*it2;
+			AI *nextEnemy = dynamic_cast<AI*>(CO2);
+
+			if((ai->getPosition() - nextEnemy->getPosition()).Length() < 30)
+			{
+				ai->CollideWithAI = false;
+			}
+			else
+			{
+				ai->CollideWithAI = true;
+			}
+		}
 	}
 }
 

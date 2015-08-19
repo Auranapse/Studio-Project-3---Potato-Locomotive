@@ -42,6 +42,7 @@ public:
 	void movementLR(double &dt, bool left = true);
 
 	virtual void Update(double &dt, Vector3 playerPos);
+	bool CollideWithAI;
 
 private:
 	//-------------------------------------Variables------------------------------------------------

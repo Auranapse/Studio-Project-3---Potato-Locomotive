@@ -9,6 +9,7 @@ struct CollisionBox
 	{
 		CT_AABB,
 		CT_POINT,
+		CT_SPHERE,
 	};
 
 	COLLISION_TYPE Type;
