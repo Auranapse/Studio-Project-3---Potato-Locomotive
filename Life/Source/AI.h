@@ -43,11 +43,8 @@ public:
 	void movementLR(double &dt, bool left = true);
 
 	void SensorUpdate(double &dt, bool left, bool middle, bool right);
-	virtual void Update(double &dt, Vector3 playerPos);
-	bool CollideWithAI;
-	std::vector<GameObject*> m_goList;
-	std::vector<CharacterObject*> m_charList;
-	bool collisionChecking(Vector3 &Position);
+	virtual void Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList);
+	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
