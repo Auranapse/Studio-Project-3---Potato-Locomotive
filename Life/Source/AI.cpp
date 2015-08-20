@@ -177,74 +177,74 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			}
 
 			//Change enemy state to walking if distance from player is more than 50
-			/*if((playerPos - Position).LengthSquared() > 10000)
+			if((playerPos - Position).LengthSquared() > 10000)
 			{
-			e_State = WALKING;
-			}*/
+				e_State = WALKING;
+			}
 		}
 		break;
 
-		case WALKING:
+	case WALKING:
+		{
+			if(isVisible(Position, Lookat, 65, playerPos) && (Position - playerPos).LengthSquared() < 10000)
 			{
-				if(isVisible(Position, Lookat, 65, playerPos) && (Position - playerPos).LengthSquared() < 10000)
-				{
-					e_State = ALERT;
-					destination = playerPos;
-				}
-
-				//Ensure that the enemy would move to its default pos for now
-				if(Position != Vector3(0, 0, 0))
-				{
-					Lookat = Vector3(0, 0, 0);
-					Vector3 diff = Vector3(0, 0, 0) - Position;
-					diff.Normalize();
-
-					Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
-					Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
-
-					if(Collision::Length(Position, Vector3(0, 0, 0), 2, false))
-					{
-						Position.SetZero();
-					}
-
-				}
-				else
-					Lookat = defaultLookat;
+				e_State = ALERT;
+				destination = playerPos;
 			}
-			break;
 
-		case ALERT:
+			//Ensure that the enemy would move to its default pos for now
+			if(Position != Vector3(0, 0, 0))
 			{
-				Lookat = destination;
+				Lookat = Vector3(0, 0, 0);
+				Vector3 diff = Vector3(0, 0, 0) - Position;
+				diff.Normalize();
 
-				//Make the enemy move towards the destination
-				if(Position.x != destination.x && Position.z != destination.z)
+				Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
+				Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
+
+				if(Collision::Length(Position, Vector3(0, 0, 0), 2, false))
 				{
-					Vector3 diff = destination - Position;
-					diff.Normalize();
-
-					Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
-					Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
-
-					if((Position - destination).LengthSquared() < 30)
-					{
-						Position.x = destination.x;
-						Position.z = destination.z;
-					}
+					Position.SetZero();
 				}
-				//If the enemy is at the destination
-				else
-				{
-					f_alert_timer += (float)dt;
 
-					if(f_alert_timer >= 5.f)
-					{
-						e_State = ATTACK;
-						f_alert_timer = 0.f;
-					}
+			}
+			else
+				Lookat = defaultLookat;
+		}
+		break;
+
+	case ALERT:
+		{
+			Lookat = destination;
+
+			//Make the enemy move towards the destination
+			if(Position.x != destination.x && Position.z != destination.z)
+			{
+				Vector3 diff = destination - Position;
+				diff.Normalize();
+
+				Velocity.x = diff.x * f_movementSpeed * static_cast<float>(dt);
+				Velocity.z = diff.z * f_movementSpeed * static_cast<float>(dt);
+
+				if((Position - destination).LengthSquared() < 30)
+				{
+					Position.x = destination.x;
+					Position.z = destination.z;
 				}
 			}
-			break;
+			//If the enemy is at the destination
+			else
+			{
+				f_alert_timer += (float)dt;
+
+				if(f_alert_timer >= 5.f)
+				{
+					e_State = ATTACK;
+					f_alert_timer = 0.f;
+				}
+			}
+		}
+		break;
 	}
 
 
