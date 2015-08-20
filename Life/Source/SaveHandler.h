@@ -1,35 +1,39 @@
 /****************************************************************************/
 /*!
-\file savefile.h
+\file SaveHandler.h
 \author Gabriel Wong Choon Jieh
 \par email: AuraTigital\@gmail.com
 \brief
-Save file
+A save file handler to ensure easy saving and loading
 !*/
 /****************************************************************************/
-#ifndef SAVEFILE_H
-#define SAVEFILE_H
+#ifndef SAVEHANDLER_H
+#define SAVEHANDLER_H
 
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <fstream>
+#include <type_traits>
 
-class SaveFile
+class SaveHandler
 {
 private:
 	std::string FILE_LOCATION;
-	
 public:
-	SaveFile();
-	~SaveFile();
 
-	std::vector<std::string*> Data;
-	
+	SaveHandler();
+	~SaveHandler();
+
+	std::vector<std::string> Data;
+
 	void init(std::string file);
+
+	void assign(float &data, float default_data, int ID);
+	void assign(unsigned short &data, unsigned short default_data, int ID);
+
 	void loadData(void);
 	void saveData(void);
-	void CreateNew(void);
-	bool fileExists(std::string file);
 };
 #endif

@@ -72,9 +72,6 @@
     <ClCompile Include="Source\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\LoadHmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\CharacterObject.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
     <ClCompile Include="Source\Player.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\savefile.cpp">
-      <Filter>Source Files\Save/Load</Filter>
-    </ClCompile>
     <ClCompile Include="Source\DepthFBO.cpp">
       <Filter>Source Files\Visuals</Filter>
     </ClCompile>
@@ -168,6 +162,12 @@
     <ClCompile Include="Source\CollisionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SaveHandler.cpp">
+      <Filter>Source Files\Save/Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LoadHmap.cpp">
+      <Filter>Source Files\Save/Load</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -177,9 +177,6 @@
       <Filter>Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\LoadHmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Button.h">
@@ -239,9 +236,6 @@
     <ClInclude Include="Source\Player.h">
       <Filter>Header Files\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\savefile.h">
-      <Filter>Header Files\Save/Load</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GBuffer.h">
       <Filter>Header Files\Visuals</Filter>
     </ClInclude>
@@ -286,6 +280,12 @@
     </ClInclude>
     <ClInclude Include="Source\CollisionBox.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SaveHandler.h">
+      <Filter>Header Files\Save/Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LoadHmap.h">
+      <Filter>Header Files\Save/Load</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

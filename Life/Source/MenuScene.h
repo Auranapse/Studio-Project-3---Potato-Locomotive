@@ -16,7 +16,7 @@ Main menu for the openGL framework
 #include "Light.h"
 #include "LoadTGA.h"
 #include "AzimuthAltitudeCamera.h"
-#include "savefile.h"
+#include "SaveHandler.h"
 #include "Button.h"
 #include "GabrielDLC.h"
 #include <string>
@@ -41,16 +41,6 @@ class MenuScene : public Scene
 
 	enum E_CTRL_TYPE
 	{
-		// Settings Controls
-		E_CTRL_TOGGLE_CULL,
-		E_CTRL_TOGGLE_WIREFRAME,
-		E_CTRL_TOGGLE_AXES,
-		E_CTRL_TOGGLE_INFO,
-
-		// Camera Controls
-		E_CTRL_CHAR_MODE,
-		E_CTRL_NOCLIP_MODE,
-
 		// Player Controls
 		// -- Move
 		E_CTRL_MOVE_FRONT,
@@ -66,20 +56,8 @@ class MenuScene : public Scene
 		E_CTRL_THROW,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
-		E_CTRL_NEXT_ITEM,
 		E_CTRL_RELOAD,
-
-		// -- Look
-		E_CTRL_LOOK_UP,
-		E_CTRL_LOOK_DOWN,
-		E_CTRL_LOOK_LEFT,
-		E_CTRL_LOOK_RIGHT,
-
-		// Debug
-		E_CTRL_SHOW_DEBUG,
-		E_CTRL_GRAV_RESET,
-		E_CTRL_GRAV_RAISE,
-		E_CTRL_GRAV_DROP,
+		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
 	};
@@ -314,7 +292,7 @@ private:
 
 	void assignsave(void);
 	void saveGame(void);
-	SaveFile SF_1;
+	SaveHandler SH_1;
 
 	// Update/Control Functions
 	float MousePosX, MousePosY;

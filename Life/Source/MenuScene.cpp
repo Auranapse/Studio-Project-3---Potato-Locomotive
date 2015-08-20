@@ -54,100 +54,20 @@ Assigns file to values
 /******************************************************************************/
 void MenuScene::assignsave(void)
 {
-	if (SF_1.Data.size() == 0)
-	{
-		std::string *outputData;
-
-		outputData = new std::string;
-		*outputData = "70";//FOV
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "87";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "83";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "65";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "68";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "16";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "17";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "32";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "69";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "2";
-		SF_1.Data.push_back(outputData);
-		
-		outputData = new std::string;
-		*outputData = "1";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "4";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "81";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "82";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "100";
-		SF_1.Data.push_back(outputData);
-	}
-
-	f_fov = static_cast<float>(std::stoi(*SF_1.Data[0]));
-	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14]));
-	char CN = std::stoi(*SF_1.Data[1]);
-	us_control[E_CTRL_MOVE_FRONT] = CN;
-	CN = std::stoi(*SF_1.Data[2]);
-	us_control[E_CTRL_MOVE_BACK] = CN;
-	CN = std::stoi(*SF_1.Data[3]);
-	us_control[E_CTRL_MOVE_LEFT] = CN;
-	CN = std::stoi(*SF_1.Data[4]);
-	us_control[E_CTRL_MOVE_RIGHT] = CN;
-	CN = std::stoi(*SF_1.Data[5]);
-	us_control[E_CTRL_MOVE_SPRINT] = CN;
-	CN = std::stoi(*SF_1.Data[6]);
-	us_control[E_CTRL_MOVE_WALK] = CN;
-	CN = std::stoi(*SF_1.Data[7]);
-	us_control[E_CTRL_MOVE_JUMP] = CN;
-	CN = std::stoi(*SF_1.Data[8]);
-	us_control[E_CTRL_INTERACT] = CN;
-	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_THROW] = CN;
-	CN = std::stoi(*SF_1.Data[10]);
-	us_control[E_CTRL_ATTACK] = CN;
-	CN = std::stoi(*SF_1.Data[11]);
-	us_control[E_CTRL_AIM] = CN;
-	CN = std::stoi(*SF_1.Data[12]);
-	us_control[E_CTRL_NEXT_ITEM] = CN;
-	CN = std::stoi(*SF_1.Data[13]);
-	us_control[E_CTRL_RELOAD] = CN;
-	SF_1.saveData();
+	SH_1.assign(f_fov, 70.f, 1);
+	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3);
+	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4);
+	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5);
+	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6);
+	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7);
+	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8);
+	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9);
+	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10);
+	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11);
+	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
+	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
+	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
 }
 
 /******************************************************************************/
@@ -158,19 +78,8 @@ Saves the file
 /******************************************************************************/
 void MenuScene::saveGame(void)
 {
-	*SF_1.Data[0] = std::to_string(static_cast<long double>(f_fov));
-	*SF_1.Data[14] = std::to_string(static_cast<long double>(f_mouseSensitivity));
-
-	std::stringstream ss;
-
-	for (unsigned i = 1; i <= 13; ++i)
-	{
-		ss << us_control[E_CTRL_MOVE_FRONT + i - 1];
-		*SF_1.Data[i] = ss.str();
-		ss.str("");
-	}
-
-	SF_1.saveData();
+	assignsave();
+	SH_1.saveData();
 }
 
 /******************************************************************************/
@@ -189,8 +98,12 @@ void MenuScene::Init()
 		us_control[i] = 0;
 	}
 
-	SF_1.init("GameData//playerdata.wtf");
+	SH_1.init("GameData//GameData.GameData");
 	assignsave();
+	SH_1.saveData();
+
+	std::cout << f_fov << ", " << f_mouseSensitivity << "\n";
+
 
 	InitShaders();
 	//Starting position of translations and initialize physics
@@ -316,20 +229,34 @@ void MenuScene::InitMenu(void)
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.15f, Application::GetWindowHeight()*0.15f, 0.1f);
-	S_MB->scale.Set(25, 25, 25);
-	S_MB->text = "Back";
-	S_MB->menubypass = true;
-	S_MB->gamestate = E_M_OPTIONS;
-	v_buttonList.push_back(S_MB);
-
 	//OPTIONS-----------------------------------------------------
 	S_MB = new S_BUTTON;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 40.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Toggle Fullscreen";
+	S_MB->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(S_MB);
+
+	//BACK BUTTONS------------------------------------------------
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.15f, Application::GetWindowHeight()*0.15f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Back";
+	S_MB->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.15f, Application::GetWindowHeight()*0.15f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Back";
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	v_buttonList.push_back(S_MB);
 }
 
@@ -344,7 +271,7 @@ S_BUTTON* MenuScene::FetchBUTTON(std::string name)
 	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
 		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->text == name)
+		if (S_MB->text == name && S_MB->gamestate == MENU_STATE)
 		{
 			return S_MB;
 		}
@@ -364,7 +291,7 @@ void MenuScene::UpdateButtons(void)
 	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
 		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->gamestate == MENU_STATE || (S_MB->menubypass && MENU_STATE != E_M_MAIN) && (S_MB->menubypass && MENU_STATE != E_M_SPLASH) && (S_MB->menubypass && MENU_STATE != E_M_LOADING))
+		if (S_MB->gamestate == MENU_STATE)
 		{
 			Vector3 offset = v3_Menupos[MENU_STATE];
 
@@ -463,6 +390,10 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 			if (FetchBUTTON("Controls")->active)
 			{
 				MENU_STATE = E_M_OPTIONS_CONTROLS;
+			}
+			else if (FetchBUTTON("Toggle Fullscreen")->active)
+			{
+				Application::fullscreentoggle();
 			}
 			else if (FetchBUTTON("Back")->active)
 			{
@@ -921,7 +852,7 @@ void MenuScene::RenderButtons(void)
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
 		S_BUTTON *S_MB = v_buttonList[i];
-		if (S_MB->gamestate == MENU_STATE || (S_MB->menubypass && MENU_STATE != E_M_MAIN) && (S_MB->menubypass && MENU_STATE != E_M_SPLASH) && (S_MB->menubypass && MENU_STATE != E_M_LOADING))
+		if (S_MB->gamestate == MENU_STATE)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(v3_Menupos[MENU_STATE]);

@@ -53,35 +53,20 @@ Loads save file from file
 /******************************************************************************/
 void mainscene::assignSave(void)
 {
-	f_fov = static_cast<float>(std::stoi(*SF_1.Data[0]));
-	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14])) / 100.f;
-	char CN = std::stoi(*SF_1.Data[1]);
-	us_control[E_CTRL_MOVE_FRONT] = CN;
-	CN = std::stoi(*SF_1.Data[2]);
-	us_control[E_CTRL_MOVE_BACK] = CN;
-	CN = std::stoi(*SF_1.Data[3]);
-	us_control[E_CTRL_MOVE_LEFT] = CN;
-	CN = std::stoi(*SF_1.Data[4]);
-	us_control[E_CTRL_MOVE_RIGHT] = CN;
-	CN = std::stoi(*SF_1.Data[5]);
-	us_control[E_CTRL_MOVE_SPRINT] = CN;
-	CN = std::stoi(*SF_1.Data[6]);
-	us_control[E_CTRL_MOVE_WALK] = CN;
-	CN = std::stoi(*SF_1.Data[7]);
-	us_control[E_CTRL_MOVE_JUMP] = CN;
-	CN = std::stoi(*SF_1.Data[8]);
-	us_control[E_CTRL_INTERACT] = CN;
-	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_THROW] = CN;
-	CN = std::stoi(*SF_1.Data[10]);
-	us_control[E_CTRL_ATTACK] = CN;
-	CN = std::stoi(*SF_1.Data[11]);
-	us_control[E_CTRL_AIM] = CN;
-	CN = std::stoi(*SF_1.Data[12]);
-	us_control[E_CTRL_NEXT_ITEM] = CN;
-	CN = std::stoi(*SF_1.Data[13]);
-	us_control[E_CTRL_RELOAD] = CN;
-	SF_1.saveData();
+	SH_1.assign(f_fov, 70.f, 1);
+	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3);
+	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4);
+	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5);
+	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6);
+	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7);
+	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8);
+	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9);
+	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10);
+	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11);
+	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
+	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
+	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
 }
 
 /******************************************************************************/
@@ -106,23 +91,30 @@ void mainscene::InitMenus(void)
 	v_buttonList.push_back(S_MB);
 
 	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Previous level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
 	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 10.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Skip to next level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
 	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 15.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 12.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 16.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Quit";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
@@ -135,9 +127,16 @@ void mainscene::InitMenus(void)
 	v_buttonList.push_back(S_MB);
 
 	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Play again";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Quit";
 	S_MB->gamestate = GS_END;
 	v_buttonList.push_back(S_MB);
 }
@@ -157,7 +156,7 @@ S_BUTTON* mainscene::FetchBUTTON(std::string name)
 	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
 		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->text == name)
+		if (S_MB->text == name && S_MB->gamestate == GAMESTATE)
 		{
 			return S_MB;
 		}
@@ -183,7 +182,7 @@ void mainscene::Init()
 
 	f_mouseSensitivity = 1;
 
-	SF_1.init("GameData//playerdata.wtf");
+	SH_1.init("GameData//GameData.GameData");
 	assignSave();
 
 	m_renderPass = RENDER_PASS_PRE;
@@ -1214,7 +1213,7 @@ void mainscene::UpdateGO(double &dt)
 			}
 			else
 			{
-				go->Update(dt);
+				go->Update(d_dt);
 			}
 		}
 	}
@@ -1474,7 +1473,7 @@ void mainscene::PlaySound2D(irrklang::ISoundSource *source)
 
 		if (d_dt2 != d_dt)
 		{
-			fx->enableDistortionSoundEffect(d_dt - d_dt2 - 30.f);
+			fx->enableDistortionSoundEffect(d_dt2 - d_dt - 30.f);
 		}
 	}
 }
@@ -1602,7 +1601,7 @@ void mainscene::Update(double dt)
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_PLAY:
-		if (Application::IsKeyPressed('X'))
+		if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]))
 		{
 			dt *= 0.05;
 
@@ -1705,6 +1704,10 @@ void mainscene::Update(double dt)
 					Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 					GAMESTATE = GS_PLAY;
 				}
+				else if (FetchBUTTON("Quit")->active)
+				{
+					e_nextScene = Application::E_SCENE_QUIT;
+				}
 			}
 		}
 		break;
@@ -1737,6 +1740,10 @@ void mainscene::Update(double dt)
 				Application::SetCursor(false);
 				Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 				GAMESTATE = GS_PLAY;
+			}
+			else if (FetchBUTTON("Quit")->active)
+			{
+				e_nextScene = Application::E_SCENE_QUIT;
 			}
 		}
 		break;

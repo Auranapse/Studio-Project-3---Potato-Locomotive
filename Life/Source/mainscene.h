@@ -31,7 +31,7 @@ Main scene
 
 #include "SpriteAnimation.h"
 #include "particle.h"
-#include "savefile.h"
+#include "SaveHandler.h"
 #include "DepthFBO.h"
 #include "GBuffer.h"
 #include "GabrielDLC.h"
@@ -234,16 +234,6 @@ class mainscene : public Scene
 
 	enum E_CTRL_TYPE
 	{
-		// Settings Controls
-		E_CTRL_TOGGLE_CULL,
-		E_CTRL_TOGGLE_WIREFRAME,
-		E_CTRL_TOGGLE_AXES,
-		E_CTRL_TOGGLE_INFO,
-
-		// Camera Controls
-		E_CTRL_CHAR_MODE,
-		E_CTRL_NOCLIP_MODE,
-
 		// Player Controls
 		// -- Move
 		E_CTRL_MOVE_FRONT,
@@ -259,20 +249,8 @@ class mainscene : public Scene
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_THROW,
-		E_CTRL_NEXT_ITEM,
 		E_CTRL_RELOAD,
-
-		// -- Look
-		E_CTRL_LOOK_UP,
-		E_CTRL_LOOK_DOWN,
-		E_CTRL_LOOK_LEFT,
-		E_CTRL_LOOK_RIGHT,
-
-		// Debug
-		E_CTRL_SHOW_DEBUG,
-		E_CTRL_GRAV_RESET,
-		E_CTRL_GRAV_RAISE,
-		E_CTRL_GRAV_DROP,
+		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
 	};
@@ -383,7 +361,7 @@ private:
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
 	
-	SaveFile SF_1;
+	SaveHandler SH_1;
 	void assignSave(void);
 
 	float f_fov;
