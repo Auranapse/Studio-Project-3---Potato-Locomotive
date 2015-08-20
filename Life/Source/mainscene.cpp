@@ -1024,6 +1024,7 @@ void mainscene::UpdatePlayer(double &dt)
 		if (ai != NULL)
 		{
 			ai->m_goList = m_goList;
+			ai->m_charList = m_charList;
 			if(ai->CollideWithAI == true)
 				ai->Update(dt, P_Player.getPosition());
 		}
@@ -1035,7 +1036,7 @@ void mainscene::UpdatePlayer(double &dt)
 			}
 		}
 
-		CO->Update(dt);
+		//CO->Update(dt);
 
 		for(std::vector<CharacterObject*>::iterator it2 = it + 1; it2 != m_charList.end(); it2++)
 		{

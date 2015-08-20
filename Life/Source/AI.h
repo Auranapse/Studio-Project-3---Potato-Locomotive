@@ -44,6 +44,7 @@ public:
 	virtual void Update(double &dt, Vector3 playerPos);
 	bool CollideWithAI;
 	std::vector<GameObject*> m_goList;
+	std::vector<CharacterObject*> m_charList;
 	bool collisionChecking(Vector3 &Position);
 private:
 	//-------------------------------------Variables------------------------------------------------
