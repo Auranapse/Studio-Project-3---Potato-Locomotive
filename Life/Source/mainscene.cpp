@@ -1125,36 +1125,15 @@ void mainscene::UpdatePlayer(double &dt)
 		AI *ai = dynamic_cast<AI*>(CO);
 		if (ai != NULL)
 		{
-			/*ai->m_goList = m_goList;
-			ai->m_charList = m_charList;
-			ai->Update(dt, P_Player.getPosition());*/
 			ai->Update(dt, P_Player.getPosition(), m_charList, m_goList);
 		}
 		else
 		{
 			if (CO->holding != NULL)
 			{
-				//CO->holding->Update(dt);
+				CO->holding->Update(dt);
 			}
 		}
-
-		//CO->Update(dt);
-
-		/*for(std::vector<CharacterObject*>::iterator it2 = it + 1; it2 != m_charList.end(); it2++)
-		{
-			
-			CharacterObject *CO2 = (CharacterObject *)*it2;
-			AI *nextEnemy = dynamic_cast<AI*>(CO2);
-
-			if((ai->getPosition() - nextEnemy->getPosition()).Length() < 30)
-			{
-				ai->CollideWithAI = false;
-			}
-			else
-			{
-				ai->CollideWithAI = true;
-			}
-		}*/
 	}
 }
 
