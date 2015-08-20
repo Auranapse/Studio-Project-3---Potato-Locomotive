@@ -49,8 +49,8 @@ Camera controls
 /******************************************************************************/
 void CustomCam1::Update(double dt)
 {
-	double Xaxis = (Application::GetWindowWidth()/2);
-	double Yaxis = (Application::GetWindowHeight()/2);
+	double Xaxis = (Application::GetWindowWidth() / 2);
+	double Yaxis = (Application::GetWindowHeight() / 2);
 	Application::GetMousePos(mouseX, mouseY);
 	mouseX = Xaxis - mouseX;
 	mouseY = Yaxis - mouseY;
@@ -59,7 +59,7 @@ void CustomCam1::Update(double dt)
 	mouseX *= static_cast<double>(mouseSensitivity);
 	mouseY *= static_cast<double>(mouseSensitivity);
 
-	if(mouseX != 0)
+	if (mouseX != 0)
 	{
 		Mtx44 rotation;
 		target -= position;
@@ -69,9 +69,9 @@ void CustomCam1::Update(double dt)
 		target += position;
 	}
 
-	if(mouseY != 0)
+	if (mouseY != 0)
 	{
-		if(target.y - position.y < 0.97f && mouseY > 0 || target.y - position.y > -0.97f && mouseY < 0)
+		if (target.y - position.y < 0.97f && mouseY > 0 || target.y - position.y > -0.97f && mouseY < 0)
 		{
 			Vector3 view = (target - position).Normalized();
 			Vector3 right = view.Cross(up);
@@ -86,8 +86,17 @@ void CustomCam1::Update(double dt)
 		}
 	}
 
+	if (target.y - position.y < -0.975f)
+	{
+		rotateCamVertical(100.f * static_cast<float>(dt));
+	}
 
-	if(mouseY != 0 || mouseX != 0)
+	if (target.y - position.y > 0.975f)
+	{
+		rotateCamVertical(-100.f * static_cast<float>(dt));
+	}
+
+	if (mouseY != 0 || mouseX != 0)
 	{
 		Application::SetMouseinput(Xaxis, Yaxis);
 	}
@@ -95,7 +104,7 @@ void CustomCam1::Update(double dt)
 
 void CustomCam1::rotateCamVertical(float degrees)
 {
-	if(target.y - position.y < 0.97f && degrees > 0 || target.y - position.y > -0.97f && degrees < 0)
+	if (target.y - position.y < 0.97f && degrees > 0 || target.y - position.y > -0.97f && degrees < 0)
 	{
 		Vector3 view = (target - position).Normalized();
 		Vector3 right = view.Cross(up);

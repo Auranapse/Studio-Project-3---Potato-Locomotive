@@ -15,7 +15,6 @@ Main scene
 #include <vector>
 #include <iostream>
 #include "Scene.h"
-#include "Camera4.h"
 #include "CustomCam1.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
@@ -23,6 +22,7 @@ Main scene
 #include "LoadTGA.h"
 #include "maploader.h"
 
+#include "Button.h"
 #include "BulletInfo.h"
 #include "GameObject.h"
 #include "WorldObject.h"
@@ -79,9 +79,12 @@ class mainscene : public Scene
 		GEO_MP5K,
 		GEO_SPAS12,
 		GEO_KATANA,
+
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,
+
+		GEO_SCREEN_OVERLAY,
 
 		GEO_LIGHT_DEPTH_QUAD,
 		GEO_POSITION_QUAD,
@@ -297,6 +300,13 @@ class mainscene : public Scene
 		ST_TOTAL,
 	};
 
+	enum GS_STATE
+	{
+		GS_PLAY,
+		GS_PAUSED,
+		GS_END,
+	};
+
 public:
 	mainscene();
 	~mainscene();
@@ -325,6 +335,14 @@ private:
 	unsigned m_lightShaderID;
 
 	double d_dt, d_dt2;
+	GS_STATE GAMESTATE;
+
+	void InitMenus(void);
+	Color UIColor, UIColorPressed;
+	std::vector<S_BUTTON*> v_buttonList;
+	S_BUTTON *FetchBUTTON(std::string name);
+	void UpdateButtons(void);
+	void RenderButtons(void);
 
 	Mtx44 m_lightDepthProj;
 	Mtx44 m_lightDepthView;
@@ -352,10 +370,10 @@ private:
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 
-	Camera4 camera;
 	CustomCam1 FPC;
 	float f_step;
 	float f_mouseSensitivity;
+	float mousePosX, mousePosY;
 
 	/******************************************************************************/
 	/*!
@@ -384,6 +402,7 @@ private:
 
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);
+	int currentLevel;
 	Particle* FetchParticle(void);
 	BulletInfo* FetchBullet(void);
 
@@ -395,7 +414,7 @@ private:
 	void UpdateParticles(double &dt);
 	void UpdateBullets(double &dt);
 
-	void Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity = 10, float dmg = 100);
+	void Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity = 10, float dmg = 100);
 	void weaponsUpdate(double &dt);
 
 	const int NUM_LIGHT_PARAM;
@@ -403,8 +422,8 @@ private:
 
 	void editFOV(float &newFOV);
 	void RenderText(Mesh* mesh, std::string text, Color color);
-	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
-	void RenderMeshin2D(Mesh *mesh, bool enableLight, float size = 1.0f, float x = .0f, float y = .0f, float rotation = 0.f);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
+	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 10.f, float glow = 0.f, Color glowColor = Color(1, 0, 0));
 
 	void initWeapons(void);
 

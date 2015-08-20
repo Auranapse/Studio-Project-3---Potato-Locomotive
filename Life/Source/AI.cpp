@@ -90,7 +90,50 @@ if true will move left, else right
 /******************************************************************************/
 void AI::movementLR(double &dt, bool left)
 {
+	Mtx44 rotation;
+	if(left == true)
+	{
+		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
+		Lookat = rotation * Lookat;
+		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
+	}
+
+	else
+	{
+		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
+		Lookat = rotation * Lookat;
+		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Update the sensors for pathfinding
+\param left
+sensors made to see if there is anything in the way of the AI
+*/
+/******************************************************************************/
+void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
+{
+	//when right has nothing to collide
+	if(left == true && mid == true, right == false)
+	{
+		movementLR(dt, false);
+	}
+
+	//when left has nothing to collide
+	else if(left == false && mid == true, right == true)
+	{
+		movementLR(dt, true);
+	}
+
+	//when middle has nothing to collide
+	else if(left == true && mid == false, right == true)
+	{
+		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
 }
 
 /******************************************************************************/

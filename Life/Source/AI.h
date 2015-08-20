@@ -13,6 +13,7 @@ Handles AI position and physics
 #include "CharacterObject.h"
 #include "GabrielDLC.h"
 #include "Collision.h"
+#include "Mtx44.h"
 
 class AI : public CharacterObject
 {
@@ -41,6 +42,7 @@ public:
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true);
 
+	void SensorUpdate(double &dt, bool left, bool middle, bool right);
 	virtual void Update(double &dt, Vector3 playerPos);
 	bool CollideWithAI;
 	std::vector<GameObject*> m_goList;

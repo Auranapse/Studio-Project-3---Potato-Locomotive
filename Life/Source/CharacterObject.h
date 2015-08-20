@@ -133,10 +133,10 @@ public:
 
 	ItemObject *holding;
 
-	virtual void Init(Vector3 Pos, Vector3 Lookat, const char* texturedir);
+	virtual void Init(const Vector3 &Pos, const Vector3 &Lookat, const char* texturedir);
 	void HoldObject(ItemObject *obj);
-	void DropObject(Vector3 ThrowVel = Vector3(0, 0, 0));
-	virtual void Update(double &dt);
+	void DropObject(const Vector3 &ThrowVel = Vector3(0, 0, 0));
+	virtual void Update(const double &dt);
 
 	CharacterObject();
 	~CharacterObject();

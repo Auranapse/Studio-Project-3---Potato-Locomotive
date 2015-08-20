@@ -87,6 +87,88 @@ void mainscene::assignSave(void)
 /******************************************************************************/
 /*!
 \brief
+Initialize menus
+*/
+/******************************************************************************/
+void mainscene::InitMenus(void)
+{
+	UIColor.Set(0.8f, 0.8f, 0.8f);
+	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
+
+	//Pause Menu--------------------------------------------------------
+	S_BUTTON* S_MB;
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Back to game";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Previous level";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 10.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Skip to next level";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 15.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
+	//End Menu----------------------------------------------------------
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new S_BUTTON;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Play again";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+}
+
+/******************************************************************************/
+/*!
+\brief
+Fetches a button with the same name
+\param name
+the name of the button
+\return
+returns the button with the same name
+*/
+/******************************************************************************/
+S_BUTTON* mainscene::FetchBUTTON(std::string name)
+{
+	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		if (S_MB->text == name)
+		{
+			return S_MB;
+		}
+	}
+
+	return NULL;
+}
+
+/******************************************************************************/
+/*!
+\brief
 Initialize default variables, create meshes, lighting
 */
 /******************************************************************************/
@@ -257,9 +339,9 @@ void mainscene::Init()
 	lights[0].position.Set(10.f, 100.f, 0.f);
 	lights[0].color.Set(1.f, 1.f, 1.f);
 	lights[0].kC = 1.f;
-	lights[0].kL = 0.00001f;
-	lights[0].kQ = 0.0000001f;
-	lights[0].power = 1.5f;
+	lights[0].kL = 0.000001f;
+	lights[0].kQ = 0.00000001f;
+	lights[0].power = 1.2f;
 
 
 	//Viewing room 2 light
@@ -364,9 +446,6 @@ void mainscene::Init()
 	glUniform1i(m_parameters[U_FOG_TYPE], f_type);
 	glUniform1i(m_parameters[U_FOG_ENABLED], enableFOG);
 
-	//Initialize camera settings
-	camera.Init(Vector3(-150.f, 150.f, 0.f), Vector3(-149.f, 150.f, 0.f), Vector3(0.f, 1.f, 0.f));
-
 	//Set projection matrix to perspective mode
 	editFOV(f_fov);
 	f_currentfov = f_fov;
@@ -394,7 +473,7 @@ void mainscene::Init()
 
 	//WEAPONS
 
-	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 8, 8, 0.53f);
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 6, 6, 0.53f);
 
 	meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
 	meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
@@ -458,8 +537,11 @@ void mainscene::Init()
 	meshList[GEO_SPECULAR_QUAD] = MeshBuilder::GenerateQuad("Specular map", Color(1, 1, 1), 1.f, 1.f, 1.f);
 	meshList[GEO_SPECULAR_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_SPECULAR);
 
-	meshList[GEO_EMISSIVE_QUAD] = MeshBuilder::GenerateQuad("Specular map", Color(1, 1, 1), 1.f, 1.f, 1.f);
+	meshList[GEO_EMISSIVE_QUAD] = MeshBuilder::GenerateQuad("Emissive map", Color(1, 1, 1), 1.f, 1.f, 1.f);
 	meshList[GEO_EMISSIVE_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_EMISSIVE);
+
+	meshList[GEO_SCREEN_OVERLAY] = MeshBuilder::GenerateQuad("Screen tint", Color(1, 1, 1), 1.f, 1.f, 1.f);
+
 
 	//Lighting-------------------------------------------------------------------------------
 
@@ -479,7 +561,7 @@ void mainscene::Init()
 	renderAxis = false;
 
 	mouseEnabled = true;
-	if (mouseEnabled == true)
+	if (mouseEnabled)
 	{
 		Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 		Application::SetCursor(false);
@@ -505,11 +587,13 @@ void mainscene::Init()
 
 	f_step = 0.f;
 
-	loadLevel(1);
+	currentLevel = 1;
+	loadLevel(currentLevel);
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 20, 0.f);
 
+	InitMenus();
 	initWeapons();
 
 	inputDelay = 0.f;
@@ -541,11 +625,18 @@ void mainscene::Init()
 	soundList[ST_CAMERA_SPOTTED] = engine->addSoundSourceFromFile("GameData//sounds//other//EnemySpotted.mp3", ESM_AUTO_DETECT, true);
 	soundList[ST_CAMERA_FOUND] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
 	slowmoentrance = true;
+
+	GAMESTATE = GS_PLAY;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Switch scene back to main
+*/
+/******************************************************************************/
 void mainscene::InitShaders()
 {
-	Application::SetCursor(true);
 	e_nextScene = Application::E_SCENE_MENU;
 }
 
@@ -593,6 +684,7 @@ bool mainscene::loadLevel(int level)
 		if (CO != NULL)
 		{
 			delete CO;
+			CO = NULL;
 		}
 		m_charList.pop_back();
 	}
@@ -603,6 +695,7 @@ bool mainscene::loadLevel(int level)
 		if (go != NULL)
 		{
 			delete go;
+			go = NULL;
 		}
 		m_goList.pop_back();
 	}
@@ -613,6 +706,7 @@ bool mainscene::loadLevel(int level)
 		if (Par != NULL)
 		{
 			delete Par;
+			Par = NULL;
 		}
 		m_ParList.pop_back();
 	}
@@ -749,7 +843,7 @@ void mainscene::initWeapons(void)
 	WPO->mesh = meshList[GEO_M9];
 	WPO->attackRate = 0.02f;
 	WPO->scale.Set(0.03f, 0.03f, 0.03f);
-	WPO->shootvelocity = 120.f;
+	WPO->shootvelocity = 300.f;
 	WPO->pos.Set(0, 10, 0);
 	WPO->pos1.Set(-5, -4, 9);
 	WPO->pos2.Set(0, -2.1f, 8);
@@ -1004,6 +1098,14 @@ void mainscene::UpdatePlayer(double &dt)
 		AI *ai = dynamic_cast<AI*>(CO);
 		if (ai != NULL)
 		{
+			Mtx44 rotation;
+			rotation.SetToRotation(CalAnglefromPosition(ai->Lookat, ai->getPosition(), true), 0.f, 1.f, 0.f);
+			Vector3 L, R, C;
+			C = rotation * Vector3(0.f, 0.f, 10.f);
+			L = rotation * Vector3(-5.f, 0.f, 7.f);
+			R = rotation * Vector3(5.f, 0.f, 7.f);
+
+			ai->SensorUpdate(dt, collide(ai->getPosition() + L), collide(ai->getPosition() + R), collide(ai->getPosition() + C));
 			ai->Update(dt, P_Player.getPosition());
 		}
 		else
@@ -1206,7 +1308,14 @@ void mainscene::UpdateBullets(double &dt)
 			}
 			else
 			{
-				BI->Update(dt);
+				if (d_dt != d_dt2)
+				{
+					BI->Update(dt*0.5);
+				}
+				else
+				{
+					BI->Update(dt);
+				}
 			}
 		}
 	}
@@ -1218,7 +1327,7 @@ void mainscene::UpdateBullets(double &dt)
 Fires bullet
 */
 /******************************************************************************/
-void mainscene::Shoot(Vector3 Pos, Vector3 Dir, float Speed, float Longevity, float dmg)
+void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity, float dmg)
 {
 	BulletInfo *BI;
 	BI = FetchBullet();
@@ -1399,41 +1508,6 @@ update player sound position
 /******************************************************************************/
 void mainscene::UpdateSound(double &dt)
 {
-	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
-}
-
-/******************************************************************************/
-/*!
-\brief
-Animations, controls
-*/
-/******************************************************************************/
-void mainscene::Update(double dt)
-{
-	d_dt = dt;
-	FPScounter = static_cast<float>(1 / dt);
-
-	if (Application::IsKeyPressed('X'))
-	{
-		dt *= 0.05;
-
-		if (P_Player.Velocity != 0)
-		{
-			float temp = P_Player.Velocity.LengthSquared() *0.002f;
-			if (temp > 1)
-			{
-				dt *= temp;
-			}
-
-			if (dt > d_dt)
-			{
-				dt = d_dt;
-			}
-		}
-	}
-
-	d_dt2 = dt;
-
 	if (slowmoentrance)
 	{
 		if (d_dt != d_dt2)
@@ -1451,7 +1525,49 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	timer += static_cast<float>(dt);
+	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
+}
+
+/******************************************************************************/
+/*!
+\brief
+update menu buttons
+*/
+/******************************************************************************/
+void mainscene::UpdateButtons(void)
+{
+	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0)))
+		{
+			S_MB->active = true;
+			S_MB->color = UIColorPressed;
+		}
+		else
+		{
+			S_MB->active = false;
+			S_MB->color = UIColor;
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Animations, controls
+*/
+/******************************************************************************/
+void mainscene::Update(double dt)
+{
+	d_dt = dt;
+	FPScounter = static_cast<float>(1 / dt);
+
+	double x, y;
+	Application::GetMousePos(x, y);
+	mousePosX = (static_cast<float>(x) / static_cast<float>(Application::GetWindowWidth()) * static_cast<float>(Application::GetWindowWidth())*0.1f);
+	mousePosY = ((static_cast<float>(Application::GetWindowHeight()) - static_cast<float>(y)) / static_cast<float>(Application::GetWindowHeight()) * static_cast<float>(Application::GetWindowHeight())*0.1f);
+
 
 	if (Application::IsKeyPressed('1'))
 	{
@@ -1501,32 +1617,153 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	UpdatePlayer(dt);
-	UpdateGO(dt);
-	UpdateParticles(dt);
-	FPC.Update(dt);
+	static bool isEscPressed = false;
+	static bool isLmbPressed = false;
 
-	sc.update(dt, P_Player.getPosition());
-
-	if (Application::IsKeyPressed(VK_F1))
+	switch (GAMESTATE)
 	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
+	case mainscene::GS_PLAY:
+		if (Application::IsKeyPressed('X'))
 		{
-			mouseEnabled = true;
-			Application::SetCursor(false);
-			loadLevel(2);
+			dt *= 0.05;
+
+			if (P_Player.Velocity != 0)
+			{
+				float temp = P_Player.Velocity.LengthSquared() *0.002f;
+				if (temp > 1)
+				{
+					dt *= temp;
+				}
+
+				if (dt > d_dt)
+				{
+					dt = d_dt;
+				}
+			}
 		}
-		else
+
+		d_dt2 = dt;
+		timer += static_cast<float>(dt);
+
+		UpdatePlayer(dt);
+		UpdateGO(dt);
+		UpdateParticles(dt);
+		FPC.Update(dt);
+		sc.update(dt, P_Player.getPosition());
+		UpdateBullets(dt);
+		weaponsUpdate(dt);
+		UpdateSound(dt);
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
 		{
-			mouseEnabled = false;
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
 			Application::SetCursor(true);
+			GAMESTATE = GS_PAUSED;
 		}
+		break;
+	case mainscene::GS_PAUSED:
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			Application::SetCursor(false);
+			Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+			GAMESTATE = GS_PLAY;
+		}
+
+		UpdateButtons();
+
+		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
+		{
+			isLmbPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_LBUTTON) && isLmbPressed)
+		{
+			isLmbPressed = false;
+			if (FetchBUTTON("Return to menu")->active)
+			{
+				e_nextScene = Application::E_SCENE_MENU;
+			}
+			{
+				isLmbPressed = false;
+				if (FetchBUTTON("Return to menu")->active)
+				{
+					e_nextScene = Application::E_SCENE_MENU;
+				}
+				else if (FetchBUTTON("Back to game")->active)
+				{
+					Application::SetCursor(false);
+					Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+					GAMESTATE = GS_PLAY;
+				}
+				else if (FetchBUTTON("Previous level")->active)
+				{
+					--currentLevel;
+					if (!loadLevel(currentLevel))
+					{
+						++currentLevel;
+					}
+
+					Application::SetCursor(false);
+					Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+					GAMESTATE = GS_PLAY;
+				}
+				else if (FetchBUTTON("Skip to next level")->active)
+				{
+					++currentLevel;
+					if (!loadLevel(currentLevel))
+					{
+						--currentLevel;
+					}
+
+					Application::SetCursor(false);
+					Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+					GAMESTATE = GS_PLAY;
+				}
+			}
+		}
+		break;
+	case GS_END:
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			e_nextScene = Application::E_SCENE_MENU;
+		}
+
+		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
+		{
+			isLmbPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_LBUTTON) && isLmbPressed)
+		{
+			isLmbPressed = false;
+			if (FetchBUTTON("Return to menu")->active)
+			{
+				e_nextScene = Application::E_SCENE_MENU;
+			}
+			else if (FetchBUTTON("Play again")->active)
+			{
+				currentLevel = 1;
+				loadLevel(currentLevel);
+				Application::SetCursor(false);
+				Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+				GAMESTATE = GS_PLAY;
+			}
+		}
+		break;
+	default:
+		break;
 	}
-
-	UpdateBullets(dt);
-	weaponsUpdate(dt);
-
-	UpdateSound(dt);
 }
 
 /******************************************************************************/
@@ -1689,10 +1926,11 @@ void mainscene::RenderBullet(void)
 Renders mesh in 3D
 */
 /******************************************************************************/
-void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x, float y, float rotation)
+void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color glowColor)
 {
-	glUniform1i(m_parameters[U_GLOW], 0);
-	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
+	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
+	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
@@ -1700,15 +1938,8 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x
 	projectionStack.LoadMatrix(ortho);
 	viewStack.PushMatrix();
 	viewStack.LoadIdentity();
-	modelStack.PushMatrix();
 	//modelStack.LoadIdentity();
 
-	modelStack.Translate(x, y, 0);
-	modelStack.Rotate(rotation, 0, 0, 1);
-	if (size != 0)
-	{
-		modelStack.Scale(size, size, size);
-	}
 
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 
@@ -1731,7 +1962,6 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float size, float x
 	mesh->Render();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	modelStack.PopMatrix();
 	viewStack.PopMatrix();
 	projectionStack.PopMatrix();
 }
@@ -1941,7 +2171,7 @@ void mainscene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 	viewStack.PushMatrix();
 	viewStack.LoadIdentity(); //No need camera for ortho mode
 	modelStack.PushMatrix();
-	modelStack.LoadIdentity(); //Reset modelStack
+	//modelStack.LoadIdentity(); //Reset modelStack
 	modelStack.Translate(x, y, 0);
 	modelStack.Scale(size, size, size);
 
@@ -2060,7 +2290,6 @@ void mainscene::RenderWorldShadow(void)
 		}
 	}
 
-
 	RenderCharacter(&P_Player);
 
 	modelStack.PushMatrix();
@@ -2087,8 +2316,6 @@ void mainscene::RenderWorldNoShadow(void)
 	}
 
 	RenderSkybox();
-
-	//RenderObjectsAlpha();//MUST RENDER IN ENVIRONMENT LAST OR WE'LL ALL DIE
 }
 
 /******************************************************************************/
@@ -2101,15 +2328,59 @@ void mainscene::RenderUI(void)
 {
 	if (P_Player.holding != NULL)
 	{
-		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f - 1 - f_curRecoil * 0.5f);
-		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f + 1 + f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
-		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f - 1 - f_curRecoil * 0.5f, Application::GetWindowHeight()*0.05f, 90);
-		RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 1, Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f + 1 + f_curRecoil * 0.5f);
+		if (P_Player.holding->isGun)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+
+			modelStack.PushMatrix();
+			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Rotate(90, 0, 0, 1);
+			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Rotate(-90, 0, 0, 1);
+			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Rotate(180, 0, 0, 1);
+			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+			modelStack.PopMatrix();
+
+			modelStack.PopMatrix();
+		}
 	}
 
 	if (DisplayInfo == true)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
+	}
+
+	switch (GAMESTATE)
+	{
+	case mainscene::GS_PLAY:
+
+		break;
+	case mainscene::GS_END:
+	case mainscene::GS_PAUSED:
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Scale(Application::GetWindowWidth(), Application::GetWindowHeight(), 1);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 5.f, 10.f, Color(0.f, 0.f, 0.f));
+		modelStack.PopMatrix();
+		RenderButtons();
+		break;
+	default:
+		break;
 	}
 }
 
@@ -2145,8 +2416,11 @@ void mainscene::RenderPassMain(void)
 	RenderMeshin2D(meshList[GEO_DIFFUSE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.045f);
 	RenderMeshin2D(meshList[GEO_SPECULAR_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.03f);
 	RenderMeshin2D(meshList[GEO_EMISSIVE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.015f);//*/
-	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false, 5, Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f);
-
+	modelStack.PushMatrix();
+	modelStack.Translate(Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f, 0);
+	modelStack.Scale(5, 5, 5);
+	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false);
+	modelStack.PopMatrix();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2340,11 +2614,34 @@ void mainscene::Render(void)
 /******************************************************************************/
 /*!
 \brief
+Renders buttons
+*/
+/******************************************************************************/
+void mainscene::RenderButtons(void)
+{
+	for (unsigned i = 0; i < v_buttonList.size(); ++i)
+	{
+		S_BUTTON *S_MB = v_buttonList[i];
+		if (S_MB->gamestate == GAMESTATE)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(S_MB->pos);
+			modelStack.Scale(S_MB->scale);
+			RenderTextOnScreen(meshList[GEO_TEXT], S_MB->text, S_MB->color);
+			modelStack.PopMatrix();
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 Clears memory upon exit
 */
 /******************************************************************************/
 void mainscene::Exit(void)
 {
+	Application::SetCursor(true);
 	if (engine != NULL)
 	{
 		engine->drop();
@@ -2391,6 +2688,7 @@ void mainscene::Exit(void)
 		if (CO != NULL)
 		{
 			delete CO;
+			CO = NULL;
 		}
 		m_charList.pop_back();
 	}

@@ -258,7 +258,16 @@ void main()
 		color.xyz = mix(color.xyz, TEST.color, fogFactor);
 	}
 
-	float temp = alpha;
+	float temp;
+
+	if(glow != 0)
+	{
+		temp = glow;
+		temp = temp / 10;
+		color = mix(color, vec4(glowColor.r, glowColor.g, glowColor.b, 1), temp);
+	}
+
+	temp = alpha;
 
 	if(alpha == 0)
 	{
@@ -269,12 +278,5 @@ void main()
 	{
 		temp = temp / 10;
 		color = mix(color, vec4(color.r, color.g, color.b, 0), (1.f - temp));
-	}
-
-	if(glow != 0)
-	{
-		temp = glow;
-		temp = temp / 10;
-		color = mix(color, vec4(glowColor.r, glowColor.g, glowColor.b, 1), temp);
 	}
 }
