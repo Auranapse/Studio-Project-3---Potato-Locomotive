@@ -71,11 +71,11 @@ void AI::movementFB(double &dt, bool forward)
 {
 	if (forward)
 	{
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Velocity -= (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -92,17 +92,17 @@ void AI::movementLR(double &dt, bool left)
 	Mtx44 rotation;
 	if(left == true)
 	{
-		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
+		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
 		Lookat = rotation * Lookat;
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
 
 	else
 	{
-		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
+		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
 		Lookat = rotation * Lookat;
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -131,7 +131,12 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	//when middle has nothing to collide
 	else if(left == true && mid == false, right == true)
 	{
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		movementFB(dt, true);
+	}
+
+	else if (left == false && mid == false, right == false)
+	{
+		movementFB(dt, true);
 	}
 }
 
@@ -148,16 +153,17 @@ GameObject vector list - To check collision
 void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
 {
 	static Vector3 destination;
-
+	/*
 	if(isVisible(Position, Lookat, 50, playerPos) && (Position - playerPos).LengthSquared() <= 144)
 	{
 		e_State = ATTACK;
 	}
-	f_movementSpeed = 1000;
+	f_movementSpeed = 1000;*/
 	switch(e_State)
 	{
 	case ATTACK:
 		{
+			/*
 			this->Lookat = playerPos;
 
 			if(this->holding != NULL)
@@ -180,13 +186,22 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			if((playerPos - Position).LengthSquared() > 10000)
 			{
 				e_State = WALKING;
-			}
+			}//*/
 		}
 		break;
 
 	case WALKING:
 		{
-			if(isVisible(Position, Lookat, 65, playerPos) && (Position - playerPos).LengthSquared() < 10000)
+			static float offset = 40.f;
+	Mtx44 rotation;
+	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
+	Vector3 L, R, C;
+	C = rotation * Vector3(0.f, 0.f, 20.f);
+	L = rotation * Vector3(-20.f, 0.f, 15.f);
+	R = rotation * Vector3(20.f, 0.f, 15.f);
+
+	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+			/*if(isVisible(Position, Lookat, 65, playerPos) && (Position - playerPos).LengthSquared() < 10000)
 			{
 				e_State = ALERT;
 				destination = playerPos;
@@ -209,12 +224,13 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 
 			}
 			else
-				Lookat = defaultLookat;
+				Lookat = defaultLookat;//*/
 		}
 		break;
 
 	case ALERT:
 		{
+			/*
 			Lookat = destination;
 
 			//Make the enemy move towards the destination
@@ -231,9 +247,9 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 					Position.x = destination.x;
 					Position.z = destination.z;
 				}
-			}
+			}//*/
 			//If the enemy is at the destination
-			else
+			//else
 			{
 				f_alert_timer += (float)dt;
 
@@ -249,98 +265,105 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 
 
 	//Collision Handling
-	static float offset = 40.f;
-	Mtx44 rotation;
-	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
-	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, 0.f, 10.f);
-	L = rotation * Vector3(-5.f, 0.f, 7.f);
-	R = rotation * Vector3(5.f, 0.f, 7.f);
+	
+	////=============Positive X Velocity=============//
+	//if(collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(10.f, 30.f, 0.f)), m_charList, m_GOList, false))
+	//{
+	//	//First if statement is to check against Character Object - AI
+	//	Position.x = Position.x +  offset * static_cast<float>(dt);
+	//	/*if(Velocity.x > 0)
+	//	{
+	//	Velocity.x = 0;
+	//	}*/
 
+	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+	//}
+	//else if(collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(10.f, 50.f, 0.f)), m_charList, m_GOList))
+	//{
+	//	//Else if is to check against GameObject - Walls
+	//	/*if(Velocity.x > 0)
+	//	{
+	//	Velocity.x = 0;
+	//	}*/
+	//	
+	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+	//}
 
-	//=============Positive X Velocity=============//
-	if(collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(10.f, 30.f, 0.f)), m_charList, m_GOList, false))
-	{
-		//First if statement is to check against Character Object - AI
-		Position.x = Position.x +  offset * static_cast<float>(dt);
-		/*if(Velocity.x > 0)
-		{
-		Velocity.x = 0;
-		}*/
+	////=============Positive Z Velocity=============//
+	//if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, 10.f)), m_charList, m_GOList, false))
+	//{
+	//	Position.z = Position.z +  offset * static_cast<float>(dt);
+	//	/*if(Velocity.z > 0)
+	//	{
+	//	Velocity.z = 0;
+	//	}*/
 
-		SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
-	}
-	else if(collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(10.f, 50.f, 0.f)), m_charList, m_GOList))
-	{
-		//Else if is to check against GameObject - Walls
-		/*if(Velocity.x > 0)
-		{
-		Velocity.x = 0;
-		}*/
+	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+	//}
+	//else if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, 10.f)), m_charList, m_GOList))
+	//{
+	//	/*if(Velocity.z > 0)
+	//	{
+	//	Velocity.z = 0;
+	//	}*/
+
+	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+	//}
+
+	////=============Negative X Velocity=============//
+	//if(collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(-10.f, 30.f, 0.f)), m_charList, m_GOList, false))
+	//{
+	//	Position.x = Position.x - offset * static_cast<float>(dt);
+	//	if(Velocity.x < 0)
+	//	{
+	//		Velocity.x = 0;
+	//	}
+	//}
+	//else if(collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(-10.f, 50.f, 0.f)), m_charList, m_GOList))
+	//{
+	//	if(Velocity.x < 0)
+	//	{
+	//		Velocity.x = 0;
+	//	}
+	//}
+
+	////=============Negative Z Velocity=============//
+	//if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, -10.f)), m_charList, m_GOList, false))
+	//{
+	//	Position.z = Position.z - offset * static_cast<float>(dt);
+	//	if(Velocity.z < 0)
+	//	{
+	//		Velocity.z = 0;
+	//	}
+	//}
+	//else if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, -10.f)), m_charList, m_GOList))
+	//{
+	//	if(Velocity.z < 0)
+	//	{
+	//		Velocity.z = 0;
+	//	}
+	//}
+
 		
-		SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
-	}
 
-	//=============Positive Z Velocity=============//
-	if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, 10.f)), m_charList, m_GOList, false))
+		if (Velocity.x != 0)
 	{
-		Position.z = Position.z +  offset * static_cast<float>(dt);
-		/*if(Velocity.z > 0)
-		{
-		Velocity.z = 0;
-		}*/
-
-		SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+		float SForceX = 0 - Velocity.x;
+		Velocity.x += SForceX * 0.1f;
 	}
-	else if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, 10.f)), m_charList, m_GOList))
+
+	if (Velocity.z != 0)
 	{
-		/*if(Velocity.z > 0)
-		{
-		Velocity.z = 0;
-		}*/
-
-		SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+		float SForceZ = 0 - Velocity.z;
+		Velocity.z += SForceZ * 0.1f;
 	}
 
-	//=============Negative X Velocity=============//
-	if(collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(-10.f, 30.f, 0.f)), m_charList, m_GOList, false))
-	{
-		Position.x = Position.x - offset * static_cast<float>(dt);
-		if(Velocity.x < 0)
-		{
-			Velocity.x = 0;
-		}
-	}
-	else if(collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(-10.f, 50.f, 0.f)), m_charList, m_GOList))
-	{
-		if(Velocity.x < 0)
-		{
-			Velocity.x = 0;
-		}
-	}
-
-	//=============Negative Z Velocity=============//
-	if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, -10.f)), m_charList, m_GOList, false))
-	{
-		Position.z = Position.z - offset * static_cast<float>(dt);
-		if(Velocity.z < 0)
-		{
-			Velocity.z = 0;
-		}
-	}
-	else if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, -10.f)), m_charList, m_GOList))
-	{
-		if(Velocity.z < 0)
-		{
-			Velocity.z = 0;
-		}
-	}
-
-
-	if((Position - playerPos).LengthSquared() > 400)
+		//if((Position - playerPos).LengthSquared() > 400)
+		Animation.Update(dt, Velocity.LengthSquared() * 0.03);
+		Lookat += Velocity * static_cast<float>(dt);
 		Position += Velocity * static_cast<float>(dt);
-	else
-		Velocity = 0;
+	//else
+		//Velocity = 0;
 }
 
 /******************************************************************************/
