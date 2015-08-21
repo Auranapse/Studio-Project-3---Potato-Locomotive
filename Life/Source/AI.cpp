@@ -75,7 +75,7 @@ void AI::movementFB(double &dt, bool forward)
 	}
 	else
 	{
-		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -94,7 +94,7 @@ void AI::movementLR(double &dt, bool left)
 	{
 		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
 		Lookat = rotation * Lookat;
-		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
 
@@ -102,7 +102,7 @@ void AI::movementLR(double &dt, bool left)
 	{
 		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
 		Lookat = rotation * Lookat;
-		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -117,24 +117,29 @@ sensors made to see if there is anything in the way of the AI
 void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 {
 	//when right has nothing to collide
-	if(left == true && mid == true, right == false)
+	if(left == true && mid == true && right == false)
 	{
 		movementLR(dt, false);
 	}
 
 	//when left has nothing to collide
-	else if(left == false && mid == true, right == true)
+	else if(left == false && mid == true && right == true)
 	{
 		movementLR(dt, true);
 	}
 
 	//when middle has nothing to collide
-	else if(left == true && mid == false, right == true)
+	else if(left == true && mid == false && right == true)
 	{
 		movementFB(dt, true);
 	}
 
-	else if (left == false && mid == false, right == false)
+	else if (left == false && mid == false && right == false)
+	{
+		movementFB(dt, true);
+	}
+
+	else
 	{
 		movementFB(dt, true);
 	}
@@ -196,11 +201,13 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
 	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, 0.f, 20.f);
-	L = rotation * Vector3(-20.f, 0.f, 15.f);
-	R = rotation * Vector3(20.f, 0.f, 15.f);
+	C = rotation * Vector3(0.f, 0.f, 200.f);
+	L = rotation * Vector3(-20.f, 0.f, 150.f);
+	R = rotation * Vector3(20.f, 0.f, 150.f);
+	
+	SensorUpdate(dt, Application::IsKeyPressed(VK_LEFT), Application::IsKeyPressed(VK_UP), Application::IsKeyPressed(VK_RIGHT));
 
-	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
+	//SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
 			/*if(isVisible(Position, Lookat, 65, playerPos) && (Position - playerPos).LengthSquared() < 10000)
 			{
 				e_State = ALERT;
@@ -286,7 +293,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	//	Velocity.x = 0;
 	//	}*/
 	//	
-	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
 	//}
 
 	////=============Positive Z Velocity=============//
@@ -297,8 +303,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	//	{
 	//	Velocity.z = 0;
 	//	}*/
-
-	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
 	//}
 	//else if(collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, 10.f)), m_charList, m_GOList))
 	//{
@@ -307,7 +311,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	//	Velocity.z = 0;
 	//	}*/
 
-	//	SensorUpdate(dt, collisionChecking(Position + L , m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
 	//}
 
 	////=============Negative X Velocity=============//
@@ -344,9 +347,9 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	//	}
 	//}
 
-		
+	//	
 
-		if (Velocity.x != 0)
+	if (Velocity.x != 0)
 	{
 		float SForceX = 0 - Velocity.x;
 		Velocity.x += SForceX * 0.1f;
@@ -402,8 +405,7 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<CharacterObject *> &m_charL
 			CharacterObject * CO = (CharacterObject*)*it;
 			if(CO->getPosition() != Position)
 			{
-				static Vector3 test = Vector3(20, 20, 20);
-				if(intersect(CO->getPosition() + test,CO->getPosition() - test, Position))
+				if(intersect(CO->getPosition(),CO->getPosition(), Position))
 				{
 					return true;
 				}

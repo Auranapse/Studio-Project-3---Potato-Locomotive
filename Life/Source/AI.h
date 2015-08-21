@@ -10,6 +10,7 @@ Handles AI position and physics
 #ifndef AI_H
 #define AI_H
 
+#include "Application.h"
 #include "CharacterObject.h"
 #include "GabrielDLC.h"
 #include "Collision.h"
