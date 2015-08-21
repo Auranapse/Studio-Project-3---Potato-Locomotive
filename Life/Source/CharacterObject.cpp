@@ -221,7 +221,7 @@ delta time
 /******************************************************************************/
 void CharacterObject::Update(const double &dt)
 {
-	Animation.Update(dt, Velocity.LengthSquared() * 0.03);
+	Animation.Update(dt, Velocity.LengthSquared() * 0.03f);
 	Lookat += Velocity * static_cast<float>(dt);
 	Position += Velocity * static_cast<float>(dt);
 }

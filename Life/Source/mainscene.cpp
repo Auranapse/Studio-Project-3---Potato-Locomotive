@@ -439,10 +439,10 @@ void mainscene::Init()
 	int f_type = 1;
 	enableFOG = true;
 	glUniform3fv(m_parameters[U_FOG_COLOR], 1, &FogCol.r);
-	glUniform1i(m_parameters[U_FOG_START], f_start);
-	glUniform1i(m_parameters[U_FOG_END], f_end);
-	glUniform1i(m_parameters[U_FOG_DENSITY], f_density);
-	glUniform1i(m_parameters[U_FOG_TYPE], f_type);
+	glUniform1i(m_parameters[U_FOG_START], static_cast<GLint>(f_start));
+	glUniform1i(m_parameters[U_FOG_END], static_cast<GLint>(f_end));
+	glUniform1i(m_parameters[U_FOG_DENSITY], static_cast<GLint>(f_density));
+	glUniform1i(m_parameters[U_FOG_TYPE], static_cast<GLint>(f_type));
 	glUniform1i(m_parameters[U_FOG_ENABLED], enableFOG);
 
 	//Set projection matrix to perspective mode
@@ -651,7 +651,7 @@ returns true if loadmap is sucessful
 /******************************************************************************/
 bool mainscene::loadLevel(int level)
 {
-	float worldsize = 40.f;
+	float worldsize = 30.f;
 	std::cout << "\nLoading map...\n";
 	std::string MAPLOC = "GameData//Maps//";
 	MAPLOC += std::to_string(static_cast<unsigned long long>(level));
@@ -1473,7 +1473,7 @@ void mainscene::PlaySound2D(irrklang::ISoundSource *source)
 
 		if (d_dt2 != d_dt)
 		{
-			fx->enableDistortionSoundEffect(d_dt2 - d_dt - 30.f);
+			fx->enableDistortionSoundEffect(static_cast<ik_f32>(d_dt2 - d_dt - 30.f));
 		}
 	}
 }
@@ -1914,9 +1914,9 @@ Renders mesh in 3D
 /******************************************************************************/
 void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color glowColor)
 {
-	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
-	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
+	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
@@ -1960,9 +1960,9 @@ Renders mesh
 /******************************************************************************/
 void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color glowColor, Material *material)
 {
-	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
-	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
+	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 
 	if (enableFOG && enableFog)
 	{
@@ -2360,7 +2360,7 @@ void mainscene::RenderUI(void)
 	case mainscene::GS_PAUSED:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(Application::GetWindowWidth(), Application::GetWindowHeight(), 1);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 5.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		RenderButtons();

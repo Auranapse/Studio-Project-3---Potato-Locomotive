@@ -17,8 +17,8 @@ public:
 	MapLoader();
 	~MapLoader();
 
-	int map_height;
-	int map_width;
+	unsigned int map_height;
+	unsigned int map_width;
 
 	bool fileExists(std::string file);
 	bool loadMap(std::string file);

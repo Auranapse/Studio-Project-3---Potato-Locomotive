@@ -138,6 +138,21 @@ class MenuScene : public Scene
 		E_M_TOTAL,
 	};
 
+	struct CONTROL_CHANGE_BUTTON
+	{
+		S_BUTTON *button;
+		unsigned short Control;
+		std::string text;
+		std::string CONTROLTEXT;
+
+		CONTROL_CHANGE_BUTTON()
+		{
+			button = NULL;
+			text = "undefined";
+			CONTROLTEXT = "undefined";
+		}
+	};
+
 public:
 	MenuScene();
 	~MenuScene();
@@ -266,6 +281,8 @@ private:
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
 
+	CONTROL_CHANGE_BUTTON us_controlCB[E_CTRL_TOTAL];
+
 	/******************************************************************************/
 	/*!
 	int MENU_STATE:
@@ -290,8 +307,7 @@ private:
 	void InitShadersAndLights(void);
 	void InitMenu(void);
 
-	void assignsave(void);
-	void saveGame(void);
+	void assignsave(bool save = false);
 	SaveHandler SH_1;
 
 	// Update/Control Functions

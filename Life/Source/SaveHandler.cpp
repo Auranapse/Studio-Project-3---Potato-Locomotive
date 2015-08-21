@@ -35,7 +35,7 @@ void SaveHandler::init(std::string file)
 	loadData();
 }
 
-void SaveHandler::assign(float &data, float default_data, int ID)
+void SaveHandler::assign(float &data, float default_data, unsigned int ID, bool save)
 {
 	std::string temp;
 	if (ID > Data.size())
@@ -47,11 +47,18 @@ void SaveHandler::assign(float &data, float default_data, int ID)
 
 	else
 	{
-		data = static_cast<float>(std::stoi(Data[ID - 1]));
+		if (save)
+		{
+			Data[ID - 1] = std::to_string(static_cast<long double>(data));
+		}
+		else
+		{
+			data = static_cast<float>(std::stoi(Data[ID - 1]));
+		}
 	}
 }
 
-void SaveHandler::assign(unsigned short &data, unsigned short default_data, int ID)
+void SaveHandler::assign(unsigned short &data, unsigned short default_data, unsigned int ID, bool save)
 {
 	std::string temp;
 	if (ID > Data.size())
@@ -66,8 +73,17 @@ void SaveHandler::assign(unsigned short &data, unsigned short default_data, int 
 
 	else
 	{
-		char CN = std::stoi(Data[ID - 1]);
-		data = CN;
+		if (save)
+		{
+			std::stringstream ss;
+			ss << data;
+			Data[ID - 1] = ss.str();
+		}
+		else
+		{
+			char CN = std::stoi(Data[ID - 1]);
+			data = CN;
+		}
 	}
 }
 
@@ -86,7 +102,7 @@ void SaveHandler::loadData(void)
 
 	std::string tempdata;
 
-	for (unsigned i = 0; i < fileSize; i++)
+	for (int i = 0; i < fileSize; i++)
 	{
 		Savefile >> tempdata;
 		Data.push_back(tempdata);
