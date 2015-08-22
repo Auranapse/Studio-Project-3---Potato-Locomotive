@@ -182,7 +182,7 @@ void mainscene::Init()
 
 	f_mouseSensitivity = 1;
 
-	SH_1.init("GameData//GameData.GameData");
+	SH_1.init("GameData//ImportantData.GoddamnitQuen");
 	assignSave();
 
 	m_renderPass = RENDER_PASS_PRE;
@@ -719,19 +719,63 @@ bool mainscene::loadLevel(int level)
 		{
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
-				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, (GAME_MAP.map_height - y)*worldsize*2.f));
+				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, y*worldsize*2.f));
 			}
-			else if (GAME_MAP.map_data[y][x] != "-")//Generate the rest of the world
+			else if (GAME_MAP.map_data[y][x] != ".")
 			{
-				if (GAME_MAP.map_data[y][x] == "1")
+				if (GAME_MAP.map_data[y][x][0] == 'W')
 				{
+					std::string temp_str_X, temp_str_Y, temp_str_Z;
+					temp_str_X = "";
+					temp_str_Y = "";
+					temp_str_Z = "";
+
+					float SizeX, SizeY, SizeZ;
+					SizeX = 0.f;
+					SizeY = 0.f;
+					SizeZ = 0.f;
+					int temp_int_1 = 0;
+
+					for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+					{
+						temp_str_X += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'y'; ++i)
+					{
+						temp_str_Y += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'z'; ++i)
+					{
+						temp_str_Z += GAME_MAP.map_data[y][x][i];
+					}
+
+					SizeX = static_cast<float>(std::atoi(temp_str_X.c_str()));
+					SizeY = static_cast<float>(std::atoi(temp_str_Y.c_str()));
+					SizeZ = static_cast<float>(std::atoi(temp_str_Z.c_str()));
+
+					if (SizeX > worldsize)
+					{
+						SizeX = worldsize;
+					}
+
+					if (SizeZ > worldsize)
+					{
+						SizeZ = worldsize;
+					}
+
+					std::cout << "\n" << SizeX << ", " << SizeY << ", " << SizeZ << std::endl;
+
 					WorldObject *WO;
 					WO = new WorldObject();
 					WO->active = true;
 					WO->colEnable = true;
-					WO->scale.Set(worldsize, worldsize, worldsize);
-					WO->pos.Set(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f);
-					WO->ColBox.Set(worldsize, worldsize, worldsize);
+					WO->scale.Set(SizeX, SizeY, SizeZ);
+					WO->pos.Set(x*worldsize*2.f, SizeY, y*worldsize*2.f);
+					WO->ColBox.Set(SizeX, SizeY, SizeZ);
 					WO->dynamicRendering = true;
 					WO->mesh = meshList[GEO_WORLD_CUBE];
 					m_goList.push_back(WO);
@@ -740,7 +784,7 @@ bool mainscene::loadLevel(int level)
 				{
 					AI *ai;
 					ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
-					ai->Init(Vector3(x*worldsize*2.f, 0, (GAME_MAP.map_height - y)*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
+					ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
 					ai->Lookat = ai->getPosition() + Vector3(0, 0, 1);
 					ai->Scale.Set(10, 10, 10);
 					m_charList.push_back(ai);
@@ -748,6 +792,7 @@ bool mainscene::loadLevel(int level)
 			}
 		}
 	}
+
 	WorldObject *WO;
 	WO = new WorldObject();
 	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0, (GAME_MAP.map_height*0.5f)*worldsize);

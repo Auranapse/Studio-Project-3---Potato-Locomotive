@@ -21,7 +21,7 @@ SaveHandler::~SaveHandler()
 
 void SaveHandler::init(std::string file)
 {
-	file = FILE_LOCATION;
+	FILE_LOCATION = file;
 
 	std::ifstream infile(FILE_LOCATION);
 	if (!infile.good())

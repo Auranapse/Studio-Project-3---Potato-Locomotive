@@ -87,7 +87,7 @@ void MenuScene::Init()
 		us_control[i] = 0;
 	}
 
-	SH_1.init("GameData//GameData.GameData");
+	SH_1.init("GameData//ImportantData.GoddamnitQuen");
 	assignsave(false);
 
 	InitShaders();
