@@ -121,7 +121,7 @@
     <ClInclude Include="Source\Anim4.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BulletInfo.h" />
-    <ClInclude Include="Source\Button.h" />
+    <ClInclude Include="Source\TextButton.h" />
     <ClInclude Include="Source\CharacterObject.h" />
     <ClInclude Include="Source\Collision.h" />
     <ClInclude Include="Source\CollisionBox.h" />

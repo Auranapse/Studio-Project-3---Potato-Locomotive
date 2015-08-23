@@ -1,29 +1,20 @@
 /****************************************************************************/
 /*!
-\file Button.h
+\file Button.cpp
 \author Gabriel Wong Choon Jieh
 \par email: AuraTigital\@gmail.com
 \brief
 menu button
 !*/
 /****************************************************************************/
-#ifndef BUTTON_H
-#define BUTTON_H
+#include "Button.h"
 
-#include "Vector3.h"
-#include "Mesh.h"
-
-struct Button
+Button::Button() : mesh_off(NULL), mesh_on(NULL), gamestate(0)
 {
-	Button();
-	~Button();
 
-	Vector3 Position;
-	Vector3 Scale;
-	int gamestate;
+}
 
-	Mesh *mesh_off;
-	Mesh *mesh_on;
-};
+Button::~Button()
+{
 
-#endif
+}

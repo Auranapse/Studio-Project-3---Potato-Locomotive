@@ -17,7 +17,7 @@ Main menu for the openGL framework
 #include "LoadTGA.h"
 #include "AzimuthAltitudeCamera.h"
 #include "SaveHandler.h"
-#include "Button.h"
+#include "TextButton.h"
 #include "GabrielDLC.h"
 #include <string>
 #include <iostream>
@@ -140,7 +140,7 @@ class MenuScene : public Scene
 
 	struct CONTROL_CHANGE_BUTTON
 	{
-		S_BUTTON *button;
+		TextButton *button;
 		unsigned short Control;
 		std::string text;
 		std::string CONTROLTEXT;
@@ -293,8 +293,8 @@ private:
 	E_MENU_STATE PREV_STATE;
 
 	Color UIColor, UIColorPressed;
-	std::vector<S_BUTTON*> v_buttonList;
-	S_BUTTON* FetchBUTTON(std::string name);
+	std::vector<TextButton*> v_buttonList;
+	TextButton* FetchBUTTON(std::string name);
 	void UpdateButtons(void);
 	void RenderButtons(void);
 

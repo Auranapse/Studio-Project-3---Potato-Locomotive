@@ -9,16 +9,36 @@ A save file handler to ensure easy saving and loading
 /****************************************************************************/
 #include "SaveHandler.h"
 
+/****************************************************************************/
+/*!
+\brief
+Default constructor
+!*/
+/****************************************************************************/
 SaveHandler::SaveHandler() : FILE_LOCATION("GameData//GameData.GameData")
 {
-	
+
 }
 
+/****************************************************************************/
+/*!
+\brief
+Default destructor
+!*/
+/****************************************************************************/
 SaveHandler::~SaveHandler()
 {
-	
+
 }
 
+/****************************************************************************/
+/*!
+\brief
+initializes the save file, create one if not available, and load if available
+\param file
+the file name and location
+!*/
+/****************************************************************************/
 void SaveHandler::init(std::string file)
 {
 	FILE_LOCATION = file;
@@ -31,10 +51,24 @@ void SaveHandler::init(std::string file)
 		filecreate.close();
 		saveData();
 	}
-	
+
 	loadData();
 }
 
+/****************************************************************************/
+/*!
+\brief
+Assign a particular value to the save file, for loading and saving.
+\param data
+the value of the data to keep
+\param default_data
+the data to default to if it doesn't exist in save
+\param ID
+the ID of the data for storing later
+\param save
+if true, will overwrite savefile, if false it'll load from savefile
+!*/
+/****************************************************************************/
 void SaveHandler::assign(float &data, float default_data, unsigned int ID, bool save)
 {
 	std::string temp;
@@ -58,6 +92,20 @@ void SaveHandler::assign(float &data, float default_data, unsigned int ID, bool 
 	}
 }
 
+/****************************************************************************/
+/*!
+\brief
+Assign a particular value to the save file, for loading and saving.
+\param data
+the value of the data to keep
+\param default_data
+the data to default to if it doesn't exist in save
+\param ID
+the ID of the data for storing later
+\param save
+if true, will overwrite savefile, if false it'll load from savefile
+!*/
+/****************************************************************************/
 void SaveHandler::assign(unsigned short &data, unsigned short default_data, unsigned int ID, bool save)
 {
 	std::string temp;
@@ -87,6 +135,12 @@ void SaveHandler::assign(unsigned short &data, unsigned short default_data, unsi
 	}
 }
 
+/****************************************************************************/
+/*!
+\brief
+Loads the save file into a vector
+!*/
+/****************************************************************************/
 void SaveHandler::loadData(void)
 {
 	while (Data.size() > 0)
@@ -111,6 +165,12 @@ void SaveHandler::loadData(void)
 	Savefile.close();
 }
 
+/****************************************************************************/
+/*!
+\brief
+Saves the vector into the save file
+!*/
+/****************************************************************************/
 void SaveHandler::saveData(void)
 {
 	std::fstream SaveFile;

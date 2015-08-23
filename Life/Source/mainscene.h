@@ -22,7 +22,7 @@ Main scene
 #include "LoadTGA.h"
 #include "maploader.h"
 
-#include "Button.h"
+#include "TextButton.h"
 #include "BulletInfo.h"
 #include "GameObject.h"
 #include "WorldObject.h"
@@ -254,7 +254,7 @@ class mainscene : public Scene
 
 		E_CTRL_TOTAL
 	};
-	
+
 	enum SOUND_TYPE
 	{
 		ST_PANEL,
@@ -267,7 +267,7 @@ class mainscene : public Scene
 
 		ST_SLOWMO_ENTER,
 		ST_SLOWMO_EXIT,
-		
+
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
 		ST_WEAPON_KATANA,
@@ -317,8 +317,8 @@ private:
 
 	void InitMenus(void);
 	Color UIColor, UIColorPressed;
-	std::vector<S_BUTTON*> v_buttonList;
-	S_BUTTON *FetchBUTTON(std::string name);
+	std::vector<TextButton*> v_buttonList;
+	TextButton *FetchBUTTON(std::string name);
 	void UpdateButtons(void);
 	void RenderButtons(void);
 
@@ -343,7 +343,7 @@ private:
 
 	Player P_Player;
 
-	SecurityCam sc; 
+	SecurityCam sc;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -360,7 +360,7 @@ private:
 	*/
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
-	
+
 	SaveHandler SH_1;
 	void assignSave(void);
 
@@ -371,7 +371,7 @@ private:
 	bool mouseEnabled;
 
 	bool DisplayInfo;
-	
+
 	float f_curRecoil;
 	float firerate;
 	float timer;

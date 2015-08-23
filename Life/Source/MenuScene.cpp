@@ -192,22 +192,22 @@ void MenuScene::InitMenu(void)
 	transcomplete = false;
 
 	//MAIN--------------------------------------------------------
-	S_BUTTON* S_MB;
-	S_MB = new S_BUTTON;
+	TextButton* S_MB;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f, Application::GetWindowHeight()*0.5f, 0.1f);
 	S_MB->scale.Set(35, 35, 35);
 	S_MB->text = "Play";
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 60.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Options";
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 90.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Quit";
@@ -215,14 +215,14 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	//OPTIONS-----------------------------------------------------
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 40.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Toggle Fullscreen";
@@ -230,14 +230,14 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	//BACK BUTTONS------------------------------------------------
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Back";
 	S_MB->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Back";
@@ -246,7 +246,7 @@ void MenuScene::InitMenu(void)
 
 	//Control changer---------------------------------------------
 	us_controlCB[E_CTRL_MOVE_FRONT].text = "Forward";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_FRONT].text;
@@ -255,7 +255,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_BACK].text = "Backward";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 40.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_BACK].text;
@@ -264,7 +264,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_LEFT].text = "Left";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 80.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_LEFT].text;
@@ -273,7 +273,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_RIGHT].text = "Right";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 120.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_RIGHT].text;
@@ -282,7 +282,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_SPRINT].text = "Sprint";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 160.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_SPRINT].text;
@@ -291,7 +291,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_WALK].text = "Walk";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 200.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_WALK].text;
@@ -300,7 +300,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_JUMP].text = "Jump";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 240.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_MOVE_JUMP].text;
@@ -309,7 +309,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_INTERACT].text = "Interact";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 320.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_INTERACT].text;
@@ -318,7 +318,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_ATTACK].text = "Attack";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 360.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_ATTACK].text;
@@ -327,7 +327,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_THROW].text = "Throw";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 400.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_THROW].text;
@@ -336,7 +336,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_AIM].text = "Aim";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 440.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_AIM].text;
@@ -345,7 +345,7 @@ void MenuScene::InitMenu(void)
 	v_buttonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_ABILITY_1].text = "Ability 1";
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.6f, Application::GetWindowHeight()*0.8f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = us_controlCB[E_CTRL_ABILITY_1].text;
@@ -366,11 +366,11 @@ void MenuScene::InitMenu(void)
 Gets the button
 */
 /******************************************************************************/
-S_BUTTON* MenuScene::FetchBUTTON(std::string name)
+TextButton* MenuScene::FetchBUTTON(std::string name)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		TextButton *S_MB = (TextButton *)*it;
 		if (S_MB != NULL)
 		{
 			if (S_MB->text == name && S_MB->gamestate == MENU_STATE)
@@ -391,9 +391,9 @@ Update button state
 /******************************************************************************/
 void MenuScene::UpdateButtons(void)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		TextButton *S_MB = (TextButton *)*it;
 		if (S_MB->gamestate == MENU_STATE)
 		{
 			Vector3 offset = v3_Menupos[MENU_STATE];
@@ -1042,7 +1042,7 @@ void MenuScene::RenderButtons(void)
 {
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
-		S_BUTTON *S_MB = v_buttonList[i];
+		TextButton *S_MB = v_buttonList[i];
 		if (S_MB->gamestate == MENU_STATE)
 		{
 			modelStack.PushMatrix();
@@ -1177,7 +1177,7 @@ void MenuScene::Exit()
 
 	while (v_buttonList.size() > 0)
 	{
-		S_BUTTON *S_MB = v_buttonList.back();
+		TextButton *S_MB = v_buttonList.back();
 		delete S_MB;
 		v_buttonList.pop_back();
 	}

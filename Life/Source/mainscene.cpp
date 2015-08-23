@@ -81,37 +81,37 @@ void mainscene::InitMenus(void)
 	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
 
 	//Pause Menu--------------------------------------------------------
-	S_BUTTON* S_MB;
+	TextButton* S_MB;
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Back to game";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Previous level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Skip to next level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 12.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Return to menu";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 16.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Quit";
@@ -119,21 +119,21 @@ void mainscene::InitMenus(void)
 	v_buttonList.push_back(S_MB);
 
 	//End Menu----------------------------------------------------------
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Return to menu";
 	S_MB->gamestate = GS_END;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Play again";
 	S_MB->gamestate = GS_END;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Quit";
@@ -151,11 +151,11 @@ the name of the button
 returns the button with the same name
 */
 /******************************************************************************/
-S_BUTTON* mainscene::FetchBUTTON(std::string name)
+TextButton* mainscene::FetchBUTTON(std::string name)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		TextButton *S_MB = (TextButton *)*it;
 		if (S_MB->text == name && S_MB->gamestate == GAMESTATE)
 		{
 			return S_MB;
@@ -1163,7 +1163,7 @@ void mainscene::UpdatePlayer(double &dt)
 		CO->Update(dt);
 	}*/
 
-	for(std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it ++)
+	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
 		AI *ai = dynamic_cast<AI*>(CO);
@@ -1559,9 +1559,9 @@ update menu buttons
 /******************************************************************************/
 void mainscene::UpdateButtons(void)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		TextButton *S_MB = (TextButton *)*it;
 		if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0)))
 		{
 			S_MB->active = true;
@@ -2652,7 +2652,7 @@ void mainscene::RenderButtons(void)
 {
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
-		S_BUTTON *S_MB = v_buttonList[i];
+		TextButton *S_MB = v_buttonList[i];
 		if (S_MB->gamestate == GAMESTATE)
 		{
 			modelStack.PushMatrix();
