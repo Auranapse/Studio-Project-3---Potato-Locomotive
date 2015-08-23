@@ -84,6 +84,7 @@
     <ClCompile Include="Source\Anim4.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
+    <ClCompile Include="Source\Button.cpp" />
     <ClCompile Include="Source\CharacterObject.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\CollisionBox.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Source\Anim4.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BulletInfo.h" />
+    <ClInclude Include="Source\Button.h" />
     <ClInclude Include="Source\TextButton.h" />
     <ClInclude Include="Source\CharacterObject.h" />
     <ClInclude Include="Source\Collision.h" />

@@ -180,6 +180,9 @@
     <ClCompile Include="Source\LoadHmap.cpp">
       <Filter>Source Files\Save/Load</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Button.cpp">
+      <Filter>Source Files\Buttons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -297,6 +300,9 @@
       <Filter>Header Files\Save/Load</Filter>
     </ClInclude>
     <ClInclude Include="Source\TextButton.h">
+      <Filter>Header Files\Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Button.h">
       <Filter>Header Files\Buttons</Filter>
     </ClInclude>
   </ItemGroup>
