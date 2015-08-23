@@ -26,6 +26,7 @@ class MeshBuilder
 {
 public:
 	static Mesh* GenerateAxes(const std::string &meshName, float lengthX, float lengthY, float lengthZ);
+	static Mesh* GenerateMatrix(const std::string &meshName, Color color, float size, float gap, float amount);
 	static Mesh* GenerateQuad(const std::string &meshName, Color color, float lengthX, float lengthY, float patternrepeat = 1);
 	static Mesh* GenerateCube(const std::string &meshName, Color color,float lengthX, float lengthY, float lengthZ);
 	static Mesh* GenerateCubeT2(const std::string &meshName, Color color,float lengthX, float lengthY, float lengthZ, float patternrepeat = 1);

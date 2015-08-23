@@ -18,6 +18,7 @@ Main menu for the openGL framework
 #include "AzimuthAltitudeCamera.h"
 #include "SaveHandler.h"
 #include "TextButton.h"
+#include "Button.h"
 #include "GabrielDLC.h"
 #include <string>
 #include <iostream>
@@ -77,6 +78,7 @@ class MenuScene : public Scene
 		E_GEO_SPLASH,
 		E_GEO_BACKGROUND,
 		E_GEO_LOADING_BACKGROUND,
+		E_GEO_MATRIX,
 		// -----------------------
 		E_GEO_TOTAL,
 	};
@@ -118,6 +120,9 @@ class MenuScene : public Scene
 		E_UNI_TEXT_ENABLED,
 		E_UNI_TEXT_COLOR,
 		//------------------------------------
+		U_UNI_GLOW,
+		U_UNI_GLOW_COLOR,
+		
 		E_UNI_TOTAL,
 	};
 
@@ -295,8 +300,8 @@ private:
 	Color UIColor, UIColorPressed;
 	std::vector<TextButton*> v_buttonList;
 	TextButton* FetchBUTTON(std::string name);
-	void UpdateButtons(void);
-	void RenderButtons(void);
+	void UpdateTextButtons(void);
+	void RenderTextButtons(void);
 
 	bool transcomplete;
 	Vector3 v3_Menupos[E_M_TOTAL];
@@ -321,7 +326,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color);
 	void RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderMesh(Mesh *mesh, bool enableLight);
-	void RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x, float y);
+	void RenderMeshOnScreen(Mesh* mesh, float Glow = 0, Color GlowColor = Color(1.f, 0.f, 0.f));
 
 	/******************************************************************************/
 	/*!

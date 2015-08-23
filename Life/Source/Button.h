@@ -15,15 +15,23 @@ menu button
 
 struct Button
 {
+	enum E_LABEL_TYPE
+	{
+		LT_NONE,
+		LT_PRE,
+		LT_BUTTON,
+	};
 	Button();
 	~Button();
+
+	E_LABEL_TYPE labeltype;
+	std::string label;
 
 	Vector3 Position;
 	Vector3 Scale;
 	int gamestate;
 
-	Mesh *mesh_off;
-	Mesh *mesh_on;
+	Mesh *mesh;
 };
 
 #endif

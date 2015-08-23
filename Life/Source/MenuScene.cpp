@@ -112,7 +112,7 @@ void MenuScene::InitShaders()
 {
 	// Init VBO here
 	// Set background color to whatever
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	glClearColor(0.9f, 0.9f, 0.9f, 0.0f);
 
 	//Enable depth buffer and depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -136,11 +136,11 @@ void MenuScene::InitShaders()
 
 	//Set projection matrix to perspective mode
 	Mtx44 projection;
-	projection.SetToPerspective(f_fov, static_cast<double>(Application::GetWindowWidth()) / static_cast<double>(Application::GetWindowHeight()), 0.1f, 10000.0f); //FOV, Aspect Ratio, Near plane, Far plane
+	projection.SetToPerspective(f_fov, static_cast<double>(Application::GetWindowWidth()) / static_cast<double>(Application::GetWindowHeight()), 0.01f, 10000.0f); //FOV, Aspect Ratio, Near plane, Far plane
 	projectionStack.LoadMatrix(projection);
 
 	// Init Camera
-	camera.Init(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	camera.Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, -100.0f), Vector3(0.0f, 1.0f, 0.0f));
 
 	//---------------------------------------------------------------------------------------
 
@@ -156,7 +156,7 @@ Initializes the meshes that is in the P_meshArray
 void MenuScene::InitMeshList()
 {
 	P_meshArray[E_GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000, 10000, 10000);
-
+	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.8f, 0.8f, 0.8f), 10000, 1000, 10);
 	//Text
 	P_meshArray[E_GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	P_meshArray[E_GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false, false);
@@ -389,7 +389,7 @@ TextButton* MenuScene::FetchBUTTON(std::string name)
 Update button state
 */
 /******************************************************************************/
-void MenuScene::UpdateButtons(void)
+void MenuScene::UpdateTextButtons(void)
 {
 	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
@@ -428,7 +428,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 	static bool bLButtonState = false;
 
-	UpdateButtons();
+	UpdateTextButtons();
 
 	if (v3_MenuCam != v3_Menupos[MENU_STATE])
 	{
@@ -706,7 +706,7 @@ void MenuScene::UpdateFOV()
 	}
 
 	Mtx44 proj;
-	proj.SetToPerspective(f_fov, 16.0f / 9.0f, 0.1f, 10000.0f);
+	proj.SetToPerspective(f_fov, Application::GetWindowWidth()/Application::GetWindowHeight(), 0.1f, 10000.0f);
 	projectionStack.LoadMatrix(proj);
 }
 
@@ -782,6 +782,11 @@ void MenuScene::InitShadersAndLights(void)
 	u_m_parameters[E_UNI_NUMLIGHTS] = glGetUniformLocation(u_m_programID, "numLights");
 
 	glUniform1i(u_m_parameters[E_UNI_NUMLIGHTS], ui_NUM_LIGHTS);
+
+	u_m_parameters[U_UNI_GLOW] = glGetUniformLocation(u_m_programID, "glow");
+	u_m_parameters[U_UNI_GLOW_COLOR] = glGetUniformLocation(u_m_programID, "glowColor");
+
+	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
 
 	//Main Lighting
 	P_lightsArray[0].type = LIGHT_POINT;
@@ -995,10 +1000,11 @@ void MenuScene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color)
 Renders a mesh on screen
 */
 /******************************************************************************/
-void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x, float y)
+void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 {
-	x /= sizeX;
-	y /= sizeY;
+	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
+	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
+	
 
 	glDisable(GL_DEPTH_TEST);
 	glUniform1i(u_m_parameters[E_UNI_LIGHTENABLED], 0);
@@ -1013,10 +1019,6 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 	projectionStack.LoadMatrix(ortho);
 	viewStack.PushMatrix();
 	viewStack.LoadIdentity(); //No need camera for ortho mode
-	modelStack.PushMatrix();
-	modelStack.LoadIdentity(); //Reset modelStack
-	modelStack.Translate(x, y, 0);
-	modelStack.Scale(sizeX, sizeY, sizeX);
 
 	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(u_m_parameters[E_UNI_MVP], 1, GL_FALSE, &MVP.a[0]);
@@ -1025,7 +1027,6 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 
 	projectionStack.PopMatrix();
 	viewStack.PopMatrix();
-	modelStack.PopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(u_m_parameters[E_UNI_TEXT_ENABLED], 0);
@@ -1038,7 +1039,7 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 Renders the menu buttons
 */
 /******************************************************************************/
-void MenuScene::RenderButtons(void)
+void MenuScene::RenderTextButtons(void)
 {
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
@@ -1095,28 +1096,44 @@ void MenuScene::Render()
 	viewStack.LoadIdentity();
 
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
-		camera.target.x, camera.target.y, camera.target.z,
+		v3_MenuCam.x, v3_MenuCam.y, v3_MenuCam.z,
+		v3_MenuCam.x, v3_MenuCam.y, -1000000.f,
 		camera.up.x, camera.up.y, camera.up.z
 		);
 
 	modelStack.LoadIdentity();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(-2000, -2000, -10000);
+	RenderMesh(P_meshArray[E_GEO_MATRIX], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
 	modelStack.Translate(-v3_MenuCam);
 
-	RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f));
+	/*modelStack.PushMatrix();
+	modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+	RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND]);
+	modelStack.PopMatrix();*/
 
 	switch (MENU_STATE)
 	{
 	case E_M_LOADING:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_LOADING_BACKGROUND], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f));
+		modelStack.PushMatrix();
+		modelStack.LoadIdentity();
+		modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+		RenderMeshOnScreen(P_meshArray[E_GEO_LOADING_BACKGROUND]);
+		modelStack.PopMatrix();
 		break;
 	}
 	case E_M_SPLASH:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_SPLASH], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f));
+		modelStack.PushMatrix();
+		modelStack.LoadIdentity();
+		modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+		RenderMeshOnScreen(P_meshArray[E_GEO_SPLASH]);
+		modelStack.PopMatrix();
 		break;
 	}
 	case E_M_MAIN:
@@ -1149,7 +1166,6 @@ void MenuScene::Render()
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1.f, 1.f, Application::GetWindowWidth() * 0.5f, Application::GetWindowHeight() * 0.5f);
 		modelStack.PushMatrix();
 		modelStack.Translate(v3_MenuCam);
 		RenderTextCenterOnScreen(P_meshArray[E_GEO_TEXT], "Enter a key", UIColor, 50.f, Application::GetWindowWidth() * 0.5f, Application::GetWindowHeight() * 0.5f);
@@ -1157,7 +1173,7 @@ void MenuScene::Render()
 		break;
 	}
 	}
-	RenderButtons();
+	RenderTextButtons();
 	modelStack.PopMatrix();
 }
 

@@ -32,27 +32,27 @@ Mesh* MeshBuilder::GenerateAxes(const std::string &meshName, float lengthX, floa
 	Vertex v;
 	std::vector<Vertex> vertex_buffer_data;
 
-	v.pos.Set(-1000, 0, 0);
+	v.pos.Set(-lengthX, 0, 0);
 	v.color.Set(1, 0, 0);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(1000, 0, 0);
+	v.pos.Set(lengthX, 0, 0);
 	v.color.Set(1, 0, 0);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0, -1000, 0);
+	v.pos.Set(0, -lengthY, 0);
 	v.color.Set(0, 1, 0);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0, 1000, 0);
+	v.pos.Set(0, lengthY, 0);
 	v.color.Set(0, 1, 0);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0, 0, -1000);
+	v.pos.Set(0, 0, -lengthZ);
 	v.color.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0, 0, 1000);
+	v.pos.Set(0, 0, lengthZ);
 	v.color.Set(0, 0, 1);
 	vertex_buffer_data.push_back(v);
 
@@ -64,6 +64,78 @@ Mesh* MeshBuilder::GenerateAxes(const std::string &meshName, float lengthX, floa
 	index_buffer_data.push_back(3);
 	index_buffer_data.push_back(4);
 	index_buffer_data.push_back(5);
+
+	Mesh *mesh = new Mesh(meshName);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_LINES;
+
+	std::vector<Vertex>().swap(vertex_buffer_data);
+	std::vector<GLuint>().swap(index_buffer_data);
+
+	return mesh;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Generate a matrix style mesh
+
+\param meshName
+name of mesh
+\param Color
+color of the matrix
+
+\return Pointer to mesh storing VBO/IBO of reference axes
+*/
+/******************************************************************************/
+Mesh* MeshBuilder::GenerateMatrix(const std::string &meshName, Color color, float size, float gap, float amount)
+{
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+
+	for (unsigned i = 0; i < amount; ++i)
+	{
+		for (unsigned j = 0; j < amount; ++j)
+		{
+			v.pos.Set(-size, i * gap, j * gap);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+
+			v.pos.Set(size, i * gap, j * gap);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+
+			v.pos.Set(i * gap, -size, j * gap);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+
+			v.pos.Set(i * gap, size, j * gap);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+
+			v.pos.Set(i * gap, j * gap, -size);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+
+			v.pos.Set(i * gap, j * gap, size);
+			v.color = color;
+			vertex_buffer_data.push_back(v);
+		}
+	}
+	
+
+	std::vector<GLuint> index_buffer_data;
+
+	for (unsigned i = 0; i < vertex_buffer_data.size(); ++i)
+	{
+		index_buffer_data.push_back(i);
+	}
 
 	Mesh *mesh = new Mesh(meshName);
 
