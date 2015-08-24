@@ -54,7 +54,8 @@ Loads save file from file
 void mainscene::assignSave(void)
 {
 	SH_1.assign(f_fov, 70.f, 1);
-	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	SH_1.assign(f_mouseSensitivity, 100.f, 2);
+	f_mouseSensitivity *= 0.01f;
 	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3);
 	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4);
 	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5);
@@ -138,6 +139,28 @@ void mainscene::InitMenus(void)
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Quit";
 	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+
+	//Death Menu--------------------------------------------------------
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Try again";
+	S_MB->gamestate = GS_DEATH;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Return to menu";
+	S_MB->gamestate = GS_DEATH;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Quit";
+	S_MB->gamestate = GS_DEATH;
 	v_buttonList.push_back(S_MB);
 }
 
@@ -1644,15 +1667,18 @@ void mainscene::UpdateButtons(void)
 	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
 		TextButton *S_MB = (TextButton *)*it;
-		if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0)))
+		if (S_MB->gamestate == GAMESTATE)
 		{
-			S_MB->active = true;
-			S_MB->color = UIColorPressed;
-		}
-		else
-		{
-			S_MB->active = false;
-			S_MB->color = UIColor;
+			if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0)))
+			{
+				S_MB->active = true;
+				S_MB->color = UIColorPressed;
+			}
+			else
+			{
+				S_MB->active = false;
+				S_MB->color = UIColor;
+			}
 		}
 	}
 }
@@ -1691,14 +1717,8 @@ void mainscene::Update(double dt)
 
 	if (Application::IsKeyPressed('1'))
 	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			glDisable(GL_CULL_FACE);
-		}
-		else
-		{
-			glEnable(GL_CULL_FACE);
-		}
+		GAMESTATE = GS_DEATH;
+		Application::SetCursor(true);
 	}
 
 	if (Application::IsKeyPressed('2'))
@@ -1712,6 +1732,8 @@ void mainscene::Update(double dt)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 	}
+
+	UpdateButtons();
 
 	static bool isEscPressed = false;
 	static bool isLmbPressed = false;
@@ -1754,8 +1776,6 @@ void mainscene::Update(double dt)
 			Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 			GAMESTATE = GS_PLAY;
 		}
-
-		UpdateButtons();
 
 		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
 		{
@@ -1844,6 +1864,60 @@ void mainscene::Update(double dt)
 			else if (FetchBUTTON("Quit")->active)
 			{
 				e_nextScene = Application::E_SCENE_QUIT;
+			}
+		}
+		break;
+	case GS_DEATH:
+		f_powerTintSet = 100.f;
+		c_powerColor.Set(0.5f, 0.f, 0.f);
+		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
+		{
+			isEscPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_ESCAPE) && isEscPressed)
+		{
+			isEscPressed = false;
+			e_nextScene = Application::E_SCENE_MENU;
+		}
+
+		if (Application::IsKeyPressed(VK_LBUTTON) && !isLmbPressed)
+		{
+			isLmbPressed = true;
+		}
+		else if (!Application::IsKeyPressed(VK_LBUTTON) && isLmbPressed)
+		{
+			isLmbPressed = false;
+			if (FetchBUTTON("Return to menu")->active)
+			{
+				e_nextScene = Application::E_SCENE_MENU;
+			}
+			else if (FetchBUTTON("Try again")->active)
+			{
+				f_powerTint = 0.f;
+				f_powerTintSet = 0.f;
+				loadLevel(currentLevel);
+				Application::SetCursor(false);
+				Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
+				GAMESTATE = GS_PLAY;
+			}
+			else if (FetchBUTTON("Quit")->active)
+			{
+				e_nextScene = Application::E_SCENE_QUIT;
+			}
+		}
+
+		//SCREEN COLOUR
+		if (f_powerTint != f_powerTintSet)
+		{
+			float diff = f_powerTintSet - f_powerTint;
+
+			if (diff < 0.01 && diff > -0.01)
+			{
+				f_powerTint = f_powerTintSet;
+			}
+			else
+			{
+				f_powerTint += diff * static_cast<float>(d_dt) * 10.f;
 			}
 		}
 		break;
@@ -2416,6 +2490,28 @@ Renders the ingameUI
 /******************************************************************************/
 void mainscene::RenderUI(void)
 {
+	switch (GAMESTATE)
+	{
+	case mainscene::GS_DEATH:
+	case mainscene::GS_PLAY:
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+		modelStack.PopMatrix();
+		break;
+	case mainscene::GS_END:
+	case mainscene::GS_PAUSED:
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 50.f, 10.f, Color(0.f, 0.f, 0.f));
+		modelStack.PopMatrix();
+		break;
+	default:
+		break;
+	}
+
 	if (P_Player.holding != NULL)
 	{
 		if (P_Player.holding->isGun)
@@ -2454,27 +2550,7 @@ void mainscene::RenderUI(void)
 		}
 	}
 
-	switch (GAMESTATE)
-	{
-	case mainscene::GS_PLAY:
-		modelStack.PushMatrix();
-		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
-		modelStack.PopMatrix();
-		break;
-	case mainscene::GS_END:
-	case mainscene::GS_PAUSED:
-		modelStack.PushMatrix();
-		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 50.f, 10.f, Color(0.f, 0.f, 0.f));
-		modelStack.PopMatrix();
-		RenderButtons();
-		break;
-	default:
-		break;
-	}
+	RenderButtons();
 
 	if (DisplayInfo == true)
 	{

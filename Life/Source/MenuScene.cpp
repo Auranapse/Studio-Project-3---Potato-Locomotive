@@ -55,7 +55,13 @@ Assigns file to values
 void MenuScene::assignsave(bool save)
 {
 	SH_1.assign(f_fov, 70.f, 1, save);
-	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	if (save)
+	{
+		f_mouseSensitivity *= 100.f;
+	}
+
+	SH_1.assign(f_mouseSensitivity, 100.f, 2, save);
+	f_mouseSensitivity *= 0.01f;
 	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3, save);
 	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4, save);
 	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5, save);
@@ -69,9 +75,6 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
 	
-	float test = 0.f;
-	SH_1.assign(test, 1337.f, 15, save);
-
 	SH_1.saveData();
 }
 

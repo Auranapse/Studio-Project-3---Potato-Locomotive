@@ -286,6 +286,7 @@ class mainscene : public Scene
 	{
 		GS_PLAY,
 		GS_PAUSED,
+		GS_DEATH,
 		GS_END,
 	};
 
