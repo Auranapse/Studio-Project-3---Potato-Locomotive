@@ -78,12 +78,14 @@ void SaveHandler::assign(float &data, float default_data, unsigned int ID, bool 
 		temp = std::to_string(static_cast<long double>(data));
 		Data.push_back(temp);
 	}
-
 	else
 	{
 		if (save)
 		{
-			Data[ID - 1] = std::to_string(static_cast<long double>(data));
+			std::stringstream ss;
+			ss.str("");
+			ss << data << "\0";
+			Data[ID - 1] = ss.str();
 		}
 		else
 		{
@@ -118,13 +120,13 @@ void SaveHandler::assign(unsigned short &data, unsigned short default_data, unsi
 
 		Data.push_back(temp);
 	}
-
 	else
 	{
 		if (save)
 		{
 			std::stringstream ss;
-			ss << data;
+			ss.str("");
+			ss << data << "\0";
 			Data[ID - 1] = ss.str();
 		}
 		else
@@ -174,7 +176,7 @@ Saves the vector into the save file
 void SaveHandler::saveData(void)
 {
 	std::fstream SaveFile;
-	SaveFile.open(FILE_LOCATION);
+	SaveFile.open(FILE_LOCATION, std::ofstream::out | std::ofstream::trunc);
 
 	SaveFile << Data.size();
 

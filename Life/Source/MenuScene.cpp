@@ -68,6 +68,10 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
+	
+	float test = 0.f;
+	SH_1.assign(test, 1337.f, 15, save);
+
 	SH_1.saveData();
 }
 
@@ -155,6 +159,11 @@ Initializes the meshes that is in the P_meshArray
 /******************************************************************************/
 void MenuScene::InitMeshList()
 {
+	for (unsigned i = 0; i < E_GEO_TOTAL; ++i)
+	{
+		P_meshArray[i] = NULL;
+	}
+
 	P_meshArray[E_GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000, 10000, 10000);
 	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.8f, 0.8f, 0.8f), 10000, 1000, 10);
 	//Text
@@ -237,8 +246,8 @@ void MenuScene::InitMenu(void)
 	m_B->Position.Set(Application::GetWindowWidth()*0.4f, Application::GetWindowHeight()*0.6f, 0.1f);
 	m_B->Scale.Set(20, 20, 20);
 	m_B->mesh = P_meshArray[E_GEO_BUTTON];
-	m_B->ID = BI_FOV_INCREASE;
-	m_B->label = "+";
+	m_B->ID = BI_FOV_DECREASE;
+	m_B->label = "-";
 	m_B->labeltype = Button::LT_BUTTON;
 	m_B->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(m_B);
@@ -247,8 +256,8 @@ void MenuScene::InitMenu(void)
 	m_B->Position.Set(Application::GetWindowWidth()*0.4f + 60.f, Application::GetWindowHeight()*0.6f, 0.1f);
 	m_B->Scale.Set(20, 20, 20);
 	m_B->mesh = P_meshArray[E_GEO_BUTTON];
-	m_B->ID = BI_FOV_DECREASE;
-	m_B->label = "-";
+	m_B->ID = BI_FOV_INCREASE;
+	m_B->label = "+";
 	m_B->labeltype = Button::LT_BUTTON;
 	m_B->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(m_B);
@@ -257,8 +266,8 @@ void MenuScene::InitMenu(void)
 	m_B->Position.Set(Application::GetWindowWidth()*0.4f, Application::GetWindowHeight()*0.6f - 40.f, 0.1f);
 	m_B->Scale.Set(20, 20, 20);
 	m_B->mesh = P_meshArray[E_GEO_BUTTON];
-	m_B->ID = BI_SENSITIVITY_INCREASE;
-	m_B->label = "+";
+	m_B->ID = BI_SENSITIVITY_DECREASE;
+	m_B->label = "-";
 	m_B->labeltype = Button::LT_BUTTON;
 	m_B->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(m_B);
@@ -267,8 +276,8 @@ void MenuScene::InitMenu(void)
 	m_B->Position.Set(Application::GetWindowWidth()*0.4f + 60.f, Application::GetWindowHeight()*0.6f - 40.f, 0.1f);
 	m_B->Scale.Set(20, 20, 20);
 	m_B->mesh = P_meshArray[E_GEO_BUTTON];
-	m_B->ID = BI_SENSITIVITY_DECREASE;
-	m_B->label = "-";
+	m_B->ID = BI_SENSITIVITY_INCREASE;
+	m_B->label = "+";
 	m_B->labeltype = Button::LT_BUTTON;
 	m_B->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(m_B);
@@ -667,7 +676,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		for (size_t i = 0; i < VK_OEM_CLEAR; ++i)
+		for (size_t i = 1; i < VK_OEM_CLEAR; ++i)
 		{
 			if ((GetAsyncKeyState(i) & 0x8000))
 			{
@@ -1299,14 +1308,14 @@ void MenuScene::Render()
 		modelStack.Translate(v3_Menupos[MENU_STATE]);
 
 		modelStack.PushMatrix();
-		modelStack.Translate(FetchBUTTON(BI_FOV_INCREASE)->Position);
+		modelStack.Translate(FetchBUTTON(BI_FOV_DECREASE)->Position);
 		modelStack.Translate(-100, 0, 0);
 		modelStack.Scale(25, 25, 25);
-		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "FOV", UIColor);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "FOV", UIColor); 
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
-		modelStack.Translate(FetchBUTTON(BI_FOV_DECREASE)->Position);
+		modelStack.Translate(FetchBUTTON(BI_FOV_INCREASE)->Position);
 		modelStack.Translate(50, 0, 0);
 		modelStack.Scale(25, 25, 25);
 
@@ -1316,24 +1325,22 @@ void MenuScene::Render()
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
-		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_INCREASE)->Position);
+		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_DECREASE)->Position);
 		modelStack.Translate(-150, 0, 0);
 		modelStack.Scale(25, 25, 25);
 		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "Mouse", UIColor);
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
-		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_DECREASE)->Position);
+		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_INCREASE)->Position);
 		modelStack.Translate(50, 0, 0);
 		modelStack.Scale(25, 25, 25);
 
-		std::stringstream ss2;
-		ss2 << (f_mouseSensitivity*100.f);
-		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss2.str(), UIColor);
+		ss.str("");
+		ss << (f_mouseSensitivity*100.f);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
 		modelStack.PopMatrix();
-
-
-
+		
 		modelStack.PopMatrix();
 		break;
 	}
@@ -1377,9 +1384,7 @@ Clears memory upon exit
 void MenuScene::Exit()
 {
 	assignsave(true);
-	glDeleteVertexArrays(1, &u_m_vertexArrayID);
-	glDeleteProgram(u_m_programID);
-
+	
 	delete[] P_lightsArray;
 
 	while (v_textButtonList.size() > 0)
@@ -1403,4 +1408,7 @@ void MenuScene::Exit()
 			delete P_meshArray[i];
 		}
 	}
+
+	glDeleteVertexArrays(1, &u_m_vertexArrayID);
+	glDeleteProgram(u_m_programID);
 }
