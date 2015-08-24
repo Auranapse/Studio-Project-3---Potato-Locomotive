@@ -785,7 +785,7 @@ bool mainscene::loadLevel(int level)
 					AI *ai;
 					ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
 					ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
-					ai->Lookat = ai->getPosition() + Vector3(0, 0, 1);
+					ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
 					ai->Scale.Set(10, 10, 10);
 					m_charList.push_back(ai);
 				}

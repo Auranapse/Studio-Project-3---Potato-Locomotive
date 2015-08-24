@@ -119,8 +119,17 @@ Gets the current direction character is looking at
 direction vector
 */
 /******************************************************************************/
-Vector3 CharacterObject::getDirection(void)
+Vector3 CharacterObject::getDirection(bool XZ)
 {
+	if(XZ)
+	{
+		if(Lookat == Position)
+		{
+			return Vector3(0, 0, 1);
+		}
+		return Vector3(Lookat.x - Position.x + CamOffset.x, 0, Lookat.z - Position.z + CamOffset.z);
+	}
+
 	return (Lookat - (Position + CamOffset));
 }
 

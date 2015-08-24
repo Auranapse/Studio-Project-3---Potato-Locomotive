@@ -129,7 +129,7 @@ public:
 	Anim4 getAnimation(void);
 	void setPosition(Vector3 &newpos);
 	Vector3 getPosition(void);
-	Vector3 getDirection(void);
+	Vector3 getDirection(bool XZ = false);
 
 	ItemObject *holding;
 
