@@ -1,27 +1,37 @@
+/****************************************************************************/
+/*!
+\file Button.h
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+menu button
+!*/
+/****************************************************************************/
 #ifndef BUTTON_H
 #define BUTTON_H
 
 #include "Vector3.h"
-#include "Vertex.h"
+#include "Mesh.h"
 
-struct S_BUTTON
+struct Button
 {
-	S_BUTTON()
+	enum E_LABEL_TYPE
 	{
-		pos.SetZero();
-		scale.Set(1.f, 1.f, 1.f);
-		color.Set(1.f, 1.f, 1.f);
-		active = false;
-		menubypass = false;
-	}
+		LT_NONE,
+		LT_PRE,
+		LT_BUTTON,
+	};
+	Button();
+	~Button();
 
-	bool active;
-	bool menubypass;
-	Vector3 pos;
-	Vector3 scale;
-	std::string text;
-	Color color;
+	E_LABEL_TYPE labeltype;
+	std::string label;
+
+	Vector3 Position;
+	Vector3 Scale;
 	int gamestate;
+
+	Mesh *mesh;
 };
 
 #endif

@@ -31,6 +31,7 @@ const int initWidth = 1280;
 const int initHeight = 720;
 int Application::i_WINDOW_WIDTH = initWidth;
 int Application::i_WINDOW_HEIGHT = initHeight;
+static bool togglefullscreen = false;
 
 /******************************************************************************/
 /*!
@@ -46,6 +47,7 @@ void resize_callback(GLFWwindow* window, int w, int h)
 {
 	glViewport(0, 0, w, h);
 }
+
 /******************************************************************************/
 /*!
 \brief
@@ -61,7 +63,6 @@ static void error_callback(int error, const char* description)
 	fputs(description, stderr);
 	_fgetchar();
 }
-
 
 /******************************************************************************/
 /*!
@@ -164,6 +165,7 @@ void Application::SetCursor(bool enable)
 		SetMouseinput(GetWindowWidth() / 2, GetWindowHeight() / 2);
 	}
 }
+
 /******************************************************************************/
 /*!
 \brief
@@ -198,6 +200,18 @@ void Application::resizeWindow(int width, int height, bool fullscreen)
 	i_WINDOW_HEIGHT = height;
 	glfwSetWindowSize(m_window, width, height);
 }
+
+/******************************************************************************/
+/*!
+\brief
+toggles fullscreen
+*/
+/******************************************************************************/
+void Application::fullscreentoggle(void)
+{
+	togglefullscreen = true;
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -210,6 +224,7 @@ int Application::GetWindowWidth()
 {
 	return i_WINDOW_WIDTH;
 }
+
 /******************************************************************************/
 /*!
 \brief
@@ -222,6 +237,7 @@ int Application::GetWindowHeight()
 {
 	return i_WINDOW_HEIGHT;
 }
+
 /******************************************************************************/
 /*!
 \brief
@@ -327,6 +343,7 @@ void Application::Init()
 		//return -1;
 	}
 
+	togglefullscreen = false;
 	m_dElapsedTime = 0.0;
 	m_dAccumulatedTime_Thread = 0.0;
 }
@@ -402,7 +419,7 @@ void Application::Run()
 					scene->e_nextScene = E_SCENE_MAIN;
 				}
 			}
-			if (IsKeyPressed(VK_F11))
+			if (togglefullscreen)
 			{
 				if (!FULL_SCREEN)
 				{
@@ -425,7 +442,7 @@ void Application::Run()
 					glfwMakeContextCurrent(m_window);
 					scene->InitShaders();
 				}
-				scene->e_nextScene = E_SCENE_MENU;
+				togglefullscreen = false;
 			}
 		} //Check if the ESC key had been pressed or if the window had been closed
 		e_currentScene = scene->GetNextScene();

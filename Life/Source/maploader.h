@@ -1,3 +1,12 @@
+/****************************************************************************/
+/*!
+\file Maploader.h
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Handles loading a map into a 2D vector
+!*/
+/****************************************************************************/
 #ifndef MAPLOADER_H
 #define MAPLOADER_H
 
@@ -17,12 +26,12 @@ public:
 	MapLoader();
 	~MapLoader();
 
-	int map_height;
-	int map_width;
+	unsigned int map_height;
+	unsigned int map_width;
 
 	bool fileExists(std::string file);
 	bool loadMap(std::string file);
+	bool saveMap(std::string file);
 	std::vector<std::vector<std::string>> map_data;
-	
 };
 #endif

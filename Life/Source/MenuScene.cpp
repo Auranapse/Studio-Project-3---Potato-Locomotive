@@ -52,125 +52,23 @@ MenuScene::~MenuScene()
 Assigns file to values
 */
 /******************************************************************************/
-void MenuScene::assignsave(void)
+void MenuScene::assignsave(bool save)
 {
-	if (SF_1.Data.size() == 0)
-	{
-		std::string *outputData;
-
-		outputData = new std::string;
-		*outputData = "70";//FOV
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "87";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "83";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "65";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "68";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "16";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "17";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "32";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "69";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "2";
-		SF_1.Data.push_back(outputData);
-		
-		outputData = new std::string;
-		*outputData = "1";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "4";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "81";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "82";
-		SF_1.Data.push_back(outputData);
-
-		outputData = new std::string;
-		*outputData = "100";
-		SF_1.Data.push_back(outputData);
-	}
-
-	f_fov = static_cast<float>(std::stoi(*SF_1.Data[0]));
-	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14]));
-	char CN = std::stoi(*SF_1.Data[1]);
-	us_control[E_CTRL_MOVE_FRONT] = CN;
-	CN = std::stoi(*SF_1.Data[2]);
-	us_control[E_CTRL_MOVE_BACK] = CN;
-	CN = std::stoi(*SF_1.Data[3]);
-	us_control[E_CTRL_MOVE_LEFT] = CN;
-	CN = std::stoi(*SF_1.Data[4]);
-	us_control[E_CTRL_MOVE_RIGHT] = CN;
-	CN = std::stoi(*SF_1.Data[5]);
-	us_control[E_CTRL_MOVE_SPRINT] = CN;
-	CN = std::stoi(*SF_1.Data[6]);
-	us_control[E_CTRL_MOVE_WALK] = CN;
-	CN = std::stoi(*SF_1.Data[7]);
-	us_control[E_CTRL_MOVE_JUMP] = CN;
-	CN = std::stoi(*SF_1.Data[8]);
-	us_control[E_CTRL_INTERACT] = CN;
-	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_THROW] = CN;
-	CN = std::stoi(*SF_1.Data[10]);
-	us_control[E_CTRL_ATTACK] = CN;
-	CN = std::stoi(*SF_1.Data[11]);
-	us_control[E_CTRL_AIM] = CN;
-	CN = std::stoi(*SF_1.Data[12]);
-	us_control[E_CTRL_NEXT_ITEM] = CN;
-	CN = std::stoi(*SF_1.Data[13]);
-	us_control[E_CTRL_RELOAD] = CN;
-	SF_1.saveData();
-}
-
-/******************************************************************************/
-/*!
-\brief
-Saves the file
-*/
-/******************************************************************************/
-void MenuScene::saveGame(void)
-{
-	*SF_1.Data[0] = std::to_string(static_cast<long double>(f_fov));
-	*SF_1.Data[14] = std::to_string(static_cast<long double>(f_mouseSensitivity));
-
-	std::stringstream ss;
-
-	for (unsigned i = 1; i <= 13; ++i)
-	{
-		ss << us_control[E_CTRL_MOVE_FRONT + i - 1];
-		*SF_1.Data[i] = ss.str();
-		ss.str("");
-	}
-
-	SF_1.saveData();
+	SH_1.assign(f_fov, 70.f, 1, save);
+	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9, save);
+	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10, save);
+	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11, save);
+	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
+	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
+	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
+	SH_1.saveData();
 }
 
 /******************************************************************************/
@@ -181,16 +79,16 @@ Initialize default variables, create meshes, lighting
 /******************************************************************************/
 void MenuScene::Init()
 {
-	f_fov = 0;
-	f_mouseSensitivity = 0;
+	f_fov = 0.f;
+	f_mouseSensitivity = 0.f;
 
 	for (size_t i = 0; i < E_CTRL_TOTAL; ++i)
 	{
 		us_control[i] = 0;
 	}
 
-	SF_1.init("GameData//playerdata.wtf");
-	assignsave();
+	SH_1.init("GameData//ImportantData.GoddamnitQuen");
+	assignsave(false);
 
 	InitShaders();
 	//Starting position of translations and initialize physics
@@ -214,7 +112,7 @@ void MenuScene::InitShaders()
 {
 	// Init VBO here
 	// Set background color to whatever
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	glClearColor(0.9f, 0.9f, 0.9f, 0.0f);
 
 	//Enable depth buffer and depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -238,11 +136,11 @@ void MenuScene::InitShaders()
 
 	//Set projection matrix to perspective mode
 	Mtx44 projection;
-	projection.SetToPerspective(f_fov, static_cast<double>(Application::GetWindowWidth()) / static_cast<double>(Application::GetWindowHeight()), 0.1f, 10000.0f); //FOV, Aspect Ratio, Near plane, Far plane
+	projection.SetToPerspective(f_fov, static_cast<double>(Application::GetWindowWidth()) / static_cast<double>(Application::GetWindowHeight()), 0.01f, 10000.0f); //FOV, Aspect Ratio, Near plane, Far plane
 	projectionStack.LoadMatrix(projection);
 
 	// Init Camera
-	camera.Init(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	camera.Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, -100.0f), Vector3(0.0f, 1.0f, 0.0f));
 
 	//---------------------------------------------------------------------------------------
 
@@ -258,7 +156,7 @@ Initializes the meshes that is in the P_meshArray
 void MenuScene::InitMeshList()
 {
 	P_meshArray[E_GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000, 10000, 10000);
-
+	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.8f, 0.8f, 0.8f), 10000, 1000, 10);
 	//Text
 	P_meshArray[E_GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	P_meshArray[E_GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false, false);
@@ -287,50 +185,179 @@ void MenuScene::InitMenu(void)
 	v3_Menupos[E_M_SPLASH].Set(-100, -100, 0);
 	v3_Menupos[E_M_MAIN].Set(0, 0, 0);
 	v3_Menupos[E_M_LOADING] = v3_Menupos[E_M_MAIN];
-	v3_Menupos[E_M_OPTIONS].Set(0, 1000, 0);
-	v3_Menupos[E_M_OPTIONS_CONTROLS].Set(200, 1000, 0);
-	v3_Menupos[E_M_OPTIONS_CONTROLS_SETCONTROL].Set(200, 2000, 0);
+	v3_Menupos[E_M_OPTIONS].Set(0, 2000, 0);
+	v3_Menupos[E_M_OPTIONS_CONTROLS].Set(4000, 2000, 0);
+	v3_Menupos[E_M_OPTIONS_CONTROLS_SETCONTROL].Set(4000, 4000, 0);
 
 	transcomplete = false;
 
 	//MAIN--------------------------------------------------------
-	S_BUTTON* S_MB;
-	S_MB = new S_BUTTON;
+	TextButton* S_MB;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f, Application::GetWindowHeight()*0.5f, 0.1f);
 	S_MB->scale.Set(35, 35, 35);
 	S_MB->text = "Play";
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 60.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Options";
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 90.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Quit";
 	S_MB->gamestate = E_M_MAIN;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.15f, Application::GetWindowHeight()*0.15f, 0.1f);
-	S_MB->scale.Set(25, 25, 25);
-	S_MB->text = "Back";
-	S_MB->menubypass = true;
-	S_MB->gamestate = E_M_OPTIONS;
-	v_buttonList.push_back(S_MB);
-
 	//OPTIONS-----------------------------------------------------
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(S_MB);
+
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 40.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Toggle Fullscreen";
+	S_MB->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(S_MB);
+
+	//BACK BUTTONS------------------------------------------------
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Back";
+	S_MB->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = "Back";
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	v_buttonList.push_back(S_MB);
+
+	//Control changer---------------------------------------------
+	us_controlCB[E_CTRL_MOVE_FRONT].text = "Forward";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_FRONT].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_FRONT].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_BACK].text = "Backward";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 40.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_BACK].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_BACK].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_LEFT].text = "Left";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 80.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_LEFT].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_LEFT].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_RIGHT].text = "Right";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 120.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_RIGHT].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_RIGHT].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_SPRINT].text = "Sprint";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 160.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_SPRINT].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_SPRINT].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_WALK].text = "Walk";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 200.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_WALK].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_WALK].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_MOVE_JUMP].text = "Jump";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 240.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_MOVE_JUMP].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_MOVE_JUMP].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_INTERACT].text = "Interact";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 320.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_INTERACT].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_INTERACT].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_ATTACK].text = "Attack";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 360.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_ATTACK].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_ATTACK].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_THROW].text = "Throw";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 400.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_THROW].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_THROW].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_AIM].text = "Aim";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.1f, Application::GetWindowHeight()*0.8f - 440.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_AIM].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_AIM].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_ABILITY_1].text = "Ability 1";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.6f, Application::GetWindowHeight()*0.8f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_ABILITY_1].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_ABILITY_1].button = S_MB;
+	v_buttonList.push_back(S_MB);
+
+	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
+	{
+		us_controlCB[i].Control = us_control[i];
+		UpdateControlSettingLabels(us_control[i], i);
+	}
 }
 
 /******************************************************************************/
@@ -339,14 +366,17 @@ void MenuScene::InitMenu(void)
 Gets the button
 */
 /******************************************************************************/
-S_BUTTON* MenuScene::FetchBUTTON(std::string name)
+TextButton* MenuScene::FetchBUTTON(std::string name)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->text == name)
+		TextButton *S_MB = (TextButton *)*it;
+		if (S_MB != NULL)
 		{
-			return S_MB;
+			if (S_MB->text == name && S_MB->gamestate == MENU_STATE)
+			{
+				return S_MB;
+			}
 		}
 	}
 
@@ -359,12 +389,12 @@ S_BUTTON* MenuScene::FetchBUTTON(std::string name)
 Update button state
 */
 /******************************************************************************/
-void MenuScene::UpdateButtons(void)
+void MenuScene::UpdateTextButtons(void)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->gamestate == MENU_STATE || (S_MB->menubypass && MENU_STATE != E_M_MAIN) && (S_MB->menubypass && MENU_STATE != E_M_SPLASH) && (S_MB->menubypass && MENU_STATE != E_M_LOADING))
+		TextButton *S_MB = (TextButton *)*it;
+		if (S_MB->gamestate == MENU_STATE)
 		{
 			Vector3 offset = v3_Menupos[MENU_STATE];
 
@@ -398,7 +428,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 	static bool bLButtonState = false;
 
-	UpdateButtons();
+	UpdateTextButtons();
 
 	if (v3_MenuCam != v3_Menupos[MENU_STATE])
 	{
@@ -436,6 +466,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 			if (FetchBUTTON("Play")->active)
 			{
+				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_LOADING;
 			}
 			else if (FetchBUTTON("Options")->active)
@@ -462,10 +493,16 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 			if (FetchBUTTON("Controls")->active)
 			{
+				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_OPTIONS_CONTROLS;
+			}
+			else if (FetchBUTTON("Toggle Fullscreen")->active)
+			{
+				Application::fullscreentoggle();
 			}
 			else if (FetchBUTTON("Back")->active)
 			{
+				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_MAIN;
 			}
 		}
@@ -483,17 +520,37 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 			if (FetchBUTTON("Back")->active)
 			{
+				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_OPTIONS;
+			}
+
+			for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
+			{
+				if (FetchBUTTON(us_controlCB[i].text) != NULL)
+				{
+					if (FetchBUTTON(us_controlCB[i].text)->active)
+					{
+						us_ControlChange = &us_control[i];
+						i_ControlChange = i;
+						PREV_STATE = MENU_STATE;
+						MENU_STATE = E_M_OPTIONS_CONTROLS_SETCONTROL;
+					}
+				}
 			}
 		}
 		break;
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		for (size_t i = VK_LBUTTON; i < VK_OEM_CLEAR; ++i)
+		for (size_t i = 0; i < VK_OEM_CLEAR; ++i)
 		{
-			if (((GetAsyncKeyState(i) & 0x8001) != 0) == true)
+			if ((GetAsyncKeyState(i) & 0x8000))
 			{
+				if (i == 12)
+				{
+					continue;
+				}
+
 				if (i == 160 || i == 161)
 				{
 					i = 16;
@@ -506,6 +563,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 				*us_ControlChange = i;
 				UpdateControlSettingLabels(i, i_ControlChange);
 				MENU_STATE = E_M_OPTIONS_CONTROLS;
+				break;
 			}
 		}
 		break;
@@ -538,27 +596,87 @@ void MenuScene::UpdateControlSettingLabels(unsigned short key, int button)
 	ss >> s;
 	if (key == 16)
 	{
-		//scrButton[button].SetText("SH");
+		us_controlCB[button].CONTROLTEXT = "SHIFT";
 	}
 	else if (key == 17)
 	{
-		//scrButton[button].SetText("CN");
+		us_controlCB[button].CONTROLTEXT = "CTRL";
+	}
+	else if (key == 164)
+	{
+		us_controlCB[button].CONTROLTEXT = "LALT";
 	}
 	else if (key == 32)
 	{
-		//scrButton[button].SetText("SP");
+		us_controlCB[button].CONTROLTEXT = "SPACE";
 	}
 	else if (key == 1)
 	{
-		//scrButton[button].SetText("LM");
+		us_controlCB[button].CONTROLTEXT = "LMB";
 	}
 	else if (key == 2)
 	{
-		//scrButton[button].SetText("RM");
+		us_controlCB[button].CONTROLTEXT = "RMB";
+	}
+	else if (key == 4)
+	{
+		us_controlCB[button].CONTROLTEXT = "MMB";
+	}
+	else if (key == 5)
+	{
+		us_controlCB[button].CONTROLTEXT = "BUTTON 4";
+	}
+	else if (key == 6)
+	{
+		us_controlCB[button].CONTROLTEXT = "BUTTON 5";
+	}
+	else if (key == 9)
+	{
+		us_controlCB[button].CONTROLTEXT = "TAB";
+	}
+	else if (key == 96)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 0";
+	}
+	else if (key == 97)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 1";
+	}
+	else if (key == 98)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 2";
+	}
+	else if (key == 99)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 3";
+	}
+	else if (key == 100)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 4";
+	}
+	else if (key == 101)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 5";
+	}
+	else if (key == 102)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 6";
+	}
+	else if (key == 103)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 7";
+	}
+	else if (key == 104)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 8";
+	}
+	else if (key == 105)
+	{
+		us_controlCB[button].CONTROLTEXT = "NUM 9";
 	}
 	else
 	{
-		//scrButton[button].SetText(s);
+		us_controlCB[button].CONTROLTEXT = s;
 	}
 }
 
@@ -588,7 +706,7 @@ void MenuScene::UpdateFOV()
 	}
 
 	Mtx44 proj;
-	proj.SetToPerspective(f_fov, 16.0f / 9.0f, 0.1f, 10000.0f);
+	proj.SetToPerspective(f_fov, Application::GetWindowWidth()/Application::GetWindowHeight(), 0.1f, 10000.0f);
 	projectionStack.LoadMatrix(proj);
 }
 
@@ -664,6 +782,11 @@ void MenuScene::InitShadersAndLights(void)
 	u_m_parameters[E_UNI_NUMLIGHTS] = glGetUniformLocation(u_m_programID, "numLights");
 
 	glUniform1i(u_m_parameters[E_UNI_NUMLIGHTS], ui_NUM_LIGHTS);
+
+	u_m_parameters[U_UNI_GLOW] = glGetUniformLocation(u_m_programID, "glow");
+	u_m_parameters[U_UNI_GLOW_COLOR] = glGetUniformLocation(u_m_programID, "glowColor");
+
+	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
 
 	//Main Lighting
 	P_lightsArray[0].type = LIGHT_POINT;
@@ -813,8 +936,12 @@ Renders text around the center on the screen
 /******************************************************************************/
 void MenuScene::RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
 {
+	modelStack.PushMatrix();
 	x -= ((text.length() - 1.5f) / 2.0f) * size;
-	//RenderTextOnScreen(mesh, text, color, size, x, y);
+	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
+	RenderTextOnScreen(mesh, text, color);
+	modelStack.PopMatrix();
 }
 
 /******************************************************************************/
@@ -873,10 +1000,11 @@ void MenuScene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color)
 Renders a mesh on screen
 */
 /******************************************************************************/
-void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x, float y)
+void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 {
-	x /= sizeX;
-	y /= sizeY;
+	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
+	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
+	
 
 	glDisable(GL_DEPTH_TEST);
 	glUniform1i(u_m_parameters[E_UNI_LIGHTENABLED], 0);
@@ -891,10 +1019,6 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 	projectionStack.LoadMatrix(ortho);
 	viewStack.PushMatrix();
 	viewStack.LoadIdentity(); //No need camera for ortho mode
-	modelStack.PushMatrix();
-	modelStack.LoadIdentity(); //Reset modelStack
-	modelStack.Translate(x, y, 0);
-	modelStack.Scale(sizeX, sizeY, sizeX);
 
 	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(u_m_parameters[E_UNI_MVP], 1, GL_FALSE, &MVP.a[0]);
@@ -903,7 +1027,6 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 
 	projectionStack.PopMatrix();
 	viewStack.PopMatrix();
-	modelStack.PopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(u_m_parameters[E_UNI_TEXT_ENABLED], 0);
@@ -916,15 +1039,15 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 Renders the menu buttons
 */
 /******************************************************************************/
-void MenuScene::RenderButtons(void)
+void MenuScene::RenderTextButtons(void)
 {
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
-		S_BUTTON *S_MB = v_buttonList[i];
-		if (S_MB->gamestate == MENU_STATE || (S_MB->menubypass && MENU_STATE != E_M_MAIN) && (S_MB->menubypass && MENU_STATE != E_M_SPLASH) && (S_MB->menubypass && MENU_STATE != E_M_LOADING))
+		TextButton *S_MB = v_buttonList[i];
+		if (S_MB->gamestate == MENU_STATE || S_MB->gamestate == PREV_STATE)
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(v3_Menupos[MENU_STATE]);
+			modelStack.Translate(v3_Menupos[S_MB->gamestate]);
 			modelStack.Translate(S_MB->pos);
 			modelStack.Scale(S_MB->scale);
 			RenderTextOnScreen(P_meshArray[E_GEO_TEXT], S_MB->text, S_MB->color);
@@ -973,28 +1096,44 @@ void MenuScene::Render()
 	viewStack.LoadIdentity();
 
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
-		camera.target.x, camera.target.y, camera.target.z,
+		v3_MenuCam.x, v3_MenuCam.y, v3_MenuCam.z,
+		v3_MenuCam.x, v3_MenuCam.y, -1000000.f,
 		camera.up.x, camera.up.y, camera.up.z
 		);
 
 	modelStack.LoadIdentity();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(-2000, -2000, -10000);
+	RenderMesh(P_meshArray[E_GEO_MATRIX], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
 	modelStack.Translate(-v3_MenuCam);
 
-	RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2));
+	/*modelStack.PushMatrix();
+	modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+	RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND]);
+	modelStack.PopMatrix();*/
 
 	switch (MENU_STATE)
 	{
 	case E_M_LOADING:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_LOADING_BACKGROUND], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2));
+		modelStack.PushMatrix();
+		modelStack.LoadIdentity();
+		modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+		RenderMeshOnScreen(P_meshArray[E_GEO_LOADING_BACKGROUND]);
+		modelStack.PopMatrix();
 		break;
 	}
 	case E_M_SPLASH:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_SPLASH], 1.f, 1.f, static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2));
+		modelStack.PushMatrix();
+		modelStack.LoadIdentity();
+		modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
+		RenderMeshOnScreen(P_meshArray[E_GEO_SPLASH]);
+		modelStack.PopMatrix();
 		break;
 	}
 	case E_M_MAIN:
@@ -1009,17 +1148,32 @@ void MenuScene::Render()
 	}
 	case E_M_OPTIONS_CONTROLS:
 	{
+		for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
+		{
+			if (us_controlCB[i].button != NULL)
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(v3_Menupos[MENU_STATE]);
+				modelStack.Translate(us_controlCB[i].button->pos);
+				modelStack.Translate(300, 0, 0);
+				modelStack.Scale(us_controlCB[i].button->scale);
+				RenderTextOnScreen(P_meshArray[E_GEO_TEXT], us_controlCB[i].CONTROLTEXT, UIColorPressed);
+				modelStack.PopMatrix();
+			}
+		}
 
 		break;
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND], 1.f, 1.f, Application::GetWindowWidth() / 2.f, Application::GetWindowHeight() / 2.f);
-		//RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "Press a key", Color(0.f, 0.f, 0.f), 30, Application::GetWindowWidth()/2 - 100, Application::GetWindowHeight()/2);
+		modelStack.PushMatrix();
+		modelStack.Translate(v3_MenuCam);
+		RenderTextCenterOnScreen(P_meshArray[E_GEO_TEXT], "Enter a key", UIColor, 50.f, Application::GetWindowWidth() * 0.5f, Application::GetWindowHeight() * 0.5f);
+		modelStack.PopMatrix();
 		break;
 	}
 	}
-	RenderButtons();
+	RenderTextButtons();
 	modelStack.PopMatrix();
 }
 
@@ -1031,7 +1185,7 @@ Clears memory upon exit
 /******************************************************************************/
 void MenuScene::Exit()
 {
-	saveGame();
+	assignsave(true);
 	glDeleteVertexArrays(1, &u_m_vertexArrayID);
 	glDeleteProgram(u_m_programID);
 
@@ -1039,7 +1193,7 @@ void MenuScene::Exit()
 
 	while (v_buttonList.size() > 0)
 	{
-		S_BUTTON *S_MB = v_buttonList.back();
+		TextButton *S_MB = v_buttonList.back();
 		delete S_MB;
 		v_buttonList.pop_back();
 	}

@@ -53,35 +53,20 @@ Loads save file from file
 /******************************************************************************/
 void mainscene::assignSave(void)
 {
-	f_fov = static_cast<float>(std::stoi(*SF_1.Data[0]));
-	f_mouseSensitivity = static_cast<float>(std::stoi(*SF_1.Data[14])) / 100.f;
-	char CN = std::stoi(*SF_1.Data[1]);
-	us_control[E_CTRL_MOVE_FRONT] = CN;
-	CN = std::stoi(*SF_1.Data[2]);
-	us_control[E_CTRL_MOVE_BACK] = CN;
-	CN = std::stoi(*SF_1.Data[3]);
-	us_control[E_CTRL_MOVE_LEFT] = CN;
-	CN = std::stoi(*SF_1.Data[4]);
-	us_control[E_CTRL_MOVE_RIGHT] = CN;
-	CN = std::stoi(*SF_1.Data[5]);
-	us_control[E_CTRL_MOVE_SPRINT] = CN;
-	CN = std::stoi(*SF_1.Data[6]);
-	us_control[E_CTRL_MOVE_WALK] = CN;
-	CN = std::stoi(*SF_1.Data[7]);
-	us_control[E_CTRL_MOVE_JUMP] = CN;
-	CN = std::stoi(*SF_1.Data[8]);
-	us_control[E_CTRL_INTERACT] = CN;
-	CN = std::stoi(*SF_1.Data[9]);
-	us_control[E_CTRL_THROW] = CN;
-	CN = std::stoi(*SF_1.Data[10]);
-	us_control[E_CTRL_ATTACK] = CN;
-	CN = std::stoi(*SF_1.Data[11]);
-	us_control[E_CTRL_AIM] = CN;
-	CN = std::stoi(*SF_1.Data[12]);
-	us_control[E_CTRL_NEXT_ITEM] = CN;
-	CN = std::stoi(*SF_1.Data[13]);
-	us_control[E_CTRL_RELOAD] = CN;
-	SF_1.saveData();
+	SH_1.assign(f_fov, 70.f, 1);
+	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3);
+	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4);
+	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5);
+	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6);
+	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7);
+	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8);
+	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9);
+	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10);
+	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11);
+	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
+	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
+	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
 }
 
 /******************************************************************************/
@@ -96,48 +81,62 @@ void mainscene::InitMenus(void)
 	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
 
 	//Pause Menu--------------------------------------------------------
-	S_BUTTON* S_MB;
+	TextButton* S_MB;
 
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Back to game";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Previous level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 10.f, 0.1f);
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Skip to next level";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 15.f, 0.1f);
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 12.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Return to menu";
 	S_MB->gamestate = GS_PAUSED;
 	v_buttonList.push_back(S_MB);
 
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 16.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Quit";
+	S_MB->gamestate = GS_PAUSED;
+	v_buttonList.push_back(S_MB);
+
 	//End Menu----------------------------------------------------------
-	S_MB = new S_BUTTON;
+	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Return to menu";
 	S_MB->gamestate = GS_END;
 	v_buttonList.push_back(S_MB);
 
-	S_MB = new S_BUTTON;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 5.f, 0.1f);
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 4.f, 0.1f);
 	S_MB->scale.Set(2, 2, 2);
 	S_MB->text = "Play again";
+	S_MB->gamestate = GS_END;
+	v_buttonList.push_back(S_MB);
+
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f - 8.f, 0.1f);
+	S_MB->scale.Set(2, 2, 2);
+	S_MB->text = "Quit";
 	S_MB->gamestate = GS_END;
 	v_buttonList.push_back(S_MB);
 }
@@ -152,12 +151,12 @@ the name of the button
 returns the button with the same name
 */
 /******************************************************************************/
-S_BUTTON* mainscene::FetchBUTTON(std::string name)
+TextButton* mainscene::FetchBUTTON(std::string name)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
-		if (S_MB->text == name)
+		TextButton *S_MB = (TextButton *)*it;
+		if (S_MB->text == name && S_MB->gamestate == GAMESTATE)
 		{
 			return S_MB;
 		}
@@ -183,7 +182,7 @@ void mainscene::Init()
 
 	f_mouseSensitivity = 1;
 
-	SF_1.init("GameData//playerdata.wtf");
+	SH_1.init("GameData//ImportantData.GoddamnitQuen");
 	assignSave();
 
 	m_renderPass = RENDER_PASS_PRE;
@@ -440,10 +439,10 @@ void mainscene::Init()
 	int f_type = 1;
 	enableFOG = true;
 	glUniform3fv(m_parameters[U_FOG_COLOR], 1, &FogCol.r);
-	glUniform1i(m_parameters[U_FOG_START], f_start);
-	glUniform1i(m_parameters[U_FOG_END], f_end);
-	glUniform1i(m_parameters[U_FOG_DENSITY], f_density);
-	glUniform1i(m_parameters[U_FOG_TYPE], f_type);
+	glUniform1i(m_parameters[U_FOG_START], static_cast<GLint>(f_start));
+	glUniform1i(m_parameters[U_FOG_END], static_cast<GLint>(f_end));
+	glUniform1i(m_parameters[U_FOG_DENSITY], static_cast<GLint>(f_density));
+	glUniform1i(m_parameters[U_FOG_TYPE], static_cast<GLint>(f_type));
 	glUniform1i(m_parameters[U_FOG_ENABLED], enableFOG);
 
 	//Set projection matrix to perspective mode
@@ -652,7 +651,7 @@ returns true if loadmap is sucessful
 /******************************************************************************/
 bool mainscene::loadLevel(int level)
 {
-	float worldsize = 40.f;
+	float worldsize = 30.f;
 	std::cout << "\nLoading map...\n";
 	std::string MAPLOC = "GameData//Maps//";
 	MAPLOC += std::to_string(static_cast<unsigned long long>(level));
@@ -720,19 +719,63 @@ bool mainscene::loadLevel(int level)
 		{
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
-				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, (GAME_MAP.map_height - y)*worldsize*2.f));
+				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, y*worldsize*2.f));
 			}
-			else if (GAME_MAP.map_data[y][x] != "-")//Generate the rest of the world
+			else if (GAME_MAP.map_data[y][x] != ".")
 			{
-				if (GAME_MAP.map_data[y][x] == "1")
+				if (GAME_MAP.map_data[y][x][0] == 'W')
 				{
+					std::string temp_str_X, temp_str_Y, temp_str_Z;
+					temp_str_X = "";
+					temp_str_Y = "";
+					temp_str_Z = "";
+
+					float SizeX, SizeY, SizeZ;
+					SizeX = 0.f;
+					SizeY = 0.f;
+					SizeZ = 0.f;
+					int temp_int_1 = 0;
+
+					for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+					{
+						temp_str_X += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'y'; ++i)
+					{
+						temp_str_Y += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'z'; ++i)
+					{
+						temp_str_Z += GAME_MAP.map_data[y][x][i];
+					}
+
+					SizeX = static_cast<float>(std::atoi(temp_str_X.c_str()));
+					SizeY = static_cast<float>(std::atoi(temp_str_Y.c_str()));
+					SizeZ = static_cast<float>(std::atoi(temp_str_Z.c_str()));
+
+					if (SizeX > worldsize)
+					{
+						SizeX = worldsize;
+					}
+
+					if (SizeZ > worldsize)
+					{
+						SizeZ = worldsize;
+					}
+
+					std::cout << "\n" << SizeX << ", " << SizeY << ", " << SizeZ << std::endl;
+
 					WorldObject *WO;
 					WO = new WorldObject();
 					WO->active = true;
 					WO->colEnable = true;
-					WO->scale.Set(worldsize, worldsize, worldsize);
-					WO->pos.Set(x*worldsize*2.f, worldsize, (GAME_MAP.map_height - y)*worldsize*2.f);
-					WO->ColBox.Set(worldsize, worldsize, worldsize);
+					WO->scale.Set(SizeX, SizeY, SizeZ);
+					WO->pos.Set(x*worldsize*2.f, SizeY, y*worldsize*2.f);
+					WO->ColBox.Set(SizeX, SizeY, SizeZ);
 					WO->dynamicRendering = true;
 					WO->mesh = meshList[GEO_WORLD_CUBE];
 					m_goList.push_back(WO);
@@ -741,7 +784,7 @@ bool mainscene::loadLevel(int level)
 				{
 					AI *ai;
 					ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
-					ai->Init(Vector3(x*worldsize*2.f, 0, (GAME_MAP.map_height - y)*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
+					ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
 					ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
 					ai->Scale.Set(10, 10, 10);
 					m_charList.push_back(ai);
@@ -749,6 +792,7 @@ bool mainscene::loadLevel(int level)
 			}
 		}
 	}
+
 	WorldObject *WO;
 	WO = new WorldObject();
 	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0, (GAME_MAP.map_height*0.5f)*worldsize);
@@ -1119,7 +1163,7 @@ void mainscene::UpdatePlayer(double &dt)
 		CO->Update(dt);
 	}*/
 
-	for(std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it ++)
+	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
 		AI *ai = dynamic_cast<AI*>(CO);
@@ -1214,7 +1258,7 @@ void mainscene::UpdateGO(double &dt)
 			}
 			else
 			{
-				go->Update(dt);
+				go->Update(d_dt);
 			}
 		}
 	}
@@ -1474,7 +1518,7 @@ void mainscene::PlaySound2D(irrklang::ISoundSource *source)
 
 		if (d_dt2 != d_dt)
 		{
-			fx->enableDistortionSoundEffect(d_dt - d_dt2 - 30.f);
+			fx->enableDistortionSoundEffect(static_cast<ik_f32>(d_dt2 - d_dt - 30.f));
 		}
 	}
 }
@@ -1515,9 +1559,9 @@ update menu buttons
 /******************************************************************************/
 void mainscene::UpdateButtons(void)
 {
-	for (std::vector<S_BUTTON*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
 	{
-		S_BUTTON *S_MB = (S_BUTTON *)*it;
+		TextButton *S_MB = (TextButton *)*it;
 		if (intersect2D((S_MB->pos + Vector3(S_MB->text.length() * (S_MB->scale.x) - S_MB->scale.x, S_MB->scale.y*0.4f, 0)), S_MB->pos + Vector3(-S_MB->scale.x*0.5f, -(S_MB->scale.y*0.4f), 0), Vector3(mousePosX, mousePosY, 0)))
 		{
 			S_MB->active = true;
@@ -1602,7 +1646,7 @@ void mainscene::Update(double dt)
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_PLAY:
-		if (Application::IsKeyPressed('X'))
+		if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]))
 		{
 			dt *= 0.05;
 
@@ -1705,6 +1749,10 @@ void mainscene::Update(double dt)
 					Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 					GAMESTATE = GS_PLAY;
 				}
+				else if (FetchBUTTON("Quit")->active)
+				{
+					e_nextScene = Application::E_SCENE_QUIT;
+				}
 			}
 		}
 		break;
@@ -1737,6 +1785,10 @@ void mainscene::Update(double dt)
 				Application::SetCursor(false);
 				Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 				GAMESTATE = GS_PLAY;
+			}
+			else if (FetchBUTTON("Quit")->active)
+			{
+				e_nextScene = Application::E_SCENE_QUIT;
 			}
 		}
 		break;
@@ -1907,9 +1959,9 @@ Renders mesh in 3D
 /******************************************************************************/
 void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color glowColor)
 {
-	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
-	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
+	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
@@ -1953,9 +2005,9 @@ Renders mesh
 /******************************************************************************/
 void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color glowColor, Material *material)
 {
-	glUniform1i(m_parameters[U_GLOW], glow);
+	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
-	glUniform1i(m_parameters[U_TRANSPARENCY], visibility);
+	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 
 	if (enableFOG && enableFog)
 	{
@@ -2353,7 +2405,7 @@ void mainscene::RenderUI(void)
 	case mainscene::GS_PAUSED:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(Application::GetWindowWidth(), Application::GetWindowHeight(), 1);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 5.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		RenderButtons();
@@ -2600,7 +2652,7 @@ void mainscene::RenderButtons(void)
 {
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
-		S_BUTTON *S_MB = v_buttonList[i];
+		TextButton *S_MB = v_buttonList[i];
 		if (S_MB->gamestate == GAMESTATE)
 		{
 			modelStack.PushMatrix();

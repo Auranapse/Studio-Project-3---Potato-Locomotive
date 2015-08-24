@@ -16,7 +16,8 @@ Main menu for the openGL framework
 #include "Light.h"
 #include "LoadTGA.h"
 #include "AzimuthAltitudeCamera.h"
-#include "savefile.h"
+#include "SaveHandler.h"
+#include "TextButton.h"
 #include "Button.h"
 #include "GabrielDLC.h"
 #include <string>
@@ -41,16 +42,6 @@ class MenuScene : public Scene
 
 	enum E_CTRL_TYPE
 	{
-		// Settings Controls
-		E_CTRL_TOGGLE_CULL,
-		E_CTRL_TOGGLE_WIREFRAME,
-		E_CTRL_TOGGLE_AXES,
-		E_CTRL_TOGGLE_INFO,
-
-		// Camera Controls
-		E_CTRL_CHAR_MODE,
-		E_CTRL_NOCLIP_MODE,
-
 		// Player Controls
 		// -- Move
 		E_CTRL_MOVE_FRONT,
@@ -66,20 +57,8 @@ class MenuScene : public Scene
 		E_CTRL_THROW,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
-		E_CTRL_NEXT_ITEM,
 		E_CTRL_RELOAD,
-
-		// -- Look
-		E_CTRL_LOOK_UP,
-		E_CTRL_LOOK_DOWN,
-		E_CTRL_LOOK_LEFT,
-		E_CTRL_LOOK_RIGHT,
-
-		// Debug
-		E_CTRL_SHOW_DEBUG,
-		E_CTRL_GRAV_RESET,
-		E_CTRL_GRAV_RAISE,
-		E_CTRL_GRAV_DROP,
+		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
 	};
@@ -99,6 +78,7 @@ class MenuScene : public Scene
 		E_GEO_SPLASH,
 		E_GEO_BACKGROUND,
 		E_GEO_LOADING_BACKGROUND,
+		E_GEO_MATRIX,
 		// -----------------------
 		E_GEO_TOTAL,
 	};
@@ -140,6 +120,9 @@ class MenuScene : public Scene
 		E_UNI_TEXT_ENABLED,
 		E_UNI_TEXT_COLOR,
 		//------------------------------------
+		U_UNI_GLOW,
+		U_UNI_GLOW_COLOR,
+		
 		E_UNI_TOTAL,
 	};
 
@@ -158,6 +141,21 @@ class MenuScene : public Scene
 		E_M_OPTIONS_CONTROLS,
 		E_M_OPTIONS_CONTROLS_SETCONTROL,
 		E_M_TOTAL,
+	};
+
+	struct CONTROL_CHANGE_BUTTON
+	{
+		TextButton *button;
+		unsigned short Control;
+		std::string text;
+		std::string CONTROLTEXT;
+
+		CONTROL_CHANGE_BUTTON()
+		{
+			button = NULL;
+			text = "undefined";
+			CONTROLTEXT = "undefined";
+		}
 	};
 
 public:
@@ -288,6 +286,8 @@ private:
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
 
+	CONTROL_CHANGE_BUTTON us_controlCB[E_CTRL_TOTAL];
+
 	/******************************************************************************/
 	/*!
 	int MENU_STATE:
@@ -298,10 +298,10 @@ private:
 	E_MENU_STATE PREV_STATE;
 
 	Color UIColor, UIColorPressed;
-	std::vector<S_BUTTON*> v_buttonList;
-	S_BUTTON* FetchBUTTON(std::string name);
-	void UpdateButtons(void);
-	void RenderButtons(void);
+	std::vector<TextButton*> v_buttonList;
+	TextButton* FetchBUTTON(std::string name);
+	void UpdateTextButtons(void);
+	void RenderTextButtons(void);
 
 	bool transcomplete;
 	Vector3 v3_Menupos[E_M_TOTAL];
@@ -312,9 +312,8 @@ private:
 	void InitShadersAndLights(void);
 	void InitMenu(void);
 
-	void assignsave(void);
-	void saveGame(void);
-	SaveFile SF_1;
+	void assignsave(bool save = false);
+	SaveHandler SH_1;
 
 	// Update/Control Functions
 	float MousePosX, MousePosY;
@@ -327,7 +326,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color);
 	void RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderMesh(Mesh *mesh, bool enableLight);
-	void RenderMeshOnScreen(Mesh* mesh, float sizeX, float sizeY, float x, float y);
+	void RenderMeshOnScreen(Mesh* mesh, float Glow = 0, Color GlowColor = Color(1.f, 0.f, 0.f));
 
 	/******************************************************************************/
 	/*!

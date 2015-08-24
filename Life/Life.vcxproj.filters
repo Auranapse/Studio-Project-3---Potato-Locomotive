@@ -61,6 +61,18 @@
     <Filter Include="Header Files\Visuals\Mesh\Model/Texture">
       <UniqueIdentifier>{9c42e182-f631-497f-9c2a-1282d6aaea1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Buttons">
+      <UniqueIdentifier>{44b2712a-5368-4062-850e-91f63d6d183b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Controls">
+      <UniqueIdentifier>{b0e02edf-6d2e-4656-9258-217c457b2539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Buttons">
+      <UniqueIdentifier>{34c7860e-5e1e-4865-a6b5-37d776c9b3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Controls">
+      <UniqueIdentifier>{2f209375-6701-4112-8770-5009e857b911}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -70,9 +82,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\LoadHmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\CharacterObject.cpp">
@@ -126,9 +135,6 @@
     <ClCompile Include="Source\Player.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\savefile.cpp">
-      <Filter>Source Files\Save/Load</Filter>
-    </ClCompile>
     <ClCompile Include="Source\DepthFBO.cpp">
       <Filter>Source Files\Visuals</Filter>
     </ClCompile>
@@ -168,6 +174,15 @@
     <ClCompile Include="Source\CollisionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SaveHandler.cpp">
+      <Filter>Source Files\Save/Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LoadHmap.cpp">
+      <Filter>Source Files\Save/Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Button.cpp">
+      <Filter>Source Files\Buttons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -177,12 +192,6 @@
       <Filter>Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\LoadHmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\CharacterObject.h">
@@ -239,9 +248,6 @@
     <ClInclude Include="Source\Player.h">
       <Filter>Header Files\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\savefile.h">
-      <Filter>Header Files\Save/Load</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GBuffer.h">
       <Filter>Header Files\Visuals</Filter>
     </ClInclude>
@@ -286,6 +292,18 @@
     </ClInclude>
     <ClInclude Include="Source\CollisionBox.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SaveHandler.h">
+      <Filter>Header Files\Save/Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LoadHmap.h">
+      <Filter>Header Files\Save/Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TextButton.h">
+      <Filter>Header Files\Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Button.h">
+      <Filter>Header Files\Buttons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

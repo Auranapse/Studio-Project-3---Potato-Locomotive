@@ -22,7 +22,7 @@ Main scene
 #include "LoadTGA.h"
 #include "maploader.h"
 
-#include "Button.h"
+#include "TextButton.h"
 #include "BulletInfo.h"
 #include "GameObject.h"
 #include "WorldObject.h"
@@ -31,7 +31,7 @@ Main scene
 
 #include "SpriteAnimation.h"
 #include "particle.h"
-#include "savefile.h"
+#include "SaveHandler.h"
 #include "DepthFBO.h"
 #include "GBuffer.h"
 #include "GabrielDLC.h"
@@ -234,16 +234,6 @@ class mainscene : public Scene
 
 	enum E_CTRL_TYPE
 	{
-		// Settings Controls
-		E_CTRL_TOGGLE_CULL,
-		E_CTRL_TOGGLE_WIREFRAME,
-		E_CTRL_TOGGLE_AXES,
-		E_CTRL_TOGGLE_INFO,
-
-		// Camera Controls
-		E_CTRL_CHAR_MODE,
-		E_CTRL_NOCLIP_MODE,
-
 		// Player Controls
 		// -- Move
 		E_CTRL_MOVE_FRONT,
@@ -259,24 +249,12 @@ class mainscene : public Scene
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_THROW,
-		E_CTRL_NEXT_ITEM,
 		E_CTRL_RELOAD,
-
-		// -- Look
-		E_CTRL_LOOK_UP,
-		E_CTRL_LOOK_DOWN,
-		E_CTRL_LOOK_LEFT,
-		E_CTRL_LOOK_RIGHT,
-
-		// Debug
-		E_CTRL_SHOW_DEBUG,
-		E_CTRL_GRAV_RESET,
-		E_CTRL_GRAV_RAISE,
-		E_CTRL_GRAV_DROP,
+		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
 	};
-	
+
 	enum SOUND_TYPE
 	{
 		ST_PANEL,
@@ -289,7 +267,7 @@ class mainscene : public Scene
 
 		ST_SLOWMO_ENTER,
 		ST_SLOWMO_EXIT,
-		
+
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
 		ST_WEAPON_KATANA,
@@ -339,8 +317,8 @@ private:
 
 	void InitMenus(void);
 	Color UIColor, UIColorPressed;
-	std::vector<S_BUTTON*> v_buttonList;
-	S_BUTTON *FetchBUTTON(std::string name);
+	std::vector<TextButton*> v_buttonList;
+	TextButton *FetchBUTTON(std::string name);
 	void UpdateButtons(void);
 	void RenderButtons(void);
 
@@ -365,7 +343,7 @@ private:
 
 	Player P_Player;
 
-	SecurityCam sc; 
+	SecurityCam sc;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -382,8 +360,8 @@ private:
 	*/
 	/******************************************************************************/
 	unsigned short us_control[E_CTRL_TOTAL];
-	
-	SaveFile SF_1;
+
+	SaveHandler SH_1;
 	void assignSave(void);
 
 	float f_fov;
@@ -393,7 +371,7 @@ private:
 	bool mouseEnabled;
 
 	bool DisplayInfo;
-	
+
 	float f_curRecoil;
 	float firerate;
 	float timer;
