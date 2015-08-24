@@ -43,7 +43,7 @@ public:
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true);
 
-	void SensorUpdate(double &dt, bool left, bool middle, bool right);
+	void SensorUpdate(double &dt, bool left = false, bool middle = false, bool right = false);
 	virtual void Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList);
 	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
 
