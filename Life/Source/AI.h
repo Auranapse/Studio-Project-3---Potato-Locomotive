@@ -66,8 +66,6 @@ private:
 	E_TYPE e_Type;
 	Mtx44 rotating;
 	float f_alert_timer;
-	bool x_axis;
-	bool z_axis;
 	bool collided;
 
 	bool positiveX, positiveZ, negativeX, negativeZ;

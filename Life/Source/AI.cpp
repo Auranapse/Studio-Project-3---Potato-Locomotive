@@ -153,6 +153,13 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	}
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+Return true if the enemy's direction is positive x
+*/
+/******************************************************************************/
 bool AI::movingByPositive_x()
 {
 	if (positiveX == true && negativeX == false && negativeZ == false && positiveZ == false)
@@ -162,6 +169,12 @@ bool AI::movingByPositive_x()
 	return false;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return true if the enemy's direction is positive z
+*/
+/******************************************************************************/
 bool AI::movingByPositive_z()
 {
 	if (positiveX == false && negativeX == false && negativeZ == false && positiveZ == true)
@@ -171,6 +184,12 @@ bool AI::movingByPositive_z()
 	return false;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return true if the enemy's direction is negative x
+*/
+/******************************************************************************/
 bool AI::movingByNegative_x()
 {
 	if (positiveX == false && negativeX == true && negativeZ == false && positiveZ == false)
@@ -180,6 +199,12 @@ bool AI::movingByNegative_x()
 	return false;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return true if the enemy's direction is negative z
+*/
+/******************************************************************************/
 bool AI::movingByNegative_z()
 {
 	if (positiveX == false && negativeX == false && negativeZ == true && positiveZ == false)
@@ -189,6 +214,12 @@ bool AI::movingByNegative_z()
 	return false;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Set the enemy direction to positive x
+*/
+/******************************************************************************/
 void AI::setPositive_x()
 {
 	positiveX = true;
@@ -198,6 +229,13 @@ void AI::setPositive_x()
 
 	diff = Vector3(1, 0, 0);
 }
+
+/******************************************************************************/
+/*!
+\brief
+Set the enemy direction to positive z
+*/
+/******************************************************************************/
 void AI::setPositive_z()
 {
 	positiveX = false;
@@ -207,6 +245,13 @@ void AI::setPositive_z()
 
 	diff = Vector3(0, 0, 1);
 }
+
+/******************************************************************************/
+/*!
+\brief
+Set the enemy direction to negative x
+*/
+/******************************************************************************/
 void AI::setNegative_x()
 {
 	positiveX = false;
@@ -216,6 +261,13 @@ void AI::setNegative_x()
 
 	diff = Vector3(-1, 0, 0);
 }
+
+/******************************************************************************/
+/*!
+\brief
+Set the enemy direction to negative z
+*/
+/******************************************************************************/
 void AI::setNegative_z()
 {
 	positiveX = false;
@@ -226,6 +278,12 @@ void AI::setNegative_z()
 	diff = Vector3(0, 0, -1);
 }
 
+/******************************************************************************/
+/*!
+\brief
+Rotate the enemy's Lookat in the clockwise direction(-90 degree)
+*/
+/******************************************************************************/
 void AI::rotateAi_Clockwise()
 {
 	Mtx44 rotation;
@@ -235,6 +293,13 @@ void AI::rotateAi_Clockwise()
 
 	Velocity = rotation * Velocity;
 }
+
+/******************************************************************************/
+/*!
+\brief
+Rotate the enemy's Lookat in the counter clockwise direction(90 degree)
+*/
+/******************************************************************************/
 void AI::rotateAI_CounterClockWise()
 {
 	Mtx44 rotation;
@@ -244,6 +309,13 @@ void AI::rotateAI_CounterClockWise()
 
 	Velocity = rotation * Velocity;
 }
+
+/******************************************************************************/
+/*!
+\brief
+Rotate the enemy's Lookat by 180 degree
+*/
+/******************************************************************************/
 void AI::rotateAI_180()
 {
 	Mtx44 rotation;
