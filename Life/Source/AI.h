@@ -66,8 +66,11 @@ private:
 	E_TYPE e_Type;
 	Mtx44 rotating;
 	float f_alert_timer;
+	float f_cooldownTime;
+	bool b_aiCooldown;
 	bool collided;
 
+	Vector3 destination;
 	bool positiveX, positiveZ, negativeX, negativeZ;
 	Vector3 diff;
 };

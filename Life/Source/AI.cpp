@@ -31,7 +31,9 @@ f_alert_timer(0.f)
 	Velocity = Vector3(0, 0, 10);
 	collided = false;
 	//x_axis = z_axis = false;
-
+	destination(NULL);
+	b_aiCooldown = false;
+	f_cooldownTime = 0.f;
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff = (0, 0, 1);
 }
@@ -354,143 +356,125 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
 {
-	//if (collided)
-	//{
-	//	int ai_nextMove = Math::RandIntMinMax(1, 3);
-	//	//1 = clodkwise
-	//	//2 = counter clock wise
-	//	//3 = 180 degree
-
-	//	//Positive Z
-	//	if (movingByPositive_z())
-	//	{
-
-	//		if (ai_nextMove == 1)
-	//		{
-	//			setNegative_x();
-	//		}
-	//		else if (ai_nextMove == 2)
-	//		{
-	//			setPositive_x();
-	//		}
-	//		else
-	//		{
-	//			setNegative_z();
-	//		}
-	//	}
-	//	//Negative X
-	//	else if (movingByNegative_x())
-	//	{
-	//		if (ai_nextMove == 1)
-	//		{
-	//			setNegative_z();
-	//		}
-	//		else if (ai_nextMove == 2)
-	//		{
-	//			setPositive_z();
-	//		}
-	//		else
-	//		{
-	//			setPositive_x();
-	//		}
-	//	}
-	//	//Negative Z
-	//	else if (movingByNegative_z())
-	//	{
-	//		if (ai_nextMove == 1)
-	//		{
-	//			setPositive_x();
-	//		}
-	//		else if (ai_nextMove == 2)
-	//		{
-	//			setNegative_x();
-	//		}
-	//		else
-	//		{
-	//			setPositive_z();
-	//		}
-	//	}
-	//	//Positive X
-	//	else if (movingByPositive_x())
-	//	{
-	//		if (ai_nextMove == 1)
-	//		{
-	//			setPositive_z();
-	//		}
-	//		else if (ai_nextMove == 2)
-	//		{
-	//			setNegative_z();
-	//		}
-	//		else
-	//		{
-	//			setNegative_x();
-	//		}
-	//	}
-
-	//	if (ai_nextMove == 1)
-	//	{
-	//		rotateAi_Clockwise();
-	//	}
-	//	else if (ai_nextMove == 2)
-	//	{
-	//		rotateAI_CounterClockWise();
-	//	}
-	//	else
-	//	{
-	//		rotateAI_180();
-	//	}
-
-	//	collided = false;
-	//}
-	//else
-	//{
-
-	//	//Positive Z
-	//	if (positiveZ)
-	//	{
-	//		if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, diff.z * 10)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 10.f, diff.z * 10)), m_charList, m_GOList, false))
-	//		{
-	//			collided = true;
-	//		}
-	//	}
-	//	//Negative Z
-	//	else if(negativeZ)
-	//	{
-	//		if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, diff.z * 10)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 10.f, diff.z * 10)), m_charList, m_GOList, false))
-	//		{
-	//			collided = true;
-	//		}
-	//	}
-
-	//	//Positive X
-	//	if (positiveX)
-	//	{
-	//		if (collisionChecking(Vector3(Position + Vector3(diff.x * 10, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(diff.x * 10, 10.f, 0.f)), m_charList, m_GOList, false))
-	//		{
-	//			collided = true;
-	//		}
-	//	}
-	//	//Negative X
-	//	else if(negativeX)
-	//	{
-	//		if (collisionChecking(Vector3(Position + Vector3(diff.x * 10, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(diff.x * 10, 10.f, 0.f)), m_charList, m_GOList, false))
-	//		{
-	//			collided = true;
-	//		}
-	//	}
-
-		/*if (Velocity.x != 0)
+	switch (e_State)
+	{
+	case WALKING:
 		{
-		float SForceX = 0 - Velocity.x;
-		Velocity.x += SForceX * 0.1f;
+			//Have the AI partol a certain area
+			//Need Pathfinding i think
+
+			if (isVisible(Position, Lookat, 60, playerPos))
+			{
+				//If player is infront and near player, then ai will switch to attack state
+				if ((playerPos - Position).LengthSquared() < 400)
+				{
+					e_State = ATTACK;
+				}
+				//if ai saw player but is too far way, the ai will investigate
+				else
+				{
+					destination = playerPos;
+					e_State = ALERT;
+				}
+			}
 		}
+		break;
 
-		if (Velocity.z != 0)
+	case ALERT:
 		{
-		float SForceZ = 0 - Velocity.z;
-		Velocity.z += SForceZ * 0.1f;
-		}*/
+			//AI will move towards the destination
+			if (Position != destination)
+			{
+				//Move the ai towards the destination
+			}
+			//If ai is at destination
+			else
+			{
+				static float alertTime = 5.f;
 
+				if (f_alert_timer < alertTime)
+				{
+					f_alert_timer += dt;
+				}
+				else
+				{
+					//Alert enemy within a small radius
+					for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
+					{
+						CharacterObject * CO = (CharacterObject*)*it;
+						AI *ai = dynamic_cast<AI*>(CO);
+						if (ai->getPosition() != Position)
+						{
+							if ((Position - ai->getPosition()).LengthSquared() < 100)
+							{
+								ai->e_State = ATTACK;
+							}
+						}
+					}
+					e_State = ATTACK;
+					f_alert_timer = 0;
+				}
+			}
+
+			//If player is infront and near player, then ai will switch to attack state
+			if (isVisible(Position, Lookat, 60, playerPos) && (playerPos - Position).LengthSquared() < 400)
+			{
+				e_State = ATTACK;
+			}
+
+			//if player have escaped ai, cooldown first before returning to walking
+			if (b_aiCooldown)
+			{
+				static float cooldownTiming = 5.f;
+
+				if (f_cooldownTime < 5.f)
+				{
+					f_cooldownTime += dt;
+				}
+				else
+				{
+					e_State = WALKING;
+					f_cooldownTime = 0.f;
+					b_aiCooldown = false;
+				}
+			}
+		}
+		break;
+
+	case ATTACK:
+		{
+			Lookat = playerPos;
+
+			//if enemy is holding a weapon
+			if (holding != NULL)
+			{
+				//Enemy is holding a gun
+				if (holding->isGun)
+				{
+					//Make enemy move a certain distance away from the enemy before shooting
+				}
+			}
+			//Enemy is not holding a weapon
+			else
+			{
+				if ((playerPos - Position).LengthSquared() > 400)
+				{
+					//make the enemy move closer to the nemy before attacking
+				}
+			}
+
+			//AI return to alert state if player have avoided enemy
+			if ((Position - playerPos).LengthSquared() > 10000)
+			{
+				b_aiCooldown = true;
+				e_State = ALERT;
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
 
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
@@ -517,132 +501,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	Animation.Update(dt, Velocity.LengthSquared());
 	Lookat += Velocity * 10 * static_cast<float>(dt);
 	Position += Velocity * 10 * static_cast<float>(dt);
-	
-	////=============Positive X Velocity=============//
-	//if (collided == false)
-	//{
-	//	if (collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(10.f, 30.f, 0.f)), m_charList, m_GOList, false))
-	//	{
-	//		//First if statement is to check against Character Object - AI
-	//		//Position.x = Position.x +  offset * static_cast<float>(dt);
-	//		if (Velocity.x > 0)
-	//		{
-	//			Velocity.x = 0;
-	//		}
-
-	//		//SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList));
-	//	}
-	//	else if (collisionChecking(Vector3(Position + Vector3(10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(10.f, 50.f, 0.f)), m_charList, m_GOList))
-	//	{
-	//		//Else if is to check against GameObject - Walls
-	//		if (Velocity.x > 0)
-	//		{
-	//			Velocity.x = 0;
-	//		}
-	//		std::cout << "Positive X" << std::endl;
-
-	//	}
-
-	//	//=============Positive Z Velocity=============//
-	//	if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, 10.f)), m_charList, m_GOList, false))
-	//	{
-	//		//Position.z = Position.z +  offset * static_cast<float>(dt);
-	//		if (Velocity.z > 0)
-	//		{
-	//			Velocity.z = 0;
-	//		}
-	//	}
-	//	else if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, 10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, 10.f)), m_charList, m_GOList))
-	//	{
-	//		if (Velocity.z > 0)
-	//		{
-	//			Velocity.z = 0;
-
-	//			Lookat = rotating * Lookat;
-	//			Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
-	//		}
-	//		std::cout << "Positive Z" << std::endl;
-	//	}
-
-	//	//=============Negative X Velocity=============//
-	//	if (collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(-10.f, 30.f, 0.f)), m_charList, m_GOList, false))
-	//	{
-	//		//Position.x = Position.x - offset * static_cast<float>(dt);
-	//		if (Velocity.x < 0)
-	//		{
-	//			Velocity.x = 0;
-	//		}
-	//	}
-	//	else if (collisionChecking(Vector3(Position + Vector3(-10.f, 10.f, 0.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(-10.f, 50.f, 0.f)), m_charList, m_GOList))
-	//	{
-	//		if (Velocity.x < 0)
-	//		{
-	//			Velocity.x = 0;
-	//		}
-	//		std::cout << "Negative X" << std::endl;
-	//	}
-
-	//	//=============Negative Z Velocity=============//
-	//	if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList, false) || collisionChecking(Vector3(Position + Vector3(0.f, 30.f, -10.f)), m_charList, m_GOList, false))
-	//	{
-	//		//Position.z = Position.z - offset * static_cast<float>(dt);
-	//		if (Velocity.z < 0)
-	//		{
-	//			Velocity.z = 0;
-	//		}
-	//	}
-	//	else if (collisionChecking(Vector3(Position + Vector3(0.f, 10.f, -10.f)), m_charList, m_GOList) || collisionChecking(Vector3(Position + Vector3(0.f, 50.f, -10.f)), m_charList, m_GOList))
-	//	{
-	//		if (Velocity.z < 0)
-	//		{
-	//			Velocity.z = 0;
-	//		}
-	//		std::cout << "Negative Z" << std::endl;
-	//	}
-	//}
-
-	//	
-
-	/*static float offset = 40.f;
-	Mtx44 rotation;
-	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
-	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, 0.f, 200.f);
-	L = rotation * Vector3(-20.f, 0.f, 150.f);
-	R = rotation * Vector3(20.f, 0.f, 150.f);*/
-	/*static float test = 0.f;
-	if (test < 1.f)
-	test += dt;
-	else
-	test = 1.f;
-	if (Application::IsKeyPressed(VK_UP) && test >= 1.f)
-	{
-	std::cout << Lookat << std::endl;
-	Lookat = rotating * Lookat;
-	std::cout << Lookat << std::endl;
-	test = 0.f;
-	}*/
-
-
-	//if (Velocity.x != 0)
-	//{
-	//	float SForceX = 0 - Velocity.x;
-	//	Velocity.x += SForceX * 0.1f;
-	//}
-
-	//if (Velocity.z != 0)
-	//{
-	//	float SForceZ = 0 - Velocity.z;
-	//	Velocity.z += SForceZ * 0.1f;
-	//}
-
-
-	////if((Position - playerPos).LengthSquared() > 400)
-	//Animation.Update(dt, Velocity.LengthSquared() * 0.03);
-	//Lookat += Velocity * static_cast<float>(dt);
-	//Position += Velocity * static_cast<float>(dt);
-	//else
-	//Velocity = 0;
 }
 
 /******************************************************************************/
@@ -683,23 +541,6 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<CharacterObject *> &m_charL
 			{
 				if (intersect(CO->getPosition() + Vector3(5, 5, 5), CO->getPosition() - Vector3(5, 5, 5), Position))
 				{
-					//Offset the AI's position so as to prevent Loop collision
-					if (movingByPositive_z())
-					{
-						Position = Position - Vector3(0, 0, 6);
-					}
-					else if (movingByNegative_z())
-					{
-						Position = Position + Vector3(0, 0, 6);
-					}
-					else if (movingByPositive_x())
-					{
-						Position = Position - Vector3(6, 0, 0);
-					}
-					else if (movingByNegative_x())
-					{
-						Position = Position + Vector3(6, 0, 0);
-					}
 					return true;
 				}
 
