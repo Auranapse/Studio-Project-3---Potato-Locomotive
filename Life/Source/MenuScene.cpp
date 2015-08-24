@@ -185,9 +185,9 @@ void MenuScene::InitMenu(void)
 	v3_Menupos[E_M_SPLASH].Set(-100, -100, 0);
 	v3_Menupos[E_M_MAIN].Set(0, 0, 0);
 	v3_Menupos[E_M_LOADING] = v3_Menupos[E_M_MAIN];
-	v3_Menupos[E_M_OPTIONS].Set(0, 1000, 0);
-	v3_Menupos[E_M_OPTIONS_CONTROLS].Set(200, 1000, 0);
-	v3_Menupos[E_M_OPTIONS_CONTROLS_SETCONTROL].Set(200, 2000, 0);
+	v3_Menupos[E_M_OPTIONS].Set(0, 2000, 0);
+	v3_Menupos[E_M_OPTIONS_CONTROLS].Set(4000, 2000, 0);
+	v3_Menupos[E_M_OPTIONS_CONTROLS_SETCONTROL].Set(4000, 4000, 0);
 
 	transcomplete = false;
 
@@ -1044,10 +1044,10 @@ void MenuScene::RenderTextButtons(void)
 	for (unsigned i = 0; i < v_buttonList.size(); ++i)
 	{
 		TextButton *S_MB = v_buttonList[i];
-		if (S_MB->gamestate == MENU_STATE)
+		if (S_MB->gamestate == MENU_STATE || S_MB->gamestate == PREV_STATE)
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(v3_Menupos[MENU_STATE]);
+			modelStack.Translate(v3_Menupos[S_MB->gamestate]);
 			modelStack.Translate(S_MB->pos);
 			modelStack.Scale(S_MB->scale);
 			RenderTextOnScreen(P_meshArray[E_GEO_TEXT], S_MB->text, S_MB->color);
