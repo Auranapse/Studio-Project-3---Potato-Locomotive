@@ -80,6 +80,8 @@ class MenuScene : public Scene
 		E_GEO_LOADING_BACKGROUND,
 		E_GEO_MATRIX,
 		// -----------------------
+		E_GEO_BUTTON,
+
 		E_GEO_TOTAL,
 	};
 	
@@ -141,6 +143,14 @@ class MenuScene : public Scene
 		E_M_OPTIONS_CONTROLS,
 		E_M_OPTIONS_CONTROLS_SETCONTROL,
 		E_M_TOTAL,
+	};
+
+	enum E_BUTTON_ID
+	{
+		BI_FOV_INCREASE,
+		BI_FOV_DECREASE,
+		BI_SENSITIVITY_INCREASE,
+		BI_SENSITIVITY_DECREASE,
 	};
 
 	struct CONTROL_CHANGE_BUTTON
@@ -256,11 +266,12 @@ private:
 	// UI
 	/******************************************************************************/
 	/*!
-	float f_LogoScreenTimer:
-	\brief	timer for splash screen
+	float f_timer:
+	\brief
+	menu timer
 	*/
 	/******************************************************************************/
-	float f_LogoScreenTimer;
+	float f_timer;
 
 	/******************************************************************************/
 	/*!
@@ -298,10 +309,15 @@ private:
 	E_MENU_STATE PREV_STATE;
 
 	Color UIColor, UIColorPressed;
-	std::vector<TextButton*> v_buttonList;
-	TextButton* FetchBUTTON(std::string name);
+	std::vector<TextButton*> v_textButtonList;
+	TextButton* FetchTB(std::string name);
 	void UpdateTextButtons(void);
 	void RenderTextButtons(void);
+
+	std::vector<Button*> v_buttonList;
+	Button* FetchBUTTON(int ID);
+	void UpdateButtons(void);
+	void RenderButtons(void);
 
 	bool transcomplete;
 	Vector3 v3_Menupos[E_M_TOTAL];
@@ -324,7 +340,7 @@ private:
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextCenter(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color);
-	void RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+	void RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
 	void RenderMesh(Mesh *mesh, bool enableLight);
 	void RenderMeshOnScreen(Mesh* mesh, float Glow = 0, Color GlowColor = Color(1.f, 0.f, 0.f));
 

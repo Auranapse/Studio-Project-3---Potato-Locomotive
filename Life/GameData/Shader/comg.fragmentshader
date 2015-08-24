@@ -176,6 +176,6 @@ void main(){
 	{
 		temp = glow;
 		temp = temp / 10;
-		color = mix(color, vec4(glowColor.r, glowColor.g, glowColor.b, 1), temp);
+		color = mix(color, vec4(glowColor.r, glowColor.g, glowColor.b, color.a), temp);
 	}
 }

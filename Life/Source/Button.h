@@ -12,6 +12,7 @@ menu button
 
 #include "Vector3.h"
 #include "Mesh.h"
+#include "Vertex.h"
 
 struct Button
 {
@@ -24,12 +25,16 @@ struct Button
 	Button();
 	~Button();
 
+	bool active;
+
+	Color color;
 	E_LABEL_TYPE labeltype;
 	std::string label;
 
 	Vector3 Position;
 	Vector3 Scale;
 	int gamestate;
+	int ID;
 
 	Mesh *mesh;
 };
