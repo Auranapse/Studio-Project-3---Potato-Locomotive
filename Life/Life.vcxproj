@@ -118,6 +118,7 @@
     <ClCompile Include="Source\Ray.cpp" />
     <ClCompile Include="Source\Room.cpp" />
     <ClCompile Include="Source\SaveHandler.cpp" />
+    <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\SecurityCam.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\Shape.cpp" />
