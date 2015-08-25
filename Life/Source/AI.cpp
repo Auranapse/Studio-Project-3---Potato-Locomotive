@@ -77,13 +77,19 @@ if true will move forward, else back
 /******************************************************************************/
 void AI::movementFB(double &dt, bool forward)
 {
+	Mtx44 rotation;
+
 	if (forward)
 	{
 		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(720 * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -95,22 +101,26 @@ moves AI left/right
 if true will move left, else right
 */
 /******************************************************************************/
-void AI::movementLR(double &dt, bool left)
+void AI::movementLR(double &dt, bool left, float rotation_speed)
 {
 	Mtx44 rotation;
 	if (left == true)
 	{
-		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * dt;
-		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(-rotation_speed * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
 
 	else
 	{
-		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * dt;
-		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(rotation_speed * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -127,46 +137,36 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
-		movementLR(dt, false);
-		left = false;
-		mid = false;
-		right = false;
+		movementLR(dt, false, 720.f);
 	}
 
 	//when left has nothing to collide
 	else if (left == false && mid == true && right == true)
 	{
-		movementLR(dt, true);
-		left = false;
-		mid = false;
-		right = false;
+		movementLR(dt, true, 720.f);
 	}
 
 	//when middle has nothing to collide
 	else if (left == true && mid == false && right == true)
 	{
 		movementFB(dt, true);
-		left = false;
-		mid = false;
-		right = false;
 	}
 
+	//if none of the sensors are colliding... just move forward
 	else if (left == false && mid == false && right == false)
 	{
 		movementFB(dt, true);
 	}
 
+	//set rand inside to do a 50 - 50 chance to go left or right
 	else if (left == true && mid == true && right == true)
 	{
 		movementFB(dt, false);
-		left = false;
-		mid = false;
-		right = false;
 	}
-	/*else
+	else
 	{
 		movementFB(dt, true);
-	}*/
+	}
 }
 
 bool AI::movingByPositive_x()
@@ -423,9 +423,9 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
 	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, 10.f, 10.f);
-	L = rotation * Vector3(5.f, 10.f, 5.f);
-	R = rotation * Vector3(5.f, 10.f, 5.f);
+	C = rotation * Vector3(0.f, ModelPos.y, 60.f);
+	L = rotation * Vector3(-20.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(20.f, ModelPos.y, 15.f);
 
 	SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
 	
@@ -611,23 +611,6 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<CharacterObject *> &m_charL
 			{
 				if (intersect(CO->getPosition() + Vector3(5, 5, 5), CO->getPosition() - Vector3(5, 5, 5), Position))
 				{
-					//Offset the AI's position so as to prevent Loop collision
-					if (movingByPositive_z())
-					{
-						Position = Position - Vector3(0, 0, 6);
-					}
-					else if (movingByNegative_z())
-					{
-						Position = Position + Vector3(0, 0, 6);
-					}
-					else if (movingByPositive_x())
-					{
-						Position = Position - Vector3(6, 0, 0);
-					}
-					else if (movingByNegative_x())
-					{
-						Position = Position + Vector3(6, 0, 0);
-					}
 					return true;
 				}
 

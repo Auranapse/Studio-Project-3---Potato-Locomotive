@@ -41,7 +41,7 @@ public:
 
 	void movementRW(bool run = true);
 	void movementFB(double &dt, bool forward = true);
-	void movementLR(double &dt, bool left = true);
+	void movementLR(double &dt, bool left = true, float rotation_speed = 90.f);
 
 	void SensorUpdate(double &dt, bool left = false, bool middle = false, bool right = false);
 	virtual void Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList);
