@@ -83,13 +83,19 @@ if true will move forward, else back
 /******************************************************************************/
 void AI::movementFB(double &dt, bool forward)
 {
+	Mtx44 rotation;
+
 	if (forward)
 	{
 		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Velocity -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(720 * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -101,22 +107,26 @@ moves AI left/right
 if true will move left, else right
 */
 /******************************************************************************/
-void AI::movementLR(double &dt, bool left)
+void AI::movementLR(double &dt, bool left, float rotation_speed)
 {
 	Mtx44 rotation;
 	if (left == true)
 	{
-		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * static_cast<float>(dt);
-		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(-rotation_speed * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
 
 	else
 	{
-		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * static_cast<float>(dt);
-		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		Lookat = Lookat - Position;
+		rotation.SetToRotation(rotation_speed * dt, 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + Position;
+		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -133,219 +143,36 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
-		movementLR(dt, false);
-		left = false;
-		mid = false;
-		right = false;
+		movementLR(dt, false, 720.f);
 	}
 
 	//when left has nothing to collide
 	else if (left == false && mid == true && right == true)
 	{
-		movementLR(dt, true);
-		left = false;
-		mid = false;
-		right = false;
+		movementLR(dt, true, 720.f);
 	}
 
 	//when middle has nothing to collide
 	else if (left == true && mid == false && right == true)
 	{
 		movementFB(dt, true);
-		left = false;
-		mid = false;
-		right = false;
 	}
 
+	//if none of the sensors are colliding... just move forward
 	else if (left == false && mid == false && right == false)
 	{
 		movementFB(dt, true);
 	}
 
+	//set rand inside to do a 50 - 50 chance to go left or right
 	else if (left == true && mid == true && right == true)
 	{
 		movementFB(dt, false);
-		left = false;
-		mid = false;
-		right = false;
 	}
-	/*else
+	else
 	{
 		movementFB(dt, true);
-	}*/
-}
-
-
-/******************************************************************************/
-/*!
-\brief
-Return true if the enemy's direction is positive x
-*/
-/******************************************************************************/
-bool AI::movingByPositive_x()
-{
-	if (positiveX == true && negativeX == false && negativeZ == false && positiveZ == false)
-	{
-		return true;
 	}
-	return false;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Return true if the enemy's direction is positive z
-*/
-/******************************************************************************/
-bool AI::movingByPositive_z()
-{
-	if (positiveX == false && negativeX == false && negativeZ == false && positiveZ == true)
-	{
-		return true;
-	}
-	return false;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Return true if the enemy's direction is negative x
-*/
-/******************************************************************************/
-bool AI::movingByNegative_x()
-{
-	if (positiveX == false && negativeX == true && negativeZ == false && positiveZ == false)
-	{
-		return true;
-	}
-	return false;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Return true if the enemy's direction is negative z
-*/
-/******************************************************************************/
-bool AI::movingByNegative_z()
-{
-	if (positiveX == false && negativeX == false && negativeZ == true && positiveZ == false)
-	{
-		return true;
-	}
-	return false;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Set the enemy direction to positive x
-*/
-/******************************************************************************/
-void AI::setPositive_x()
-{
-	positiveX = true;
-	positiveZ = false;
-	negativeX = false;
-	negativeZ = false;
-
-	diff = Vector3(1, 0, 0);
-}
-
-/******************************************************************************/
-/*!
-\brief
-Set the enemy direction to positive z
-*/
-/******************************************************************************/
-void AI::setPositive_z()
-{
-	positiveX = false;
-	positiveZ = true;
-	negativeX = false;
-	negativeZ = false;
-
-	diff = Vector3(0, 0, 1);
-}
-
-/******************************************************************************/
-/*!
-\brief
-Set the enemy direction to negative x
-*/
-/******************************************************************************/
-void AI::setNegative_x()
-{
-	positiveX = false;
-	positiveZ = false;
-	negativeX = true;
-	negativeZ = false;
-
-	diff = Vector3(-1, 0, 0);
-}
-
-/******************************************************************************/
-/*!
-\brief
-Set the enemy direction to negative z
-*/
-/******************************************************************************/
-void AI::setNegative_z()
-{
-	positiveX = false;
-	positiveZ = false;
-	negativeX = false;
-	negativeZ = true;
-
-	diff = Vector3(0, 0, -1);
-}
-
-/******************************************************************************/
-/*!
-\brief
-Rotate the enemy's Lookat in the clockwise direction(-90 degree)
-*/
-/******************************************************************************/
-void AI::rotateAi_Clockwise()
-{
-	Mtx44 rotation;
-	rotation.SetToRotation(-90, 0, 1, 0);
-
-	Lookat = rotation * Lookat;
-
-	Velocity = rotation * Velocity;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Rotate the enemy's Lookat in the counter clockwise direction(90 degree)
-*/
-/******************************************************************************/
-void AI::rotateAI_CounterClockWise()
-{
-	Mtx44 rotation;
-	rotation.SetToRotation(90, 0, 1, 0);
-
-	Lookat = rotation * Lookat;
-
-	Velocity = rotation * Velocity;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Rotate the enemy's Lookat by 180 degree
-*/
-/******************************************************************************/
-void AI::rotateAI_180()
-{
-	Mtx44 rotation;
-	rotation.SetToRotation(180, 0, 1, 0);
-
-	Lookat = rotation * Lookat;
-
-	Velocity = rotation * Velocity;
 }
 
 
@@ -561,9 +388,9 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
 	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, 10.f, 10.f);
-	L = rotation * Vector3(5.f, 10.f, 5.f);
-	R = rotation * Vector3(5.f, 10.f, 5.f);
+	C = rotation * Vector3(0.f, ModelPos.y, 60.f);
+	L = rotation * Vector3(-20.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(20.f, ModelPos.y, 15.f);
 
 	SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
 
