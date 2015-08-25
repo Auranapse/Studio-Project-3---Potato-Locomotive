@@ -73,6 +73,30 @@
     <Filter Include="Header Files\Controls">
       <UniqueIdentifier>{2f209375-6701-4112-8770-5009e857b911}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Collision">
+      <UniqueIdentifier>{5a1605f9-2067-4dd6-bc33-50864f9d36a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Collision">
+      <UniqueIdentifier>{a4e54329-d218-4c2b-811f-46d203f0877b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets">
+      <UniqueIdentifier>{b35c5a90-526d-4405-9500-9e137191fb9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets">
+      <UniqueIdentifier>{09b03a97-b77d-42a1-9c32-3be6d98942ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Living">
+      <UniqueIdentifier>{3b73fbfa-3b63-4a35-8ae6-6d58dd8368d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\NonLiving">
+      <UniqueIdentifier>{9bc283ce-ccef-4cab-a29c-1eaafcfd8b2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Living">
+      <UniqueIdentifier>{f1cff395-9d84-461c-973c-3e21452ea97b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\NonLiving">
+      <UniqueIdentifier>{2ddf455c-cb7a-4291-a0b6-30f9b4d44fb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -165,13 +189,7 @@
     <ClCompile Include="Source\ItemObject.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Collision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SecurityCam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CollisionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\SaveHandler.cpp">
@@ -182,6 +200,51 @@
     </ClCompile>
     <ClCompile Include="Source\Button.cpp">
       <Filter>Source Files\Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shape.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sphere.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AABB.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ray.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Plane.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CollisionBox.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Collision.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Asset.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Enemy.cpp">
+      <Filter>Source Files\Assets\Living</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Living.cpp">
+      <Filter>Source Files\Assets\Living</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Projectile.cpp">
+      <Filter>Source Files\Assets\Living</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NonLiving.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Room.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SoundRange.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SoundEngine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,13 +347,7 @@
     <ClInclude Include="Source\ItemObject.h">
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Collision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SecurityCam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CollisionBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SaveHandler.h">
@@ -304,6 +361,54 @@
     </ClInclude>
     <ClInclude Include="Source\Button.h">
       <Filter>Header Files\Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shape.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sphere.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AABB.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Ray.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Plane.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CollisionBox.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision.h">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Asset.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NonLiving.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Room.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SoundRange.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Enemy.h">
+      <Filter>Header Files\Assets\Living</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Living.h">
+      <Filter>Header Files\Assets\Living</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Projectile.h">
+      <Filter>Header Files\Assets\Living</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SoundEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

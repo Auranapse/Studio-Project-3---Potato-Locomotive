@@ -210,6 +210,41 @@ Vector3& Vector3::operator*=( float scalar )
 	return *this;
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+operator* overload for scalar division
+
+\param scalar - float to divide with
+ 
+\exception None
+\return Resulting vector
+*/
+Vector3 Vector3::operator/( float scalar ) const
+{
+	return Vector3(scalar / x, scalar / y, scalar / z);
+}
+
+/******************************************************************************/
+/*!
+\brief
+operator*= overload for scalar division and assignment
+
+\param scalar
+	float to divide with
+\return 
+	Resulting vector
+*/
+/******************************************************************************/
+Vector3& Vector3::operator/=( float scalar )
+{
+	x /= scalar;
+	y /= scalar;
+	z /= scalar;
+	return *this;
+}
+
 /******************************************************************************/
 /*!
 \brief

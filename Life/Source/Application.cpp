@@ -57,7 +57,6 @@ Define an error callback
 \param description - The error description
 */
 /******************************************************************************/
-
 static void error_callback(int error, const char* description)
 {
 	fputs(description, stderr);

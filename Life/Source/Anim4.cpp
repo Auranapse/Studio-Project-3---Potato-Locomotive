@@ -12,7 +12,8 @@ Struct to store arms and legs rotation
 
 /******************************************************************************/
 /*!
-\brief	Anim4 default constructor
+\brief
+Anim4 default constructor
 
 \param	a
 Left Arm
@@ -31,7 +32,8 @@ Anim4::Anim4(float a, float b, float c, float d) : LEFT_ARM(a), RIGHT_ARM(b), LE
 
 /******************************************************************************/
 /*!
-\brief	Anim4 default destructor
+\brief
+Anim4 default destructor
 */
 /******************************************************************************/
 Anim4::~Anim4()

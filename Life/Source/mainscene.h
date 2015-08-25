@@ -10,8 +10,6 @@ Main scene
 #ifndef MAINSCENE_H
 #define MAINSCENE_H
 
-#include <irrKlang.h>
-#include <ik_ISoundEffectControl.h>
 #include <vector>
 #include <iostream>
 #include "Scene.h"
@@ -40,6 +38,11 @@ Main scene
 #include "Player.h"
 #include "AI.h"
 #include "SecurityCam.h"
+#include "SoundEngine.h"
+
+
+#include "SceneManager.h"
+
 
 /******************************************************************************/
 /*!
@@ -79,6 +82,8 @@ class mainscene : public Scene
 		GEO_MP5K,
 		GEO_SPAS12,
 		GEO_KATANA,
+		//Objects
+		GEO_ITEM_SYRINGE,
 
 		//------------------------
 		//EFFECTS/OTHERS
@@ -286,6 +291,7 @@ class mainscene : public Scene
 	{
 		GS_PLAY,
 		GS_PAUSED,
+		GS_DEATH,
 		GS_END,
 	};
 
@@ -394,7 +400,6 @@ private:
 	Particle* FetchParticle(void);
 	BulletInfo* FetchBullet(void);
 
-	void PlaySound2D(irrklang::ISoundSource *source);
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
 	void UpdatePlayerPower(double &dt);
@@ -423,10 +428,10 @@ private:
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color glowColor = Color(1, 0, 0), Material *material = NULL);
 	void RenderSkybox(void);
 	void RenderUI(void);
-	bool collide(Vector3 &Position, bool bullet = false);
+	bool collide(Vector3 &Position);
 	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;
-	irrklang::ISoundEngine* engine;
+	SoundEngine SE_Engine;
 };
 
 #endif

@@ -55,7 +55,13 @@ Assigns file to values
 void MenuScene::assignsave(bool save)
 {
 	SH_1.assign(f_fov, 70.f, 1, save);
-	SH_1.assign(f_mouseSensitivity, 1.f, 2);
+	if (save)
+	{
+		f_mouseSensitivity *= 100.f;
+	}
+
+	SH_1.assign(f_mouseSensitivity, 100.f, 2, save);
+	f_mouseSensitivity *= 0.01f;
 	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3, save);
 	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4, save);
 	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5, save);
@@ -69,9 +75,6 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
 	
-	float test = 0.f;
-	SH_1.assign(test, 1337.f, 15, save);
-
 	SH_1.saveData();
 }
 
@@ -541,7 +544,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 		transcomplete = false;
 
 		Vector3 diff = v3_Menupos[MENU_STATE] - v3_MenuCam;
-		v3_MenuCam += diff * static_cast<float>(dt) * 6.f;
+		v3_MenuCam += diff * static_cast<float>(dt) * 10.f;
 
 		if (diff.x < 0.15f && diff.y < 0.15f && diff.x > -0.15f && diff.y > -0.15f)
 		{
@@ -1134,7 +1137,7 @@ Renders a mesh on screen
 /******************************************************************************/
 void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 {
-	glUniform1i(u_m_parameters[U_UNI_GLOW], Glow);
+	glUniform1i(u_m_parameters[U_UNI_GLOW], static_cast<GLint>(Glow));
 	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
 
 
@@ -1390,14 +1393,22 @@ void MenuScene::Exit()
 	while (v_textButtonList.size() > 0)
 	{
 		TextButton *S_MB = v_textButtonList.back();
-		delete S_MB;
+		if (S_MB != NULL)
+		{
+			delete S_MB;
+		}
+		S_MB = NULL;
 		v_textButtonList.pop_back();
 	}
 
 	while (v_buttonList.size() > 0)
 	{
 		Button *m_B = v_buttonList.back();
-		delete m_B;
+		if (m_B != NULL)
+		{
+			delete m_B;
+		}
+		m_B = NULL;
 		v_buttonList.pop_back();
 	}
 
@@ -1407,6 +1418,7 @@ void MenuScene::Exit()
 		{
 			delete P_meshArray[i];
 		}
+		P_meshArray[i] = NULL;
 	}
 
 	glDeleteVertexArrays(1, &u_m_vertexArrayID);

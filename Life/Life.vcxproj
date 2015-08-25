@@ -80,9 +80,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\AABB.cpp" />
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Anim4.cpp" />
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Asset.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
     <ClCompile Include="Source\Button.cpp" />
     <ClCompile Include="Source\CharacterObject.cpp" />
@@ -90,9 +92,11 @@
     <ClCompile Include="Source\CollisionBox.cpp" />
     <ClCompile Include="Source\CustomCam1.cpp" />
     <ClCompile Include="Source\DepthFBO.cpp" />
+    <ClCompile Include="Source\Enemy.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
     <ClCompile Include="Source\GBuffer.cpp" />
     <ClCompile Include="Source\ItemObject.cpp" />
+    <ClCompile Include="Source\Living.cpp" />
     <ClCompile Include="Source\LoadHmap.cpp" />
     <ClCompile Include="Source\mainscene.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
@@ -106,11 +110,20 @@
     <ClCompile Include="Source\MenuScene.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
+    <ClCompile Include="Source\NonLiving.cpp" />
     <ClCompile Include="Source\particle.cpp" />
+    <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\Projectile.cpp" />
+    <ClCompile Include="Source\Ray.cpp" />
+    <ClCompile Include="Source\Room.cpp" />
     <ClCompile Include="Source\SaveHandler.cpp" />
     <ClCompile Include="Source\SecurityCam.cpp" />
     <ClCompile Include="Source\shader.cpp" />
+    <ClCompile Include="Source\Shape.cpp" />
+    <ClCompile Include="Source\SoundEngine.cpp" />
+    <ClCompile Include="Source\SoundRange.cpp" />
+    <ClCompile Include="Source\Sphere.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
     <ClCompile Include="Source\Strategy.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
@@ -118,11 +131,25 @@
     <ClCompile Include="Source\WorldObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\Anim4.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Asset.h" />
     <ClInclude Include="Source\BulletInfo.h" />
     <ClInclude Include="Source\Button.h" />
+    <ClInclude Include="Source\Enemy.h" />
+    <ClInclude Include="Source\Living.h" />
+    <ClInclude Include="Source\NonLiving.h" />
+    <ClInclude Include="Source\Plane.h" />
+    <ClInclude Include="Source\Projectile.h" />
+    <ClInclude Include="Source\Ray.h" />
+    <ClInclude Include="Source\Room.h" />
+    <ClInclude Include="Source\SceneManager.h" />
+    <ClInclude Include="Source\Shape.h" />
+    <ClInclude Include="Source\SoundEngine.h" />
+    <ClInclude Include="Source\SoundRange.h" />
+    <ClInclude Include="Source\Sphere.h" />
     <ClInclude Include="Source\TextButton.h" />
     <ClInclude Include="Source\CharacterObject.h" />
     <ClInclude Include="Source\Collision.h" />

@@ -20,6 +20,11 @@ public:
 
 	bool isWeapon;
 	bool isGun;
+
+	Vector3 pos1;
+	Vector3 Rotation1;
+
+	virtual void Update(double &dt);
 };
 
 #endif

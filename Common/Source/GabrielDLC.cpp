@@ -63,6 +63,23 @@ bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
 /******************************************************************************/
 /*!
 \brief
+Check shortest distance from point to a line/plane
+\param point
+point away from plane
+\param pointPlane1
+point in Plane
+\param pointPlane2
+another point in Plane
+*/
+/******************************************************************************/
+float minDistance(Vector3 &point, Vector3 &pointPlane1, Vector3 &pointPlane2)
+{
+	return point.Dot(pointPlane1.Cross(pointPlane2));
+}
+
+/******************************************************************************/
+/*!
+\brief
 Calculates angle between vectors using their position
 \param Target
 the target object
