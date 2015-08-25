@@ -68,6 +68,10 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
+	
+	float test = 0.f;
+	SH_1.assign(test, 1337.f, 15, save);
+
 	SH_1.saveData();
 }
 
@@ -93,7 +97,7 @@ void MenuScene::Init()
 	InitShaders();
 	//Starting position of translations and initialize physics
 
-	f_LogoScreenTimer = 0;
+	f_timer = 0.f;
 	MousePosX = 0.f;
 	MousePosY = 0.f;
 	v3_MenuCam.SetZero();
@@ -155,6 +159,11 @@ Initializes the meshes that is in the P_meshArray
 /******************************************************************************/
 void MenuScene::InitMeshList()
 {
+	for (unsigned i = 0; i < E_GEO_TOTAL; ++i)
+	{
+		P_meshArray[i] = NULL;
+	}
+
 	P_meshArray[E_GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000, 10000, 10000);
 	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.8f, 0.8f, 0.8f), 10000, 1000, 10);
 	//Text
@@ -169,6 +178,9 @@ void MenuScene::InitMeshList()
 
 	P_meshArray[E_GEO_LOADING_BACKGROUND] = MeshBuilder::GenerateQuad("Loading Screen", Color(1.0f, 1.0f, 1.0f), static_cast<float>(Application::GetWindowWidth() / 2), static_cast<float>(Application::GetWindowHeight() / 2), 1.0f);
 	P_meshArray[E_GEO_LOADING_BACKGROUND]->textureID[0] = LoadTGA("GameData//Image//UI//Loading.tga", true);
+
+	P_meshArray[E_GEO_BUTTON] = MeshBuilder::GenerateQuad("Button Texture", Color(0.f, 0.f, 0.f), 1.f, 1.f, 1.0f);
+	P_meshArray[E_GEO_BUTTON]->textureID[0] = LoadTGA("GameData//Image//UI//Button.tga", true);
 }
 
 /******************************************************************************/
@@ -182,7 +194,7 @@ void MenuScene::InitMenu(void)
 	UIColor.Set(0.1f, 0.1f, 0.1f);
 	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
 
-	v3_Menupos[E_M_SPLASH].Set(-100, -100, 0);
+	v3_Menupos[E_M_SPLASH].Set(0, -2000, 0);
 	v3_Menupos[E_M_MAIN].Set(0, 0, 0);
 	v3_Menupos[E_M_LOADING] = v3_Menupos[E_M_MAIN];
 	v3_Menupos[E_M_OPTIONS].Set(0, 2000, 0);
@@ -198,36 +210,78 @@ void MenuScene::InitMenu(void)
 	S_MB->scale.Set(35, 35, 35);
 	S_MB->text = "Play";
 	S_MB->gamestate = E_M_MAIN;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 60.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Options";
 	S_MB->gamestate = E_M_MAIN;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 90.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Quit";
 	S_MB->gamestate = E_M_MAIN;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	//OPTIONS-----------------------------------------------------
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 100.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.5f - 40.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 140.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Toggle Fullscreen";
 	S_MB->gamestate = E_M_OPTIONS;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
+
+	Button *m_B;
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f, Application::GetWindowHeight()*0.6f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON];
+	m_B->ID = BI_FOV_DECREASE;
+	m_B->label = "-";
+	m_B->labeltype = Button::LT_BUTTON;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f + 60.f, Application::GetWindowHeight()*0.6f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON];
+	m_B->ID = BI_FOV_INCREASE;
+	m_B->label = "+";
+	m_B->labeltype = Button::LT_BUTTON;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f, Application::GetWindowHeight()*0.6f - 40.f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON];
+	m_B->ID = BI_SENSITIVITY_DECREASE;
+	m_B->label = "-";
+	m_B->labeltype = Button::LT_BUTTON;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f + 60.f, Application::GetWindowHeight()*0.6f - 40.f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON];
+	m_B->ID = BI_SENSITIVITY_INCREASE;
+	m_B->label = "+";
+	m_B->labeltype = Button::LT_BUTTON;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
 
 	//BACK BUTTONS------------------------------------------------
 	S_MB = new TextButton;
@@ -235,14 +289,14 @@ void MenuScene::InitMenu(void)
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Back";
 	S_MB->gamestate = E_M_OPTIONS;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
 	S_MB->pos.Set(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Back";
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	//Control changer---------------------------------------------
 	us_controlCB[E_CTRL_MOVE_FRONT].text = "Forward";
@@ -252,7 +306,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_FRONT].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_FRONT].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_BACK].text = "Backward";
 	S_MB = new TextButton;
@@ -261,7 +315,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_BACK].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_BACK].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_LEFT].text = "Left";
 	S_MB = new TextButton;
@@ -270,7 +324,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_LEFT].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_LEFT].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_RIGHT].text = "Right";
 	S_MB = new TextButton;
@@ -279,7 +333,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_RIGHT].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_RIGHT].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_SPRINT].text = "Sprint";
 	S_MB = new TextButton;
@@ -288,7 +342,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_SPRINT].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_SPRINT].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_WALK].text = "Walk";
 	S_MB = new TextButton;
@@ -297,7 +351,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_WALK].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_WALK].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_MOVE_JUMP].text = "Jump";
 	S_MB = new TextButton;
@@ -306,7 +360,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_MOVE_JUMP].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_MOVE_JUMP].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_INTERACT].text = "Interact";
 	S_MB = new TextButton;
@@ -315,7 +369,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_INTERACT].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_INTERACT].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_ATTACK].text = "Attack";
 	S_MB = new TextButton;
@@ -324,7 +378,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_ATTACK].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_ATTACK].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_THROW].text = "Throw";
 	S_MB = new TextButton;
@@ -333,7 +387,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_THROW].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_THROW].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_AIM].text = "Aim";
 	S_MB = new TextButton;
@@ -342,7 +396,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_AIM].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_AIM].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	us_controlCB[E_CTRL_ABILITY_1].text = "Ability 1";
 	S_MB = new TextButton;
@@ -351,7 +405,7 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_ABILITY_1].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_ABILITY_1].button = S_MB;
-	v_buttonList.push_back(S_MB);
+	v_textButtonList.push_back(S_MB);
 
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -366,9 +420,9 @@ void MenuScene::InitMenu(void)
 Gets the button
 */
 /******************************************************************************/
-TextButton* MenuScene::FetchBUTTON(std::string name)
+TextButton* MenuScene::FetchTB(std::string name)
 {
-	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_textButtonList.begin(); it != v_textButtonList.end(); ++it)
 	{
 		TextButton *S_MB = (TextButton *)*it;
 		if (S_MB != NULL)
@@ -386,12 +440,35 @@ TextButton* MenuScene::FetchBUTTON(std::string name)
 /******************************************************************************/
 /*!
 \brief
+Gets the button
+*/
+/******************************************************************************/
+Button* MenuScene::FetchBUTTON(int ID)
+{
+	for (std::vector<Button*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		Button *m_B = (Button *)*it;
+		if (m_B != NULL)
+		{
+			if (m_B->gamestate == MENU_STATE && m_B->ID == ID)
+			{
+				return m_B;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+/******************************************************************************/
+/*!
+\brief
 Update button state
 */
 /******************************************************************************/
 void MenuScene::UpdateTextButtons(void)
 {
-	for (std::vector<TextButton*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	for (std::vector<TextButton*>::iterator it = v_textButtonList.begin(); it != v_textButtonList.end(); ++it)
 	{
 		TextButton *S_MB = (TextButton *)*it;
 		if (S_MB->gamestate == MENU_STATE)
@@ -415,11 +492,39 @@ void MenuScene::UpdateTextButtons(void)
 /******************************************************************************/
 /*!
 \brief
+Update button state
+*/
+/******************************************************************************/
+void MenuScene::UpdateButtons(void)
+{
+	for (std::vector<Button*>::iterator it = v_buttonList.begin(); it != v_buttonList.end(); ++it)
+	{
+		Button *m_B = (Button *)*it;
+
+		Vector3 offset = v3_Menupos[MENU_STATE];
+
+		if (intersect2D(m_B->Position + offset + m_B->Scale, m_B->Position + offset - m_B->Scale, Vector3(MousePosX, MousePosY, 0)))
+		{
+			m_B->active = true;
+			m_B->color = UIColorPressed;
+		}
+		else
+		{
+			m_B->active = false;
+			m_B->color = UIColor;
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 Animations, controls
 */
 /******************************************************************************/
 void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update()
 {
+	f_timer += static_cast<float>(dt);
 	//Mouse Section
 	double x, y;
 	Application::GetMousePos(x, y);
@@ -429,6 +534,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 	static bool bLButtonState = false;
 
 	UpdateTextButtons();
+	UpdateButtons();
 
 	if (v3_MenuCam != v3_Menupos[MENU_STATE])
 	{
@@ -464,17 +570,17 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 		{
 			bLButtonState = false;
 
-			if (FetchBUTTON("Play")->active)
+			if (FetchTB("Play")->active)
 			{
 				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_LOADING;
 			}
-			else if (FetchBUTTON("Options")->active)
+			else if (FetchTB("Options")->active)
 			{
 				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_OPTIONS;
 			}
-			else if (FetchBUTTON("Quit")->active)
+			else if (FetchTB("Quit")->active)
 			{
 				e_nextScene = Application::E_SCENE_QUIT;
 			}
@@ -491,19 +597,47 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 		{
 			bLButtonState = false;
 
-			if (FetchBUTTON("Controls")->active)
+			if (FetchTB("Controls")->active)
 			{
 				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_OPTIONS_CONTROLS;
 			}
-			else if (FetchBUTTON("Toggle Fullscreen")->active)
+			else if (FetchTB("Toggle Fullscreen")->active)
 			{
 				Application::fullscreentoggle();
 			}
-			else if (FetchBUTTON("Back")->active)
+			else if (FetchTB("Back")->active)
 			{
 				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_MAIN;
+			}
+			else if (FetchBUTTON(BI_FOV_INCREASE)->active)
+			{
+				if (f_fov < 120)
+				{
+					f_fov += 5;
+				}
+			}
+			else if (FetchBUTTON(BI_FOV_DECREASE)->active)
+			{
+				if (f_fov > 45)
+				{
+					f_fov -= 5;
+				}
+			}
+			else if (FetchBUTTON(BI_SENSITIVITY_INCREASE)->active)
+			{
+				if (f_mouseSensitivity < 50)
+				{
+					f_mouseSensitivity += 0.1f;
+				}
+			}
+			else if (FetchBUTTON(BI_SENSITIVITY_DECREASE)->active)
+			{
+				if (f_mouseSensitivity > 0.1)
+				{
+					f_mouseSensitivity -= 0.1f;
+				}
 			}
 		}
 		break;
@@ -518,7 +652,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 		{
 			bLButtonState = false;
 
-			if (FetchBUTTON("Back")->active)
+			if (FetchTB("Back")->active)
 			{
 				PREV_STATE = MENU_STATE;
 				MENU_STATE = E_M_OPTIONS;
@@ -526,9 +660,9 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 
 			for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 			{
-				if (FetchBUTTON(us_controlCB[i].text) != NULL)
+				if (FetchTB(us_controlCB[i].text) != NULL)
 				{
-					if (FetchBUTTON(us_controlCB[i].text)->active)
+					if (FetchTB(us_controlCB[i].text)->active)
 					{
 						us_ControlChange = &us_control[i];
 						i_ControlChange = i;
@@ -542,7 +676,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 	}
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
-		for (size_t i = 0; i < VK_OEM_CLEAR; ++i)
+		for (size_t i = 1; i < VK_OEM_CLEAR; ++i)
 		{
 			if ((GetAsyncKeyState(i) & 0x8000))
 			{
@@ -570,9 +704,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 	}
 	case E_M_SPLASH:
 	{
-		f_LogoScreenTimer += static_cast<float>(dt);
-
-		if (f_LogoScreenTimer > 1.0f)
+		if (f_timer > 0.5f)
 		{
 			MENU_STATE = E_M_MAIN;
 		}
@@ -706,7 +838,7 @@ void MenuScene::UpdateFOV()
 	}
 
 	Mtx44 proj;
-	proj.SetToPerspective(f_fov, Application::GetWindowWidth()/Application::GetWindowHeight(), 0.1f, 10000.0f);
+	proj.SetToPerspective(f_fov, Application::GetWindowWidth() / Application::GetWindowHeight(), 0.1f, 10000.0f);
 	projectionStack.LoadMatrix(proj);
 }
 
@@ -1002,9 +1134,9 @@ Renders a mesh on screen
 /******************************************************************************/
 void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 {
-	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
+	glUniform1i(u_m_parameters[U_UNI_GLOW], Glow);
 	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
-	
+
 
 	glDisable(GL_DEPTH_TEST);
 	glUniform1i(u_m_parameters[E_UNI_LIGHTENABLED], 0);
@@ -1031,6 +1163,7 @@ void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(u_m_parameters[E_UNI_TEXT_ENABLED], 0);
 	glEnable(GL_DEPTH_TEST);
+	glUniform1i(u_m_parameters[U_UNI_GLOW], 0);
 }
 
 /******************************************************************************/
@@ -1041,16 +1174,45 @@ Renders the menu buttons
 /******************************************************************************/
 void MenuScene::RenderTextButtons(void)
 {
-	for (unsigned i = 0; i < v_buttonList.size(); ++i)
+	for (unsigned i = 0; i < v_textButtonList.size(); ++i)
 	{
-		TextButton *S_MB = v_buttonList[i];
-		if (S_MB->gamestate == MENU_STATE || S_MB->gamestate == PREV_STATE)
+		TextButton *S_MB = v_textButtonList[i];
+		if ((S_MB->gamestate == MENU_STATE || S_MB->gamestate == PREV_STATE) && S_MB->gamestate != E_M_LOADING)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(v3_Menupos[S_MB->gamestate]);
 			modelStack.Translate(S_MB->pos);
 			modelStack.Scale(S_MB->scale);
 			RenderTextOnScreen(P_meshArray[E_GEO_TEXT], S_MB->text, S_MB->color);
+			modelStack.PopMatrix();
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Renders the menu buttons
+*/
+/******************************************************************************/
+void MenuScene::RenderButtons(void)
+{
+	for (unsigned i = 0; i < v_buttonList.size(); ++i)
+	{
+		Button *m_B = v_buttonList[i];
+		if ((m_B->gamestate == MENU_STATE || m_B->gamestate == PREV_STATE) && m_B->gamestate != E_M_LOADING)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(v3_Menupos[m_B->gamestate]);
+			modelStack.Translate(m_B->Position);
+			modelStack.Scale(m_B->Scale);
+			RenderMeshOnScreen(P_meshArray[E_GEO_BUTTON], 10.f, m_B->color);
+
+			if (m_B->labeltype == Button::LT_BUTTON)
+			{
+				RenderTextCenterOnScreen(P_meshArray[E_GEO_TEXT], m_B->label, m_B->color);
+			}
+
 			modelStack.PopMatrix();
 		}
 	}
@@ -1097,24 +1259,23 @@ void MenuScene::Render()
 
 	viewStack.LookAt(
 		v3_MenuCam.x, v3_MenuCam.y, v3_MenuCam.z,
-		v3_MenuCam.x, v3_MenuCam.y, -1000000.f,
+		v3_MenuCam.x, v3_MenuCam.y, -100.f,
 		camera.up.x, camera.up.y, camera.up.z
 		);
 
 	modelStack.LoadIdentity();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(-2000, -2000, -10000);
+	modelStack.Translate(-2500, -2500, -10000);
+	modelStack.Rotate(f_timer, 1, 1, 1);
 	RenderMesh(P_meshArray[E_GEO_MATRIX], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(-v3_MenuCam);
 
-	/*modelStack.PushMatrix();
-	modelStack.Translate(static_cast<float>(Application::GetWindowWidth() * 0.5f), static_cast<float>(Application::GetWindowHeight() * 0.5f), 0);
-	RenderMeshOnScreen(P_meshArray[E_GEO_BACKGROUND]);
-	modelStack.PopMatrix();*/
+	RenderTextButtons();
+	RenderButtons();
 
 	switch (MENU_STATE)
 	{
@@ -1143,7 +1304,44 @@ void MenuScene::Render()
 	}
 	case E_M_OPTIONS:
 	{
+		modelStack.PushMatrix();
+		modelStack.Translate(v3_Menupos[MENU_STATE]);
 
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_FOV_DECREASE)->Position);
+		modelStack.Translate(-100, 0, 0);
+		modelStack.Scale(25, 25, 25);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "FOV", UIColor); 
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_FOV_INCREASE)->Position);
+		modelStack.Translate(50, 0, 0);
+		modelStack.Scale(25, 25, 25);
+
+		std::stringstream ss;
+		ss << f_fov;
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_DECREASE)->Position);
+		modelStack.Translate(-150, 0, 0);
+		modelStack.Scale(25, 25, 25);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "Mouse", UIColor);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_INCREASE)->Position);
+		modelStack.Translate(50, 0, 0);
+		modelStack.Scale(25, 25, 25);
+
+		ss.str("");
+		ss << (f_mouseSensitivity*100.f);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
+		modelStack.PopMatrix();
+		
+		modelStack.PopMatrix();
 		break;
 	}
 	case E_M_OPTIONS_CONTROLS:
@@ -1167,13 +1365,13 @@ void MenuScene::Render()
 	case E_M_OPTIONS_CONTROLS_SETCONTROL:
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(v3_MenuCam);
-		RenderTextCenterOnScreen(P_meshArray[E_GEO_TEXT], "Enter a key", UIColor, 50.f, Application::GetWindowWidth() * 0.5f, Application::GetWindowHeight() * 0.5f);
+		modelStack.Translate(v3_Menupos[MENU_STATE]);
+		RenderTextCenterOnScreen(P_meshArray[E_GEO_TEXT], "Enter a key", UIColor, 40.f, Application::GetWindowWidth() * 0.5f, Application::GetWindowHeight() * 0.5f);
 		modelStack.PopMatrix();
 		break;
 	}
 	}
-	RenderTextButtons();
+
 	modelStack.PopMatrix();
 }
 
@@ -1186,15 +1384,20 @@ Clears memory upon exit
 void MenuScene::Exit()
 {
 	assignsave(true);
-	glDeleteVertexArrays(1, &u_m_vertexArrayID);
-	glDeleteProgram(u_m_programID);
-
+	
 	delete[] P_lightsArray;
+
+	while (v_textButtonList.size() > 0)
+	{
+		TextButton *S_MB = v_textButtonList.back();
+		delete S_MB;
+		v_textButtonList.pop_back();
+	}
 
 	while (v_buttonList.size() > 0)
 	{
-		TextButton *S_MB = v_buttonList.back();
-		delete S_MB;
+		Button *m_B = v_buttonList.back();
+		delete m_B;
 		v_buttonList.pop_back();
 	}
 
@@ -1205,4 +1408,7 @@ void MenuScene::Exit()
 			delete P_meshArray[i];
 		}
 	}
+
+	glDeleteVertexArrays(1, &u_m_vertexArrayID);
+	glDeleteProgram(u_m_programID);
 }

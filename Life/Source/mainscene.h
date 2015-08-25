@@ -257,10 +257,8 @@ class mainscene : public Scene
 
 	enum SOUND_TYPE
 	{
-		ST_PANEL,
 		ST_STEP,
 		ST_STEP_2,
-		ST_KILL,
 		ST_BUZZER,
 		ST_ALERT,
 		ST_BACKGROUND,
@@ -276,6 +274,12 @@ class mainscene : public Scene
 		ST_CAMERA_FOUND,
 
 		ST_TOTAL,
+	};
+
+	enum POWER_TYPE
+	{
+		PT_SLOWMO,
+		PT_SUPERVISION,
 	};
 
 	enum GS_STATE
@@ -332,7 +336,6 @@ private:
 	Vector3 gravity_force;
 
 	irrklang::ISoundSource *soundList[ST_TOTAL];
-	bool slowmoentrance;
 
 	Mesh* meshList[NUM_GEOMETRY];
 	std::vector<SecurityCam*> m_ScamList;
@@ -364,8 +367,9 @@ private:
 	SaveHandler SH_1;
 	void assignSave(void);
 
+	float f_defaultfov;
 	float f_fov;
-	float f_currentfov;
+	float f_targetfov;
 	float FPScounter;
 	bool renderAxis;
 	bool mouseEnabled;
@@ -378,6 +382,12 @@ private:
 	float inputDelay;
 	int currentWeapon;
 
+	POWER_TYPE CurrentPower;
+	bool PowerActive;
+	float f_powerTint;
+	float f_powerTintSet;
+	Color c_powerColor;
+
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);
 	int currentLevel;
@@ -387,6 +397,7 @@ private:
 	void PlaySound2D(irrklang::ISoundSource *source);
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
+	void UpdatePlayerPower(double &dt);
 	void UpdateGO(double &dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type = Particle::PAR_DEFAULT, float lifetime = 5.f);
 	void UpdateParticles(double &dt);
@@ -401,7 +412,7 @@ private:
 	void editFOV(float &newFOV);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
-	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 10.f, float glow = 0.f, Color glowColor = Color(1, 0, 0));
+	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color glowColor = Color(1, 0, 0));
 
 	void initWeapons(void);
 
@@ -409,7 +420,7 @@ private:
 	void RenderCharacter(CharacterObject *CO);
 	void RenderParticles(void);
 	void RenderBullet(void);
-	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 10.f, float glow = 0.f, Color glowColor = Color(1, 0, 0), Material *material = NULL);
+	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color glowColor = Color(1, 0, 0), Material *material = NULL);
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position, bool bullet = false);

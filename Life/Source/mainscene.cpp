@@ -180,6 +180,11 @@ void mainscene::Init()
 		us_control[i] = 0;
 	}
 
+	for (unsigned i = 0; i < NUM_GEOMETRY; ++i)
+	{
+		meshList[i] = NULL;
+	}
+
 	f_mouseSensitivity = 1;
 
 	SH_1.init("GameData//ImportantData.GoddamnitQuen");
@@ -447,7 +452,8 @@ void mainscene::Init()
 
 	//Set projection matrix to perspective mode
 	editFOV(f_fov);
-	f_currentfov = f_fov;
+	f_targetfov = f_fov;
+	f_defaultfov = f_fov;
 
 	//Generate meshes------------------------------------------------------------------------
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
@@ -472,7 +478,7 @@ void mainscene::Init()
 
 	//WEAPONS
 
-	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 6, 6, 0.53f);
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 4, 4, 0.53f);
 
 	meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
 	meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
@@ -590,10 +596,16 @@ void mainscene::Init()
 	loadLevel(currentLevel);
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
-	gravity_force.Set(0.f, -9.82f * 20, 0.f);
+	gravity_force.Set(0.f, -9.82f * 25, 0.f);
 
 	InitMenus();
 	initWeapons();
+
+	PowerActive = false;
+	CurrentPower = PT_SLOWMO;
+	f_powerTint = 0.f;
+	f_powerTintSet = f_powerTint;
+
 
 	inputDelay = 0.f;
 	timer = 0.f;
@@ -605,12 +617,8 @@ void mainscene::Init()
 	soundList[ST_SLOWMO_ENTER] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_enter.mp3", ESM_AUTO_DETECT, true);
 	soundList[ST_SLOWMO_EXIT] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_exit.mp3", ESM_AUTO_DETECT, true);
 
-	soundList[ST_PANEL] = engine->addSoundSourceFromFile("GameData//sounds//other//panel.wav", ESM_AUTO_DETECT, true);
-	soundList[ST_PANEL]->setDefaultVolume(4.5f);
-	soundList[ST_PANEL]->setDefaultMinDistance(100.f);
 	soundList[ST_STEP] = engine->addSoundSourceFromFile("GameData//sounds//other//step1.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_STEP_2] = engine->addSoundSourceFromFile("GameData//sounds//other//step2.wav", ESM_AUTO_DETECT, true);
-	soundList[ST_KILL] = engine->addSoundSourceFromFile("GameData//sounds//other//kill.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav", ESM_AUTO_DETECT, true);
 	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
 
@@ -623,7 +631,6 @@ void mainscene::Init()
 
 	soundList[ST_CAMERA_SPOTTED] = engine->addSoundSourceFromFile("GameData//sounds//other//EnemySpotted.mp3", ESM_AUTO_DETECT, true);
 	soundList[ST_CAMERA_FOUND] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
-	slowmoentrance = true;
 
 	GAMESTATE = GS_PLAY;
 }
@@ -884,10 +891,11 @@ void mainscene::initWeapons(void)
 	WeaponsObject *WPO;
 	WPO = new WeaponsObject();
 	WPO->active = true;
+	WPO->adsZoom = 1.5f;
 	WPO->mesh = meshList[GEO_M9];
 	WPO->attackRate = 0.02f;
 	WPO->scale.Set(0.03f, 0.03f, 0.03f);
-	WPO->shootvelocity = 300.f;
+	WPO->shootvelocity = 400.f;
 	WPO->pos.Set(0, 10, 0);
 	WPO->pos1.Set(-5, -4, 9);
 	WPO->pos2.Set(0, -2.1f, 8);
@@ -1184,6 +1192,81 @@ void mainscene::UpdatePlayer(double &dt)
 /******************************************************************************/
 /*!
 \brief
+Handles player powers
+*/
+/******************************************************************************/
+void mainscene::UpdatePlayerPower(double &dt)
+{
+	static bool abilityPressed = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed)
+	{
+		abilityPressed = true;
+		if (PowerActive)
+		{
+			PowerActive = false;
+			f_powerTintSet = 0.f;
+			engine->play2D(soundList[ST_SLOWMO_EXIT]);
+		}
+		else
+		{
+			PowerActive = true;
+			CurrentPower = PT_SLOWMO;
+			f_powerTintSet = 25.f;
+			c_powerColor.Set(0.1f, 0.f, 0.f);
+			engine->play2D(soundList[ST_SLOWMO_ENTER]);
+		}
+	}
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed)
+	{
+		abilityPressed = false;
+	}
+
+	if (PowerActive)
+	{
+		switch (CurrentPower)
+		{
+		case mainscene::PT_SLOWMO:
+			dt *= 0.05;
+
+			if (P_Player.Velocity != 0)
+			{
+				float temp = P_Player.Velocity.LengthSquared() *0.002f;
+				if (temp > 1)
+				{
+					dt *= temp;
+				}
+
+				if (dt > d_dt)
+				{
+					dt = d_dt;
+				}
+			}
+			break;
+		case mainscene::PT_SUPERVISION:
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (f_powerTint != f_powerTintSet)
+	{
+		float diff = f_powerTintSet - f_powerTint;
+
+		if (diff < 0.01 && diff > -0.01)
+		{
+			f_powerTint = f_powerTintSet;
+		}
+		else
+		{
+			f_powerTint += diff * static_cast<float>(d_dt) * 10.f;
+		}
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 Handles game object physics
 */
 /******************************************************************************/
@@ -1326,14 +1409,14 @@ void mainscene::UpdateBullets(double &dt)
 				BI->setStatus(false);
 				for (unsigned i = 0; i < 5; ++i)
 				{
-					generateParticle(BI->getPosition(), Vector3(0.5, 0.5, 0.5), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
+					generateParticle(BI->getPosition(), Vector3(0.2, 0.2, 0.2), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
 				}
 			}
 			else
 			{
 				if (d_dt != d_dt2)
 				{
-					BI->Update(dt*0.5);
+					BI->Update(dt*0.4);
 				}
 				else
 				{
@@ -1376,6 +1459,14 @@ void mainscene::weaponsUpdate(double &dt)
 		if (Application::IsKeyPressed(us_control[E_CTRL_THROW]) || !P_Player.holding->isWeapon && Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && !isAttackPressed)
 		{
 			isAttackPressed = true;
+
+			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+			if (!WO->animState)
+			{
+				WO->toggleAnimation();
+				f_targetfov = f_defaultfov;
+			}
+
 			P_Player.DropObject(P_Player.getDirection().Normalized() * 400.f);
 		}
 
@@ -1427,6 +1518,14 @@ void mainscene::weaponsUpdate(double &dt)
 				{
 					isAimPressed = true;
 					WO->toggleAnimation();
+					if (!WO->animState)
+					{
+						f_targetfov = f_targetfov / WO->adsZoom;
+					}
+					else
+					{
+						f_targetfov = f_defaultfov;
+					}
 				}
 				else if (!Application::IsKeyPressed(us_control[E_CTRL_AIM]) && isAimPressed)
 				{
@@ -1531,23 +1630,6 @@ update player sound position
 /******************************************************************************/
 void mainscene::UpdateSound(double &dt)
 {
-	if (slowmoentrance)
-	{
-		if (d_dt != d_dt2)
-		{
-			engine->play2D(soundList[ST_SLOWMO_ENTER]);
-			slowmoentrance = false;
-		}
-	}
-	else
-	{
-		if (d_dt == d_dt2)
-		{
-			engine->play2D(soundList[ST_SLOWMO_EXIT]);
-			slowmoentrance = true;
-		}
-	}
-
 	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
 }
 
@@ -1591,6 +1673,21 @@ void mainscene::Update(double dt)
 	mousePosX = (static_cast<float>(x) / static_cast<float>(Application::GetWindowWidth()) * static_cast<float>(Application::GetWindowWidth())*0.1f);
 	mousePosY = ((static_cast<float>(Application::GetWindowHeight()) - static_cast<float>(y)) / static_cast<float>(Application::GetWindowHeight()) * static_cast<float>(Application::GetWindowHeight())*0.1f);
 
+	if (f_fov != f_targetfov)
+	{
+		float diff = f_targetfov - f_fov;
+
+		if (diff < 0.01 && diff > -0.01)
+		{
+			f_fov = f_targetfov;
+		}
+		else
+		{
+			f_fov += diff * static_cast<float>(d_dt) * 10.f;
+		}
+
+		editFOV(f_fov);
+	}
 
 	if (Application::IsKeyPressed('1'))
 	{
@@ -1616,55 +1713,13 @@ void mainscene::Update(double dt)
 		}
 	}
 
-	if (Application::IsKeyPressed('3'))
-	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			renderAxis = true;
-		}
-		else
-		{
-			renderAxis = false;
-		}
-	}
-
-	if (Application::IsKeyPressed('4'))
-	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
-		{
-			DisplayInfo = false;
-		}
-		else
-		{
-			DisplayInfo = true;
-		}
-	}
-
 	static bool isEscPressed = false;
 	static bool isLmbPressed = false;
 
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_PLAY:
-		if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]))
-		{
-			dt *= 0.05;
-
-			if (P_Player.Velocity != 0)
-			{
-				float temp = P_Player.Velocity.LengthSquared() *0.002f;
-				if (temp > 1)
-				{
-					dt *= temp;
-				}
-
-				if (dt > d_dt)
-				{
-					dt = d_dt;
-				}
-			}
-		}
-
+		UpdatePlayerPower(dt);
 		d_dt2 = dt;
 		timer += static_cast<float>(dt);
 
@@ -2005,6 +2060,10 @@ Renders mesh
 /******************************************************************************/
 void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color glowColor, Material *material)
 {
+	if (visibility <= 0)
+	{
+		return;
+	}
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
@@ -2152,7 +2211,7 @@ void mainscene::RenderText(Mesh* mesh, std::string text, Color color)
 		return;
 
 	glUniform1i(m_parameters[U_GLOW], 0);
-	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
+	glUniform1i(m_parameters[U_TRANSPARENCY], 100);
 
 	glDisable(GL_DEPTH_TEST);
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
@@ -2189,7 +2248,7 @@ void mainscene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 		return;
 
 	glUniform1i(m_parameters[U_GLOW], 0);
-	glUniform1i(m_parameters[U_TRANSPARENCY], 10);
+	glUniform1i(m_parameters[U_TRANSPARENCY], 100);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -2309,9 +2368,6 @@ void mainscene::RenderWorldShadow(void)
 		}
 	}
 
-	RenderParticles();
-	RenderBullet();
-
 	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
@@ -2338,6 +2394,9 @@ Renders the entire world without shadow
 /******************************************************************************/
 void mainscene::RenderWorldNoShadow(void)
 {
+	RenderParticles();
+	RenderBullet();
+
 	if (renderAxis == true)
 	{
 		modelStack.PushMatrix();
@@ -2361,57 +2420,65 @@ void mainscene::RenderUI(void)
 	{
 		if (P_Player.holding->isGun)
 		{
-			modelStack.PushMatrix();
-			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+			if (WO->animState)
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
 
-			modelStack.PushMatrix();
-			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Rotate(90, 0, 0, 1);
-			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Rotate(90, 0, 0, 1);
+				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Rotate(-90, 0, 0, 1);
-			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Rotate(-90, 0, 0, 1);
+				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Rotate(180, 0, 0, 1);
-			modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-			RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Rotate(180, 0, 0, 1);
+				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
+				modelStack.PopMatrix();
 
-			modelStack.PopMatrix();
+				modelStack.PopMatrix();
+			}
 		}
-	}
-
-	if (DisplayInfo == true)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
 	}
 
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_PLAY:
-
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+		modelStack.PopMatrix();
 		break;
 	case mainscene::GS_END:
 	case mainscene::GS_PAUSED:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
 		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 5.f, 10.f, Color(0.f, 0.f, 0.f));
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 50.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		RenderButtons();
 		break;
 	default:
 		break;
+	}
+
+	if (DisplayInfo == true)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
 	}
 }
 
@@ -2491,7 +2558,7 @@ void mainscene::RenderPassGPass(void)
 	lights[0].position.x = P_Player.getPosition().x;
 	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
-	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
+	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + P_Player.getPosition().y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10 + P_Player.getPosition().y, lights[0].position.z + 1, 0, 1, 0);
 
 	RenderWorldShadow();
 }
@@ -2722,6 +2789,14 @@ void mainscene::Exit(void)
 			CO = NULL;
 		}
 		m_charList.pop_back();
+	}
+
+	for (unsigned i = 0; i < NUM_GEOMETRY; ++i)
+	{
+		if (meshList[i] != NULL)
+		{
+			delete meshList[i];
+		}
 	}
 
 	glDeleteProgram(m_gPassShaderID);

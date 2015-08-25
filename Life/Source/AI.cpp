@@ -30,7 +30,7 @@ f_alert_timer(0.f)
 	rotating.SetToRotation(90.f, 0, 1, 0);
 	Velocity = Vector3(0, 0, 10);
 	collided = false;
-	x_axis = z_axis = false;
+	//x_axis = z_axis = false;
 
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff = (0, 0, 1);
