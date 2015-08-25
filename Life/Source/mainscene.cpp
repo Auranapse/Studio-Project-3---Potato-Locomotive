@@ -512,8 +512,11 @@ void mainscene::Init()
 	meshList[GEO_SPAS12] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//SPAS12.obj");
 	meshList[GEO_SPAS12]->textureID[0] = LoadTGA("GameData//Image//weapons//SPAS12.tga", true);
 
-	meshList[GEO_KATANA] = MeshBuilder::GenerateOBJ("SPAS-12", "GameData//OBJ//weapons//Katana.obj");
+	meshList[GEO_KATANA] = MeshBuilder::GenerateOBJ("Katana", "GameData//OBJ//weapons//Katana.obj");
 	meshList[GEO_KATANA]->textureID[0] = LoadTGA("GameData//Image//weapons//Katana.tga", true);
+
+	meshList[GEO_ITEM_SYRINGE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Items//Syringe.obj");
+	meshList[GEO_ITEM_SYRINGE]->textureID[0] = LoadTGA("GameData//Image//Items//Syringe.tga", true);
 
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
@@ -523,6 +526,7 @@ void mainscene::Init()
 	meshList[GEO_SPAS12]->material = meshList[GEO_M9]->material;
 	meshList[GEO_MP5K]->material = meshList[GEO_M9]->material;
 	meshList[GEO_KATANA]->material = meshList[GEO_M9]->material;
+	meshList[GEO_ITEM_SYRINGE]->material = meshList[GEO_M9]->material;
 
 	//----------------------SKYBOX
 	meshList[E_GEO_LEFT] = MeshBuilder::GenerateSkybox("left", Color(0.f, 0.f, 0.f), 1.f);
@@ -911,6 +915,21 @@ void mainscene::initWeapons(void)
 {
 	firerate = 0.f;
 
+	ItemObject *IO;
+	IO = new ItemObject();
+	IO->active = true;
+	IO->pos.Set(-20, 10, 0);
+	IO->pos1.Set(-5, -4, 5);
+	IO->scale.Set(0.5f, 0.5f, 0.5f);
+	IO->ColBox.Set(1, 1, 1);
+	IO->ColBoxOffset.Set(0, 1, 0);
+	IO->enablePhysics = true;
+	IO->holdable = true;
+	IO->mesh = meshList[GEO_ITEM_SYRINGE];
+	IO->isWeapon = false;
+	IO->isGun = false;
+	m_goList.push_back(IO);
+
 	WeaponsObject *WPO;
 	WPO = new WeaponsObject();
 	WPO->active = true;
@@ -939,8 +958,8 @@ void mainscene::initWeapons(void)
 	WPO->AnimSpeed = 9.f;
 	WPO->scale.Set(0.1f, 0.1f, 0.1f);
 	WPO->pos.Set(20, 10, 0);
-	WPO->pos1.Set(4, -8.5f, 9);
-	WPO->pos2.Set(10, -10.f, 12);
+	WPO->pos1.Set(4, -7.5f, 9);
+	WPO->pos2.Set(10, -9.f, 12);
 	WPO->Rotation1.Set(5, 0, 45);
 	WPO->Rotation2.Set(90, 180, 90);
 	WPO->isGun = false;
@@ -1483,83 +1502,95 @@ void mainscene::weaponsUpdate(double &dt)
 		{
 			isAttackPressed = true;
 
-			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-			if (!WO->animState)
+			if (P_Player.holding->isWeapon)
 			{
-				WO->toggleAnimation();
-				f_targetfov = f_defaultfov;
+				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+				if (WO != NULL)
+				{
+					if (!WO->animState)
+					{
+						WO->toggleAnimation();
+						f_targetfov = f_defaultfov;
+					}
+				}
 			}
 
 			P_Player.DropObject(P_Player.getDirection().Normalized() * 400.f);
 		}
-
 		else if (P_Player.holding->isWeapon)
 		{
 			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-			if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
+			if (WO != NULL)
 			{
-				if (P_Player.holding->isGun)
+				if (Application::IsKeyPressed(us_control[E_CTRL_ATTACK]))
 				{
-					if (WO->CurrentClip > 0 && WO->attackRate + firerate < timer)
+					if (P_Player.holding->isGun)
 					{
-						firerate = timer;
-						Vector3 ShootVector = FPC.target - FPC.position;
-						FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
-						Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
-						WO->rotation.x -= WO->recoilEffect *0.1f;
-						WO->pos.z -= WO->recoilEffect*0.02f;
-						PlaySound2D(soundList[WO->AttackSound]);
-						f_curRecoil += WO->recoilEffect * 0.05f;
-						--WO->CurrentClip;
-					}
-					else if (WO->CurrentClip <= 0 && !isAttackPressed)
-					{
-						isAttackPressed = true;
-						PlaySound2D(soundList[ST_WEAPON_CLICK]);
-					}
-				}
-				else
-				{
-					if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState && !isAttackPressed)
-					{
-						isAttackPressed = true;
-						firerate = timer;
-						WO->toggleAnimation();
-						PlaySound2D(soundList[WO->AttackSound]);
-					}
-				}
-			}
-			else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isAttackPressed)
-			{
-				isAttackPressed = false;
-			}
-
-			if (P_Player.holding->isGun)
-			{
-				static bool isAimPressed = false;
-				if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) && !isAimPressed)
-				{
-					isAimPressed = true;
-					WO->toggleAnimation();
-					if (!WO->animState)
-					{
-						f_targetfov = f_targetfov / WO->adsZoom;
+						if (WO->CurrentClip > 0 && WO->attackRate + firerate < timer)
+						{
+							firerate = timer;
+							Vector3 ShootVector = FPC.target - FPC.position;
+							FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
+							Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
+							WO->rotation.x -= WO->recoilEffect *0.1f;
+							WO->pos.z -= WO->recoilEffect*0.02f;
+							PlaySound2D(soundList[WO->AttackSound]);
+							f_curRecoil += WO->recoilEffect * 0.05f;
+							--WO->CurrentClip;
+						}
+						else if (WO->CurrentClip <= 0 && !isAttackPressed)
+						{
+							isAttackPressed = true;
+							PlaySound2D(soundList[ST_WEAPON_CLICK]);
+						}
 					}
 					else
 					{
-						f_targetfov = f_defaultfov;
+						if (WO->isAnimationComplete() && firerate + WO->attackRate < timer && WO->animState && !isAttackPressed)
+						{
+							isAttackPressed = true;
+							firerate = timer;
+							WO->toggleAnimation();
+							PlaySound2D(soundList[WO->AttackSound]);
+						}
 					}
 				}
-				else if (!Application::IsKeyPressed(us_control[E_CTRL_AIM]) && isAimPressed)
+				else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isAttackPressed)
 				{
-					isAimPressed = false;
+					isAttackPressed = false;
 				}
 
-				if (f_curRecoil > 0)
+				if (P_Player.holding->isGun)
 				{
-					f_curRecoil -= f_curRecoil * 0.1f;
+					static bool isAimPressed = false;
+					if (Application::IsKeyPressed(us_control[E_CTRL_AIM]) && !isAimPressed)
+					{
+						isAimPressed = true;
+						WO->toggleAnimation();
+						if (!WO->animState)
+						{
+							f_targetfov = f_targetfov / WO->adsZoom;
+						}
+						else
+						{
+							f_targetfov = f_defaultfov;
+						}
+					}
+					else if (!Application::IsKeyPressed(us_control[E_CTRL_AIM]) && isAimPressed)
+					{
+						isAimPressed = false;
+					}
+
+					if (f_curRecoil > 0)
+					{
+						f_curRecoil -= f_curRecoil * 0.1f;
+					}
 				}
 			}
+		}
+		else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isAttackPressed)
+		{
+			isAttackPressed = false;
 		}
 	}
 }

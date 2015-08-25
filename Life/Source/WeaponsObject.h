@@ -27,9 +27,7 @@ public:
 	
 	bool animState;
 
-	Vector3 pos1;//Animation for first position
 	Vector3 pos2;//Position final frame
-	Vector3 Rotation1;//Animation for rotation
 	Vector3 Rotation2;//Rotation final frame
 
 	int AttackSound;

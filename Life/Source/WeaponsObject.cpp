@@ -40,94 +40,97 @@ void WeaponsObject::toggleAnimation()
 
 void WeaponsObject::Update(double &dt)
 {
-	if (animState)
+	if (isHeld)
 	{
-		if (pos != pos1)
+		if (animState)
 		{
-			Vector3 v3_temp1 = pos1 - pos;
-			pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-			animComplete = false;
-		}
-
-		if (rotation != Rotation1)
-		{
-			Vector3 v3_temp1 = Rotation1 - rotation;
-			rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-			animComplete = false;
-		}
-
-		if (!animComplete)
-		{
-			if (pos.x < pos1.x + 0.01f && pos.x > pos1.x - 0.01f && pos.y < pos1.y + 0.01f && pos.y > pos1.y - 0.01f && pos.z < pos1.z + 0.01f && pos.z > pos1.z - 0.01f)
+			if (pos != pos1)
 			{
-				pos = pos1;
-
-				if (rotation.x < Rotation1.x + 0.01f && rotation.x > Rotation1.x - 0.01f && rotation.y < Rotation1.y + 0.01f && rotation.y > Rotation1.y - 0.01f && rotation.z < Rotation1.z + 0.01f && rotation.z > Rotation1.z - 0.01f)
-				{
-					rotation = Rotation1;
-					animComplete = true;
-				}
-			}
-		}
-	}
-	else
-	{
-
-		if (isGun)
-		{
-			if (pos != pos2)
-			{
-				Vector3 v3_temp1 = pos2 - pos;
+				Vector3 v3_temp1 = pos1 - pos;
 				pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
 				animComplete = false;
 			}
 
-			if (rotation != Rotation2)
+			if (rotation != Rotation1)
 			{
-				Vector3 v3_temp1 = Rotation2 - rotation;
+				Vector3 v3_temp1 = Rotation1 - rotation;
 				rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
 				animComplete = false;
 			}
 
 			if (!animComplete)
 			{
-				if (pos.x < pos2.x + 0.01f && pos.x > pos2.x - 0.01f && pos.y < pos2.y + 0.01f && pos.y > pos2.y - 0.01f && pos.z < pos2.z + 0.01f && pos.z > pos2.z - 0.01f)
+				if (pos.x < pos1.x + 0.01f && pos.x > pos1.x - 0.01f && pos.y < pos1.y + 0.01f && pos.y > pos1.y - 0.01f && pos.z < pos1.z + 0.01f && pos.z > pos1.z - 0.01f)
 				{
-					pos = pos2;
+					pos = pos1;
 
-					if (rotation.x < Rotation2.x + 0.01f && rotation.x > Rotation2.x - 0.01f && rotation.y < Rotation2.y + 0.01f && rotation.y > Rotation2.y - 0.01f && rotation.z < Rotation2.z + 0.01f && rotation.z > Rotation2.z - 0.01f)
+					if (rotation.x < Rotation1.x + 0.01f && rotation.x > Rotation1.x - 0.01f && rotation.y < Rotation1.y + 0.01f && rotation.y > Rotation1.y - 0.01f && rotation.z < Rotation1.z + 0.01f && rotation.z > Rotation1.z - 0.01f)
 					{
-						rotation = Rotation2;
+						rotation = Rotation1;
 						animComplete = true;
 					}
 				}
 			}
 		}
-
 		else
 		{
-			if (pos != pos2)
+
+			if (isGun)
 			{
-				Vector3 v3_temp1 = pos2 - pos;
-				pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-				animComplete = false;
+				if (pos != pos2)
+				{
+					Vector3 v3_temp1 = pos2 - pos;
+					pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+					animComplete = false;
+				}
+
+				if (rotation != Rotation2)
+				{
+					Vector3 v3_temp1 = Rotation2 - rotation;
+					rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+					animComplete = false;
+				}
+
+				if (!animComplete)
+				{
+					if (pos.x < pos2.x + 0.01f && pos.x > pos2.x - 0.01f && pos.y < pos2.y + 0.01f && pos.y > pos2.y - 0.01f && pos.z < pos2.z + 0.01f && pos.z > pos2.z - 0.01f)
+					{
+						pos = pos2;
+
+						if (rotation.x < Rotation2.x + 0.01f && rotation.x > Rotation2.x - 0.01f && rotation.y < Rotation2.y + 0.01f && rotation.y > Rotation2.y - 0.01f && rotation.z < Rotation2.z + 0.01f && rotation.z > Rotation2.z - 0.01f)
+						{
+							rotation = Rotation2;
+							animComplete = true;
+						}
+					}
+				}
 			}
 
-			if (rotation != Rotation2)
-			{
-				Vector3 v3_temp1 = Rotation2 - rotation;
-				rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
-				animComplete = false;
-			}
-
-			if (timer > attackRate)
-			{
-				timer = 0.f;
-				animState = true;
-			}
 			else
 			{
-				timer += static_cast<float>(dt);
+				if (pos != pos2)
+				{
+					Vector3 v3_temp1 = pos2 - pos;
+					pos += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+					animComplete = false;
+				}
+
+				if (rotation != Rotation2)
+				{
+					Vector3 v3_temp1 = Rotation2 - rotation;
+					rotation += v3_temp1 * static_cast<float>(dt) * AnimSpeed;
+					animComplete = false;
+				}
+
+				if (timer > attackRate)
+				{
+					timer = 0.f;
+					animState = true;
+				}
+				else
+				{
+					timer += static_cast<float>(dt);
+				}
 			}
 		}
 	}

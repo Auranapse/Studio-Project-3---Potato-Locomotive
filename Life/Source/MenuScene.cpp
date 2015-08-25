@@ -544,7 +544,7 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 		transcomplete = false;
 
 		Vector3 diff = v3_Menupos[MENU_STATE] - v3_MenuCam;
-		v3_MenuCam += diff * static_cast<float>(dt) * 6.f;
+		v3_MenuCam += diff * static_cast<float>(dt) * 10.f;
 
 		if (diff.x < 0.15f && diff.y < 0.15f && diff.x > -0.15f && diff.y > -0.15f)
 		{

@@ -79,6 +79,8 @@ class mainscene : public Scene
 		GEO_MP5K,
 		GEO_SPAS12,
 		GEO_KATANA,
+		//Objects
+		GEO_ITEM_SYRINGE,
 
 		//------------------------
 		//EFFECTS/OTHERS
