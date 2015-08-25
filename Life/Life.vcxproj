@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\AABB.cpp" />
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Anim4.cpp" />
     <ClCompile Include="Source\Application.cpp" />
@@ -107,10 +108,14 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\particle.cpp" />
+    <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\Ray.cpp" />
     <ClCompile Include="Source\SaveHandler.cpp" />
     <ClCompile Include="Source\SecurityCam.cpp" />
     <ClCompile Include="Source\shader.cpp" />
+    <ClCompile Include="Source\Shape.cpp" />
+    <ClCompile Include="Source\Sphere.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
     <ClCompile Include="Source\Strategy.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
@@ -118,11 +123,16 @@
     <ClCompile Include="Source\WorldObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\Anim4.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BulletInfo.h" />
     <ClInclude Include="Source\Button.h" />
+    <ClInclude Include="Source\Plane.h" />
+    <ClInclude Include="Source\Ray.h" />
+    <ClInclude Include="Source\Shape.h" />
+    <ClInclude Include="Source\Sphere.h" />
     <ClInclude Include="Source\TextButton.h" />
     <ClInclude Include="Source\CharacterObject.h" />
     <ClInclude Include="Source\Collision.h" />
