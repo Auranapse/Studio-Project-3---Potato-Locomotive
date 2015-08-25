@@ -343,7 +343,7 @@ void mainscene::Init()
 	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 
 	m_gBuffer.Init(Application::GetWindowWidth(), Application::GetWindowHeight());
-	m_lightDepthFBO.Init(4096, 4096);
+	m_lightDepthFBO.Init(8192, 8192);
 	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
 	//Main Lighting (VIewing room sign)
 	/*lights[0].type = LIGHT_POINT;
@@ -583,9 +583,6 @@ void mainscene::Init()
 	meshList[GEO_OBJCAKE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
 
-	//Starting position of translations and initialize physics
-
-
 	renderAxis = false;
 
 	mouseEnabled = true;
@@ -594,6 +591,7 @@ void mainscene::Init()
 		Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
 		Application::SetCursor(false);
 	}
+
 	FPScounter = 0.f;
 
 	DisplayInfo = true;
@@ -655,9 +653,9 @@ void mainscene::Init()
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
 	GAMESTATE = GS_PLAY;
-	Shape *sTest = new Sphere(Vector3(0,0,0), 5);
-	Asset *Test = new SoundRange(meshList[GEO_OBJCAKE], sTest, 1, false, false, Vector3(0,0,0), 5);
-	
+	Shape *sTest = new Sphere(Vector3(0, 0, 0), 5);
+	Asset *Test = new SoundRange(meshList[GEO_OBJCAKE], sTest, 1, false, false, Vector3(0, 0, 0), 5);
+
 }
 
 /******************************************************************************/
@@ -1663,7 +1661,7 @@ void mainscene::UpdateSound(double &dt)
 {
 	if (d_dt != d_dt2)
 	{
-		SE_Engine.effectDistortion(true, ((d_dt - dt) *3.f) - 20.f);
+		SE_Engine.effectDistortion(true, (static_cast<float>(d_dt - dt) *3.f) - 20.f);
 	}
 	else
 	{
@@ -1996,7 +1994,7 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 		modelStack.PopMatrix();
 	}
 
-	if (CO == &P_Player)
+	if (CO == &P_Player && m_renderPass != RENDER_PASS_PRE)
 	{
 		return;
 	}
@@ -2448,11 +2446,11 @@ void mainscene::RenderWorldShadow(void)
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
-			if (!go->dynamicRendering)
+			if (m_goList.size() < 100)
 			{
 				RenderGO(go);
 			}
-			else if (isVisible(FPC.position, FPC.target, f_fov, go->pos))//Dynamic rendering
+			else if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 4000)//Dynamic rendering
 			{
 				RenderGO(go);
 			}
@@ -2462,7 +2460,7 @@ void mainscene::RenderWorldShadow(void)
 	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
-		if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()))
+		if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
 		{
 			RenderCharacter(CO);
 		}
@@ -2513,7 +2511,7 @@ void mainscene::RenderUI(void)
 	case mainscene::GS_PLAY:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 0.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
 		modelStack.PopMatrix();
 		break;
@@ -2521,7 +2519,7 @@ void mainscene::RenderUI(void)
 	case mainscene::GS_PAUSED:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 1.f);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 0.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 50.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		break;
@@ -2537,7 +2535,7 @@ void mainscene::RenderUI(void)
 			if (WO->animState)
 			{
 				modelStack.PushMatrix();
-				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
 
 				modelStack.PushMatrix();
 				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
@@ -2641,7 +2639,7 @@ void mainscene::RenderPassGPass(void)
 	//if (lights[0].type == LIGHT_DIRECTIONAL)
 	{
 		//m_lightDepthProj.SetToOrtho(-100 - FPC.position.z*0.1, 100 - FPC.position.z*0.1, -100 - FPC.position.x*0.1, 100 - FPC.position.x*0.1, -200 + FPC.position.y*0.1, 400 + FPC.position.y*0.1);
-		m_lightDepthProj.SetToOrtho(-200, 200, -200, 200, -200, 400);
+		m_lightDepthProj.SetToOrtho(-150, 150, -150, 150, -200, 400);
 	}
 	//else
 	{
@@ -2649,9 +2647,10 @@ void mainscene::RenderPassGPass(void)
 	}
 
 	lights[0].position.x = P_Player.getPosition().x;
+	lights[0].position.y = 100.f + P_Player.getPosition().y;
 	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
-	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + P_Player.getPosition().y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10 + P_Player.getPosition().y, lights[0].position.z + 1, 0, 1, 0);
+	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
 
 	RenderWorldShadow();
 }
