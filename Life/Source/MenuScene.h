@@ -20,6 +20,7 @@ Main menu for the openGL framework
 #include "TextButton.h"
 #include "Button.h"
 #include "GabrielDLC.h"
+#include "SoundEngine.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -80,11 +81,13 @@ class MenuScene : public Scene
 		E_GEO_LOADING_BACKGROUND,
 		E_GEO_MATRIX,
 		// -----------------------
-		E_GEO_BUTTON,
+		E_GEO_BUTTON_BACK,
+		E_GEO_BUTTON_LEFT,
+		E_GEO_BUTTON_RIGHT,
 
 		E_GEO_TOTAL,
 	};
-	
+
 	/******************************************************************************/
 	/*!
 	enum E_UNI_TYPE:
@@ -124,7 +127,7 @@ class MenuScene : public Scene
 		//------------------------------------
 		U_UNI_GLOW,
 		U_UNI_GLOW_COLOR,
-		
+
 		E_UNI_TOTAL,
 	};
 
@@ -145,8 +148,16 @@ class MenuScene : public Scene
 		E_M_TOTAL,
 	};
 
+	enum SOUND_TYPE
+	{
+		ST_BUTTON_CLICK,
+		ST_BUTTON_CLICK_2,
+		ST_TOTAL
+	};
+
 	enum E_BUTTON_ID
 	{
+		BI_BACK,
 		BI_FOV_INCREASE,
 		BI_FOV_DECREASE,
 		BI_SENSITIVITY_INCREASE,
@@ -245,6 +256,7 @@ private:
 	*/
 	/******************************************************************************/
 	float f_fov;
+	float f_fov_target;
 
 	//Lighting
 	/******************************************************************************/
@@ -333,6 +345,7 @@ private:
 
 	// Update/Control Functions
 	float MousePosX, MousePosY;
+	void editFOV(float &newFOV);
 	void UpdateFOV();
 	void UpdateControlSettingLabels(unsigned short key, int button);
 
@@ -367,6 +380,9 @@ private:
 	*/
 	/******************************************************************************/
 	MS projectionStack;
+
+	SoundEngine SE_Engine;
+	ISoundSource *SoundList[ST_TOTAL];
 };
 
 #endif

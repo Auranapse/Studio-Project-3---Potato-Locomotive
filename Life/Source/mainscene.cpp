@@ -360,11 +360,11 @@ void mainscene::Init()
 
 	lights[0].type = LIGHT_POINT;
 	lights[0].position.Set(10.f, 100.f, 0.f);
-	lights[0].color.Set(1.f, 1.f, 1.f);
+	lights[0].color.Set(.85f, .92f, 1.f);
 	lights[0].kC = 1.f;
 	lights[0].kL = 0.000001f;
 	lights[0].kQ = 0.00000001f;
-	lights[0].power = 1.2f;
+	lights[0].power = 1.5f;
 
 
 	//Viewing room 2 light
@@ -795,8 +795,6 @@ bool mainscene::loadLevel(int level)
 					{
 						SizeZ = worldsize;
 					}
-
-					std::cout << "\n" << SizeX << ", " << SizeY << ", " << SizeZ << std::endl;
 
 					WorldObject *WO;
 					WO = new WorldObject();
@@ -1660,7 +1658,7 @@ void mainscene::UpdateSound(double &dt)
 {
 	if (d_dt != d_dt2)
 	{
-		SE_Engine.effectDistortion(true, (static_cast<float>(d_dt - dt) *3.f) - 20.f);
+		SE_Engine.effectDistortion(true, (static_cast<float>(d_dt - dt) *3.f) - 30.f);
 	}
 	else
 	{
