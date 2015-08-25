@@ -49,6 +49,7 @@ public:
 	virtual void Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList);
 	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
 
+	void ai_ScanArea(const double &dt);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
