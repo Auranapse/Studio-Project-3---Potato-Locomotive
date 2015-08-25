@@ -12,6 +12,8 @@ Handles AI position and physics
 
 #include "Application.h"
 #include "CharacterObject.h"
+#include "ItemObject.h"
+#include "WeaponsObject.h"
 #include "GabrielDLC.h"
 #include "Collision.h"
 #include "Mtx44.h"
@@ -60,6 +62,8 @@ public:
 	void rotateAi_Clockwise();
 	void rotateAI_CounterClockWise();
 	void rotateAI_180();
+
+	void ai_ScanArea(const double &dt);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
@@ -70,7 +74,12 @@ private:
 	bool b_aiCooldown;
 	bool collided;
 
+	Vector3 prevPosition;
 	Vector3 destination;
+	bool b_updateAI;
+	double d_totalRotation;
+	double d_enemyRotation;
+	bool b_rotateClockwiseFirst;
 	bool positiveX, positiveZ, negativeX, negativeZ;
 	Vector3 diff;
 };
