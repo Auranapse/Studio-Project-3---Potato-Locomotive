@@ -20,10 +20,6 @@ Aperture Science Laboratories Underground
 #include <fstream>
 #include <sstream>
 
-#include <irrKlang.h>
-#pragma comment (lib, "irrKlang.lib")
-
-using namespace irrklang;
 
 /******************************************************************************/
 /*!
@@ -196,7 +192,7 @@ Initialize default variables, create meshes, lighting
 /******************************************************************************/
 void mainscene::Init()
 {
-	engine = createIrrKlangDevice(ESOD_AUTO_DETECT, ESEO_MULTI_THREADED | ESEO_LOAD_PLUGINS | ESEO_USE_3D_BUFFERS);
+	SE_Engine.Init();
 	//Control initialization--------------
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -637,27 +633,26 @@ void mainscene::Init()
 	inputDelay = 0.f;
 	timer = 0.f;
 
-	soundList[ST_BACKGROUND] = engine->addSoundSourceFromFile("GameData//sounds//ambience//background.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_BACKGROUND] = SE_Engine.preloadSound("GameData//sounds//ambience//background.wav");
 	soundList[ST_BACKGROUND]->setDefaultVolume(0.3f);
-	engine->play2D(soundList[ST_BACKGROUND], true);
 
-	soundList[ST_SLOWMO_ENTER] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_enter.mp3", ESM_AUTO_DETECT, true);
-	soundList[ST_SLOWMO_EXIT] = engine->addSoundSourceFromFile("GameData//sounds//effects//slowmo_exit.mp3", ESM_AUTO_DETECT, true);
+	soundList[ST_SLOWMO_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_enter.mp3");
+	soundList[ST_SLOWMO_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_exit.mp3");
 
-	soundList[ST_STEP] = engine->addSoundSourceFromFile("GameData//sounds//other//step1.wav", ESM_AUTO_DETECT, true);
-	soundList[ST_STEP_2] = engine->addSoundSourceFromFile("GameData//sounds//other//step2.wav", ESM_AUTO_DETECT, true);
-	soundList[ST_BUZZER] = engine->addSoundSourceFromFile("GameData//sounds//other//buzzer.wav", ESM_AUTO_DETECT, true);
-	soundList[ST_ALERT] = engine->addSoundSourceFromFile("GameData//sounds//other//alert.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
+	soundList[ST_STEP_2] = SE_Engine.preloadSound("GameData//sounds//other//step2.wav");
+	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
+	soundList[ST_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//alert.wav");
 
-	soundList[ST_WEAPON_M9_SHOOT] = engine->addSoundSourceFromFile("GameData//sounds//weapons//M9//FIRE.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_M9_SHOOT] = SE_Engine.preloadSound("GameData//sounds//weapons//M9//FIRE.wav");
 	soundList[ST_WEAPON_M9_SHOOT]->setDefaultVolume(0.3f);
 
-	soundList[ST_WEAPON_KATANA] = engine->addSoundSourceFromFile("GameData//sounds//weapons//Katana.mp3", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_KATANA] = SE_Engine.preloadSound("GameData//sounds//weapons//Katana.mp3");
 
-	soundList[ST_WEAPON_CLICK] = engine->addSoundSourceFromFile("GameData//sounds//weapons//empty.wav", ESM_AUTO_DETECT, true);
+	soundList[ST_WEAPON_CLICK] = SE_Engine.preloadSound("GameData//sounds//weapons//empty.wav");
 
-	soundList[ST_CAMERA_SPOTTED] = engine->addSoundSourceFromFile("GameData//sounds//other//EnemySpotted.mp3", ESM_AUTO_DETECT, true);
-	soundList[ST_CAMERA_FOUND] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
+	soundList[ST_CAMERA_SPOTTED] = SE_Engine.preloadSound("GameData//sounds//other//EnemySpotted.mp3");
+	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
 	GAMESTATE = GS_PLAY;
 	Shape *sTest = new Sphere(Vector3(0,0,0), 5);
@@ -1065,7 +1060,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			PlaySound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -1077,7 +1072,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			PlaySound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -1088,7 +1083,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			PlaySound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -1099,7 +1094,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
-			PlaySound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_STEP]);
 			f_step = timer;
 		}
 	}
@@ -1109,7 +1104,7 @@ void mainscene::UpdatePlayer(double &dt)
 		if (inAir == false)
 		{
 			P_Player.Velocity.y += 120;
-			PlaySound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_STEP]);
 		}
 	}
 
@@ -1250,7 +1245,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 		{
 			PowerActive = false;
 			f_powerTintSet = 0.f;
-			engine->play2D(soundList[ST_SLOWMO_EXIT]);
+			SE_Engine.playSound2D(soundList[ST_SLOWMO_EXIT]);
 		}
 		else
 		{
@@ -1258,7 +1253,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 			CurrentPower = PT_SLOWMO;
 			f_powerTintSet = 25.f;
 			c_powerColor.Set(0.1f, 0.f, 0.f);
-			engine->play2D(soundList[ST_SLOWMO_ENTER]);
+			SE_Engine.playSound2D(soundList[ST_SLOWMO_ENTER]);
 		}
 	}
 	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed)
@@ -1448,13 +1443,13 @@ void mainscene::UpdateBullets(double &dt)
 		BulletInfo *BI = (BulletInfo *)*it;
 		if (BI->getStatus())
 		{
-			if (collide(BI->getPosition(), true))
+			if (collide(BI->getPosition()))
 			{
 				BI->verticalvelocity = 0.f;
 				BI->setStatus(false);
 				for (unsigned i = 0; i < 5; ++i)
 				{
-					generateParticle(BI->getPosition(), Vector3(0.2, 0.2, 0.2), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
+					generateParticle(BI->getPosition(), Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
 				}
 			}
 			else
@@ -1537,14 +1532,14 @@ void mainscene::weaponsUpdate(double &dt)
 							Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
-							PlaySound2D(soundList[WO->AttackSound]);
+							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 							f_curRecoil += WO->recoilEffect * 0.05f;
 							--WO->CurrentClip;
 						}
 						else if (WO->CurrentClip <= 0 && !isAttackPressed)
 						{
 							isAttackPressed = true;
-							PlaySound2D(soundList[ST_WEAPON_CLICK]);
+							SE_Engine.playSound2D(soundList[ST_WEAPON_CLICK]);
 						}
 					}
 					else
@@ -1554,7 +1549,7 @@ void mainscene::weaponsUpdate(double &dt)
 							isAttackPressed = true;
 							firerate = timer;
 							WO->toggleAnimation();
-							PlaySound2D(soundList[WO->AttackSound]);
+							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 						}
 					}
 				}
@@ -1604,7 +1599,7 @@ void mainscene::weaponsUpdate(double &dt)
 Check collision
 */
 /******************************************************************************/
-bool mainscene::collide(Vector3 &Position, bool bullet)
+bool mainscene::collide(Vector3 &Position)
 {
 	//Game object collisions
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
@@ -1661,33 +1656,21 @@ bool mainscene::collideGO(GameObject *go, GameObject *go2)
 /******************************************************************************/
 /*!
 \brief
-player a 2D sound
-*/
-/******************************************************************************/
-void mainscene::PlaySound2D(irrklang::ISoundSource *source)
-{
-	ISound *snd = engine->play2D(source, false, false, false, true);
-
-	if (snd)
-	{
-		ISoundEffectControl* fx = snd->getSoundEffectControl();
-
-		if (d_dt2 != d_dt)
-		{
-			fx->enableDistortionSoundEffect(static_cast<ik_f32>(d_dt2 - d_dt - 30.f));
-		}
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 update player sound position
 */
 /******************************************************************************/
 void mainscene::UpdateSound(double &dt)
 {
-	engine->setListenerPosition(vec3df(FPC.position.x, FPC.position.y, FPC.position.z), vec3df(-(FPC.target.x - FPC.position.x), FPC.target.y - FPC.position.y, -(FPC.target.z - FPC.position.z)).normalize(), vec3df(0, 0, 0), vec3df(FPC.up.x, FPC.up.y, FPC.up.z));
+	if (d_dt != d_dt2)
+	{
+		SE_Engine.effectDistortion(true, ((d_dt - dt) *3.f) - 20.f);
+	}
+	else
+	{
+		SE_Engine.effectDistortion(false);
+	}
+
+	SE_Engine.UpdateListenerPosition(FPC.position, (FPC.target - FPC.target), FPC.up);
 }
 
 /******************************************************************************/
@@ -2850,10 +2833,7 @@ Clears memory upon exit
 void mainscene::Exit(void)
 {
 	Application::SetCursor(true);
-	if (engine != NULL)
-	{
-		engine->drop();
-	}
+	SE_Engine.Exit();
 
 	while (BIv_BulletList.size() > 0)
 	{
@@ -2907,6 +2887,7 @@ void mainscene::Exit(void)
 		{
 			delete meshList[i];
 		}
+		meshList[i] = NULL;
 	}
 
 	glDeleteProgram(m_gPassShaderID);

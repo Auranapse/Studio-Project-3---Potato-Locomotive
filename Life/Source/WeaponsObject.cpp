@@ -1,5 +1,20 @@
+/****************************************************************************/
+/*!
+\file WeaponsObject.cpp
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Class to handle weapons
+!*/
+/****************************************************************************/
 #include "WeaponsObject.h"
 
+/******************************************************************************/
+/*!
+\brief
+Default Constructor
+*/
+/******************************************************************************/
 WeaponsObject::WeaponsObject()
 {
 	isWeapon = true;
@@ -20,11 +35,23 @@ WeaponsObject::WeaponsObject()
 	timer = 0.f;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Default Destructor
+*/
+/******************************************************************************/
 WeaponsObject::~WeaponsObject()
 {
 
 }
 
+/******************************************************************************/
+/*!
+\brief
+Toggles the animation state
+*/
+/******************************************************************************/
 void WeaponsObject::toggleAnimation()
 {
 	if (animState)
@@ -38,6 +65,14 @@ void WeaponsObject::toggleAnimation()
 	animComplete = false;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Updates the weapon animtations
+\param dt
+delta time
+*/
+/******************************************************************************/
 void WeaponsObject::Update(double &dt)
 {
 	if (isHeld)
@@ -136,11 +171,27 @@ void WeaponsObject::Update(double &dt)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief
+check if animation completed
+\return
+returns true if animation is completed
+*/
+/******************************************************************************/
 bool WeaponsObject::isAnimationComplete(void)
 {
 	return animComplete;
 }
 
+/******************************************************************************/
+/*!
+\brief
+force sets the animation completion
+\param isitreally
+if true will set animComplete to true
+*/
+/******************************************************************************/
 void WeaponsObject::isAnimationComplete(bool isitreally)
 {
 	animComplete = isitreally;

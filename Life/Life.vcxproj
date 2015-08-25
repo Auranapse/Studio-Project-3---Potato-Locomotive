@@ -121,6 +121,7 @@
     <ClCompile Include="Source\SecurityCam.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\Shape.cpp" />
+    <ClCompile Include="Source\SoundEngine.cpp" />
     <ClCompile Include="Source\SoundRange.cpp" />
     <ClCompile Include="Source\Sphere.cpp" />
     <ClCompile Include="Source\SpriteAnimation.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Source\Room.h" />
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\Shape.h" />
+    <ClInclude Include="Source\SoundEngine.h" />
     <ClInclude Include="Source\SoundRange.h" />
     <ClInclude Include="Source\Sphere.h" />
     <ClInclude Include="Source\TextButton.h" />

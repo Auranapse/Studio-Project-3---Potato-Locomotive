@@ -243,6 +243,9 @@
     <ClCompile Include="Source\SoundRange.cpp">
       <Filter>Source Files\Assets\NonLiving</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SoundEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -403,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="Source\Projectile.h">
       <Filter>Header Files\Assets\Living</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SoundEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,12 @@
+/****************************************************************************/
+/*!
+\file WeaponsObject.h
+\author Gabriel Wong Choon Jieh
+\par email: AuraTigital\@gmail.com
+\brief
+Class to handle weapons
+!*/
+/****************************************************************************/
 #ifndef WEAPONSOBJECT_H
 #define WEAPONSOBJECT_H
 

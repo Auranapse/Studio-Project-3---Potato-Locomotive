@@ -1137,7 +1137,7 @@ Renders a mesh on screen
 /******************************************************************************/
 void MenuScene::RenderMeshOnScreen(Mesh* mesh, float Glow, Color GlowColor)
 {
-	glUniform1i(u_m_parameters[U_UNI_GLOW], Glow);
+	glUniform1i(u_m_parameters[U_UNI_GLOW], static_cast<GLint>(Glow));
 	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
 
 
@@ -1393,14 +1393,22 @@ void MenuScene::Exit()
 	while (v_textButtonList.size() > 0)
 	{
 		TextButton *S_MB = v_textButtonList.back();
-		delete S_MB;
+		if (S_MB != NULL)
+		{
+			delete S_MB;
+		}
+		S_MB = NULL;
 		v_textButtonList.pop_back();
 	}
 
 	while (v_buttonList.size() > 0)
 	{
 		Button *m_B = v_buttonList.back();
-		delete m_B;
+		if (m_B != NULL)
+		{
+			delete m_B;
+		}
+		m_B = NULL;
 		v_buttonList.pop_back();
 	}
 
@@ -1410,6 +1418,7 @@ void MenuScene::Exit()
 		{
 			delete P_meshArray[i];
 		}
+		P_meshArray[i] = NULL;
 	}
 
 	glDeleteVertexArrays(1, &u_m_vertexArrayID);

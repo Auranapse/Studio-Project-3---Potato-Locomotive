@@ -33,7 +33,7 @@ f_alert_timer(0.f)
 	//x_axis = z_axis = false;
 
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
-	diff = (0, 0, 1);
+	diff.Set(0.f, 0.f, 1.f);
 }
 
 /******************************************************************************/
@@ -101,7 +101,7 @@ void AI::movementLR(double &dt, bool left)
 	if (left == true)
 	{
 		rotation.SetToRotation(-90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * dt;
+		Lookat = rotation * Lookat * static_cast<float>(dt);
 		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
@@ -109,7 +109,7 @@ void AI::movementLR(double &dt, bool left)
 	else
 	{
 		rotation.SetToRotation(90.f, 0.f, 1.f, 0.f);
-		Lookat = rotation * Lookat * dt;
+		Lookat = rotation * Lookat * static_cast<float>(dt);
 		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
