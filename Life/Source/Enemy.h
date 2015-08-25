@@ -9,6 +9,7 @@ public:
 				int damage, float walkForce) 
 				: Living(mesh, bound, mass, health, velo, acc, force)
 	{
+		this->type = 1;
 		this->damage;
 		this->walkForce = walkForce;
 	}

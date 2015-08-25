@@ -8,6 +8,7 @@ public:
 				Vector3 acc, Vector3 force, int damage) 
 				: Living(mesh, bound, mass, health, velo, acc, force)
 	{
+		this->type = 2;
 		this->damage = damage;
 	}
 	Projectile();

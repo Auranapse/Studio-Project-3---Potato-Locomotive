@@ -39,6 +39,7 @@ protected:
 	1 = Enemy
 	2 = Projectile
 	3 = Room
+	4 = SoundRange
 	*/
 	//type = ONLY SET IN CHILD CONSTRUCTORS(No Mutator)
 };
