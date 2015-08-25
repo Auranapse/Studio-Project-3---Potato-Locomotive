@@ -41,6 +41,10 @@ Main scene
 #include "AI.h"
 #include "SecurityCam.h"
 
+
+#include "SceneManager.h"
+
+
 /******************************************************************************/
 /*!
 		Class mainscene:

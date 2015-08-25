@@ -660,6 +660,9 @@ void mainscene::Init()
 	soundList[ST_CAMERA_FOUND] = engine->addSoundSourceFromFile("GameData//sounds//other//Alarm.mp3", ESM_AUTO_DETECT, true);
 
 	GAMESTATE = GS_PLAY;
+	Shape *sTest = new Sphere(Vector3(0,0,0), 5);
+	Asset *Test = new SoundRange(meshList[GEO_OBJCAKE], sTest, 1, false, false, Vector3(0,0,0), 5);
+	
 }
 
 /******************************************************************************/
