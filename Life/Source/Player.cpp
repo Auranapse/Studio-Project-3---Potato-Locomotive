@@ -94,6 +94,6 @@ delta time
 /******************************************************************************/
 void Player::Update(double &dt)
 {
-	Animation.Update(dt, Velocity.LengthSquared()*0.03f);
+	Animation.Update(dt, Vector3(Velocity.x, 0, Velocity.z).LengthSquared()*0.03f);
 	Position += Velocity * static_cast<float>(dt);
 }
