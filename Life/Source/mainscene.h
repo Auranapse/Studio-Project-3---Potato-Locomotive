@@ -431,7 +431,7 @@ private:
 	void editFOV(float &newFOV);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
-	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color glowColor = Color(1, 0, 0));
+	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0));
 
 	void initWeapons(void);
 
@@ -439,7 +439,7 @@ private:
 	void RenderCharacter(CharacterObject *CO);
 	void RenderParticles(void);
 	void RenderBullet(void);
-	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color glowColor = Color(1, 0, 0), Material *material = NULL);
+	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0), Material *material = NULL);
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position);

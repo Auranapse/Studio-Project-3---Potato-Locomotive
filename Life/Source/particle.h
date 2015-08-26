@@ -10,6 +10,7 @@ public:
 	enum Type
 	{
 		PAR_SPARKS,
+		PAR_BLOOD,
 		PAR_MESH,
 	};
 

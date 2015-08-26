@@ -75,7 +75,7 @@ Initialize menus
 /******************************************************************************/
 void mainscene::InitMenus(void)
 {
-	UIColor.Set(0.8f, 0.8f, 0.8f);
+	UIColor.Set(0.9f, 0.9f, 0.9f);
 	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
 
 	//Pause Menu--------------------------------------------------------
@@ -206,7 +206,8 @@ void mainscene::Init()
 		meshList[i] = NULL;
 	}
 
-	f_mouseSensitivity = 1;
+	f_fov = 70.f;
+	f_mouseSensitivity = 1.f;
 
 	SH_1.init("GameData//ImportantData.GoddamnitQuen");
 	assignSave();
@@ -358,7 +359,7 @@ void mainscene::Init()
 		m_lightDepthFBO.Init(2048, 2048);
 		break;
 	case GRA_SHIT:
-		m_lightDepthFBO.Init(512, 512);
+		m_lightDepthFBO.Init(16, 16);
 		break;
 	default:
 		m_lightDepthFBO.Init(2048, 2048);
@@ -366,18 +367,6 @@ void mainscene::Init()
 	}
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
-	//Main Lighting (VIewing room sign)
-	/*lights[0].type = LIGHT_POINT;
-	lights[0].position.Set(100.f, 200.f, -550.f);
-	lights[0].color.Set(1.f, 1.f, 1.f);
-	lights[0].power = 1.5f;
-	lights[0].kC = 1.f;
-	lights[0].kL = 0.001f;
-	lights[0].kQ = 0.000001f;
-	lights[0].cosCutoff = cos(Math::DegreeToRadian(50.f));
-	lights[0].cosInner = cos(Math::DegreeToRadian(20.f));
-	lights[0].exponent = 3.f;
-	lights[0].spotDirection.Set(0.f, 1.f, 0.f);//*/
 
 	lights[0].type = LIGHT_POINT;
 	lights[0].position.Set(10.f, 100.f, 0.f);
@@ -385,7 +374,7 @@ void mainscene::Init()
 	lights[0].kC = 0.f;
 	lights[0].kL = 0.f;
 	lights[0].kQ = 0.f;
-	lights[0].power = 1.5f;
+	lights[0].power = 1.f;
 
 
 	//Viewing room 2 light
@@ -486,18 +475,13 @@ void mainscene::Init()
 	float f_density = 0.005f;
 	int f_type = 1;
 
-	if (Graphics >= GRA_MEDIUM)
+	if (Graphics <= GRA_MEDIUM)
 	{
 		enableFOG = true;
 	}
 	else
 	{
 		enableFOG = false;
-	}
-
-	if (Graphics == GRA_SHIT)
-	{
-		lights[0].power = 1.f;
 	}
 
 	glUniform3fv(m_parameters[U_FOG_COLOR], 1, &FogCol.r);
@@ -700,8 +684,8 @@ void mainscene::Init()
 	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
 	MainManager.Add(Test);
 
-	Shape *aTest = new Sphere(Vector3(2,0,5), 5);
-	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 40, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(10,0,0), 1, 20, 0);
+	Shape *aTest = new Sphere(Vector3(2, 0, 5), 5);
+	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 40, 1, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(10, 0, 0), 1, 20, 0);
 	MainManager.Add(Test2);
 }
 
@@ -728,7 +712,6 @@ returns true if loadmap is sucessful
 /******************************************************************************/
 bool mainscene::loadLevel(int level)
 {
-	float worldsize = 30.f;
 	std::cout << "\nLoading map...\n";
 	std::string MAPLOC = "GameData//Maps//";
 	MAPLOC += std::to_string(static_cast<unsigned long long>(level));
@@ -741,6 +724,8 @@ bool mainscene::loadLevel(int level)
 
 	P_Player.Velocity.SetZero();
 	P_Player.DropObject();
+	PowerActive = false;
+	f_powerTintSet = 0.f;
 
 	while (BIv_BulletList.size() > 0)
 	{
@@ -786,6 +771,8 @@ bool mainscene::loadLevel(int level)
 		}
 		m_ParList.pop_back();
 	}
+
+	float worldsize = static_cast<float>(GAME_MAP.worldSize);
 
 	std::cout << "Map Size: ";
 	std::cout << GAME_MAP.map_width << ", " << GAME_MAP.map_height << "\n";
@@ -937,7 +924,7 @@ bool mainscene::loadLevel(int level)
 	WO->mesh = meshList[GEO_WORLD_CUBE];
 	m_goList.push_back(WO);
 
-	lights[0].position.y = worldsize * 4.f;
+	lights[0].position.y = worldsize * 4.5f;
 
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
@@ -1538,6 +1525,12 @@ void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel,
 	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Leg_right);
 
 	generateParticle(CO->getPosition() + CO->ModelPos, CO->Scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
+
+	for (unsigned i = 0; i < 8; ++i)
+	{
+		float bloodsize = Math::RandFloatMinMax(0.1f, .8f);
+		generateParticle(CO->getPosition() + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 1.0f);
+	}
 }
 
 /******************************************************************************/
@@ -2082,7 +2075,6 @@ void mainscene::Update(double dt)
 	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
 	//Living* Whatever = (Living*)MainManager.SceneAssets[1];
 	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().x<<std::endl;
-
 }
 
 /******************************************************************************/
@@ -2214,6 +2206,18 @@ void mainscene::RenderParticles(void)
 				modelStack.PopMatrix();
 				break;
 			}
+			case Particle::PAR_BLOOD:
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(Par->Pos);
+				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+				modelStack.Scale(Par->Scale);
+				RenderMesh(meshList[GEO_BULLET], false, true, 100, 100, Color(1.f, 0.f, 0.f));
+				modelStack.PopMatrix();
+				break;
+			}
 			case Particle::PAR_MESH:
 			{
 				if (Par->mesh != NULL)
@@ -2262,7 +2266,7 @@ void mainscene::RenderBullet(void)
 Renders mesh in 3D
 */
 /******************************************************************************/
-void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color glowColor)
+void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color &glowColor)
 {
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
@@ -2308,7 +2312,7 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, f
 Renders mesh
 */
 /******************************************************************************/
-void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color glowColor, Material *material)
+void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float visibility, float glow, Color &glowColor, Material *material)
 {
 	if (visibility <= 0)
 	{
@@ -2689,7 +2693,7 @@ void mainscene::RenderUI(void)
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
 		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 0.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 50.f, 10.f, Color(0.f, 0.f, 0.f));
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 70.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		break;
 	default:
@@ -2815,15 +2819,10 @@ void mainscene::RenderPassGPass(void)
 		//m_lightDepthProj.SetToPerspective(90, 1.f, 0.1, 20);
 	}
 
-	lights[0].position.x = P_Player.getPosition().x;
-	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
 	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
 
-	if (Graphics <= GRA_SHIT)
-	{
-		RenderWorldShadow();
-	}
+	RenderWorldShadow();
 }
 
 /******************************************************************************/
@@ -2966,8 +2965,14 @@ void mainscene::Render(void)
 
 	modelStack.LoadIdentity();
 
-	RenderPassGPass();
-	RenderPassGBuffer();
+	lights[0].position.x = P_Player.getPosition().x;
+	lights[0].position.z = P_Player.getPosition().z;
+	if (Graphics < GRA_SHIT)
+	{
+		RenderPassGPass();
+		RenderPassGBuffer();
+	}
+
 	RenderPassLight();
 	RenderPassMain();
 }

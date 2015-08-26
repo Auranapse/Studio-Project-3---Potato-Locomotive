@@ -245,14 +245,14 @@ void MenuScene::InitMenu(void)
 
 	//OPTIONS-----------------------------------------------------
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 120.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f, Application::GetWindowHeight()*0.6f - 140.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
 	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 160.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f, Application::GetWindowHeight()*0.6f - 180.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Toggle Fullscreen";
 	S_MB->gamestate = E_M_OPTIONS;
