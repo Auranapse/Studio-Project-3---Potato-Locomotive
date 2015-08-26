@@ -488,17 +488,19 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			}
 
 			//AI return to alert state if player have avoided enemy
-			if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
+			/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
 			{
 				b_aiCooldown = true;
 				e_State = ALERT;
-			}
+			}*/
 		}
 		break;
 
 	default:
 		break;
 	}
+
+	UpdateLookat(dt);
 
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
