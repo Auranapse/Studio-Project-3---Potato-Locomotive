@@ -79,6 +79,7 @@ public:
 	void PROJECTILE_PROJECTILE(Asset*, Asset*);
 	void PROJECTILE_ROOM(Asset*, Asset*);
 	void PROJECTILE_SOUND(Asset*, Asset*);
+
+	std::vector<Asset*>SceneAssets;//go private later, this is just for testing...
 private:
-	std::vector<Asset*>SceneAssets;
 };

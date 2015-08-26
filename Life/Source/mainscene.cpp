@@ -699,8 +699,13 @@ void mainscene::Init()
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
 	GAMESTATE = GS_PLAY;
-	Shape *sTest = new Sphere(Vector3(0, 0, 0), 5);
-	Asset *Test = new SoundRange(meshList[GEO_OBJCAKE], sTest, 1, false, false, Vector3(0, 0, 0), 5);
+	Shape *sTest = new Sphere(Vector3(0, 0, 0), 100);
+	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
+	MainManager.Add(Test);
+
+	Shape *aTest = new Sphere(Vector3(2,0,5), 5);
+	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 40, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(10,0,0), 1, 20, 0);
+	MainManager.Add(Test2);
 }
 
 /******************************************************************************/
@@ -2075,6 +2080,12 @@ void mainscene::Update(double dt)
 	default:
 		break;
 	}
+
+	MainManager.Update(dt, 1);
+	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
+	//Living* Whatever = (Living*)MainManager.SceneAssets[1];
+	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().x<<std::endl;
+
 }
 
 /******************************************************************************/

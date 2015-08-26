@@ -20,11 +20,13 @@ public:
 	Enemy(Mesh *mesh, Shape *bound, float mass,
 				int health, Vector3 velo, 
 				Vector3 acc, Vector3 force, 
-				int damage, float walkForce) 
+				int damage, float walkForce,
+				int alertLevel) 
 				: Living(mesh, bound, mass, health, velo, acc, force)
 	{
+		this->alertLevel = alertLevel;
 		this->type = 1;
-		this->damage;
+		this->damage = damage;
 		this->walkForce = walkForce;
 	}
 	Enemy();
