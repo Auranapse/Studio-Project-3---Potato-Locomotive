@@ -525,7 +525,11 @@ void mainscene::Init()
 
 	//WEAPONS
 
-	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 4, 4, 0.53f);
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.8f, 0.5f), 4, 4, 0.53f);
+	meshList[GEO_BULLET]->material.kAmbient.Set(0.8f, 0.8f, 0.8f);
+	meshList[GEO_BULLET]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BULLET]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BULLET]->material.kShininess = 10.0f;
 
 	meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
 	meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
@@ -624,15 +628,6 @@ void mainscene::Init()
 
 	DisplayInfo = true;
 
-	for (unsigned short i = 0; i < 100; ++i)
-	{
-		BulletInfo* BI = new BulletInfo();
-		BI->setStatus(false);
-		BIv_BulletList.push_back(BI);
-	}
-
-
-
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
 
@@ -723,18 +718,6 @@ bool mainscene::loadLevel(int level)
 	P_Player.DropObject();
 	PowerActive = false;
 	f_powerTintSet = 0.f;
-
-	while (BIv_BulletList.size() > 0)
-	{
-		BulletInfo *BI = BIv_BulletList.back();
-		if (BI != NULL)
-		{
-			delete BI;
-			BI = NULL;
-		}
-
-		BIv_BulletList.pop_back();
-	}
 
 	while (m_charList.size() > 0)
 	{
@@ -902,13 +885,12 @@ bool mainscene::loadLevel(int level)
 				ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
 				ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
 				ai->Scale.Set(10, 10, 10);
-				
+
 				WeaponsObject *WO;
 				WO = new WeaponsObject(WO_presetList[WO_M9]);
 				ai->HoldObject(WO);
 				m_goList.push_back(WO);
 				m_charList.push_back(ai);
-				TEST = ai;
 			}
 		}
 	}
@@ -1017,31 +999,37 @@ Particle* mainscene::FetchParticle(void)
 /******************************************************************************/
 /*!
 \brief
-Gets an unsused Bullet in the vector
+Gets an unsused bulletobject in the gameobject vector
 \return
-returns an unactive bullet
+returns an unactive gameobject
 */
 /******************************************************************************/
-BulletInfo* mainscene::FetchBullet(void)
+BulletObject* mainscene::FetchBullet(void)
 {
-	for (unsigned i = 0; i < BIv_BulletList.size(); ++i)
+	for (unsigned i = 0; i < m_goList.size(); ++i)
 	{
-		if (!BIv_BulletList[i]->getStatus())
+		BulletObject *BO = dynamic_cast<BulletObject*>(m_goList[i]);
+		if (BO != NULL)
 		{
-			BIv_BulletList[i]->setStatus(true);
-			return BIv_BulletList[i];
-			break;
+			if (!BO->active)
+			{
+				BO->active = true;
+				BO->gravityEnabled = false;
+				return dynamic_cast<BulletObject*>(m_goList[i]);
+				break;
+			}
 		}
 	}
 
 	for (unsigned i = 0; i < 10; ++i)
 	{
-		BulletInfo *BI;
-		BI = new BulletInfo();
-		BI->setStatus(false);
-		BIv_BulletList.push_back(BI);
+		BulletObject *BO;
+		BO = new BulletObject();
+		BO->active = true;
+		BO->gravityEnabled = false;
+		m_goList.push_back(BO);
 	}
-	return BIv_BulletList.back();
+	return dynamic_cast<BulletObject*>(m_goList.back());
 }
 
 /******************************************************************************/
@@ -1318,33 +1306,6 @@ void mainscene::UpdatePlayer(double &dt)
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(dt);
 
-	/*for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
-	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		AI *ai = dynamic_cast<AI*>(CO);
-		if (ai != NULL)
-		{
-			Mtx44 rotation;
-			rotation.SetToRotation(CalAnglefromPosition(ai->Lookat, ai->getPosition(), true), 0.f, 1.f, 0.f);
-			Vector3 L, R, C;
-			C = rotation * Vector3(0.f, 0.f, 10.f);
-			L = rotation * Vector3(-5.f, 0.f, 7.f);
-			R = rotation * Vector3(5.f, 0.f, 7.f);
-
-			ai->SensorUpdate(dt, collide(ai->getPosition() + L), collide(ai->getPosition() + R), collide(ai->getPosition() + C));
-			ai->Update(dt, P_Player.getPosition());
-		}
-		else
-		{
-			if (CO->holding != NULL)
-			{
-				CO->holding->Update(dt);
-			}
-		}
-
-		CO->Update(dt);
-	}*/
-
 	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
@@ -1365,15 +1326,14 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
+	/* Set AI to die
+	if (TEST->active)
 	{
-		if (TEST->active)
-		{
-			TEST->DropObject();
-			TEST->active = false;
-			generateCharacterParticle(TEST, Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0));
-		}
+		TEST->DropObject();
+		TEST->active = false;
+		generateCharacterParticle(TEST, Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0));
 	}
+	*/
 }
 
 /******************************************************************************/
@@ -1464,6 +1424,32 @@ void mainscene::UpdateGO(double &dt)
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
+			BulletObject *BO = dynamic_cast<BulletObject*>(go);
+			if (BO != NULL)
+			{
+				if (collide(BO->pos))
+				{
+					for (unsigned i = 0; i < 5; ++i)
+					{
+						generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
+					}
+
+					BO->active = false;
+				}
+
+				if (BO->life > 0)
+				{
+					BO->life -= static_cast<float>(dt);
+				}
+				else
+				{
+					BO->active = false;
+				}
+
+				BO->pos += BO->vel * static_cast<float>(dt);
+				continue;
+			}
+
 			if (go->enablePhysics && !go->isHeld)
 			{
 				go->colEnable = false;
@@ -1488,7 +1474,10 @@ void mainscene::UpdateGO(double &dt)
 				}
 				else
 				{
-					go->vel += gravity_force * static_cast<float>(dt);
+					if (go->gravityEnabled)
+					{
+						go->vel += gravity_force * static_cast<float>(dt);
+					}
 				}
 
 				if (collide(Vector3(go->pos.x + go->ColBox.x, go->pos.y, go->pos.z)))
@@ -1615,56 +1604,18 @@ void mainscene::UpdateParticles(double &dt)
 /******************************************************************************/
 /*!
 \brief
-Updates bullet
-*/
-/******************************************************************************/
-void mainscene::UpdateBullets(double &dt)
-{
-	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
-	{
-		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus())
-		{
-			if (collide(BI->getPosition()))
-			{
-				BI->verticalvelocity = 0.f;
-				BI->setStatus(false);
-				for (unsigned i = 0; i < 5; ++i)
-				{
-					generateParticle(BI->getPosition(), Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
-				}
-			}
-			else
-			{
-				if (d_dt != d_dt2)
-				{
-					BI->Update(dt*0.4);
-				}
-				else
-				{
-					BI->Update(dt);
-				}
-			}
-		}
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 Fires bullet
 */
 /******************************************************************************/
-void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity, float dmg)
+void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity)
 {
-	BulletInfo *BI;
-	BI = FetchBullet();
-	BI->damage = dmg;
-	BI->setLife(Longevity);
-	BI->setSpeed(Speed);
-	BI->setPosition(Pos);
-	BI->setDirection(Dir);
-	BI->setStatus(true);
+	BulletObject *BO;
+	BO = FetchBullet();
+	BO->pos = Pos;
+	BO->vel = Dir * Speed;
+	BO->life = Longevity;
+	BO->scale.Set(0.5f, 0.5f, 0.5f);
+	BO->mesh = meshList[GEO_BULLET];
 }
 
 /******************************************************************************/
@@ -1958,7 +1909,6 @@ void mainscene::Update(double dt)
 			}
 		}
 
-		UpdateBullets(dt);
 		weaponsUpdate(dt);
 		UpdateSound(dt);
 		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
@@ -2181,7 +2131,7 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	{
 		Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition(), false);
 	}
-	
+
 
 	if (CO->holding != NULL)
 	{
@@ -2273,7 +2223,7 @@ void mainscene::RenderParticles(void)
 				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false);
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
 				modelStack.PopMatrix();
 				break;
 			}
@@ -2285,7 +2235,7 @@ void mainscene::RenderParticles(void)
 				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false, true, 100, 100, Color(1.f, 0.f, 0.f));
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
 				modelStack.PopMatrix();
 				break;
 			}
@@ -2313,27 +2263,6 @@ void mainscene::RenderParticles(void)
 /******************************************************************************/
 /*!
 \brief
-Rendering of bullets
-*/
-/******************************************************************************/
-void mainscene::RenderBullet(void)
-{
-	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
-	{
-		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus() && BI->getLife() < 5.9f)
-		{
-			modelStack.PushMatrix();
-			modelStack.Translate(BI->getPosition());
-			RenderMesh(meshList[GEO_BULLET], false);
-			modelStack.PopMatrix();
-		}
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 Renders mesh in 3D
 */
 /******************************************************************************/
@@ -2347,6 +2276,7 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, f
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
+	glUniform1i(m_parameters[U_LIGHTENABLED], static_cast<GLint>(enableLight));
 
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
@@ -2523,7 +2453,6 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 			}
 		}
 		mesh->Render();
-
 		break;
 	}
 	}
@@ -2712,7 +2641,6 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&P_Player);
 	RenderParticles();
-	RenderBullet();
 
 	for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
 	{
@@ -2822,7 +2750,7 @@ void mainscene::RenderUI(void)
 			}
 		}
 	}
-	
+
 	if (DisplayInfo)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
@@ -2852,7 +2780,7 @@ void mainscene::RenderPassMain(void)
 	m_lightDepthFBO.BindForReading(GL_TEXTURE8);
 	glUniform1i(m_parameters[U_SHADOW_MAP], 8);
 
-	
+
 	/*
 	RenderMeshin2D(meshList[GEO_POSITION_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.09f);
 	RenderMeshin2D(meshList[GEO_NORMAL_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.075f);
@@ -2874,7 +2802,7 @@ void mainscene::RenderPassMain(void)
 		RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false);
 		modelStack.PopMatrix();
 	}
-	
+
 	RenderUI();
 
 	glDisable(GL_BLEND);
@@ -3097,18 +3025,6 @@ void mainscene::Exit(void)
 {
 	Application::SetCursor(true);
 	SE_Engine.Exit();
-
-	while (BIv_BulletList.size() > 0)
-	{
-		BulletInfo *BI = BIv_BulletList.back();
-		if (BI != NULL)
-		{
-			delete BI;
-			BI = NULL;
-		}
-
-		BIv_BulletList.pop_back();
-	}
 
 	while (m_goList.size() > 0)
 	{

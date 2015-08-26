@@ -92,7 +92,7 @@ void AI::movementFB(double &dt, bool forward)
 	else
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(720 * dt, 0, 1, 0);
+		rotation.SetToRotation(720 * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
@@ -113,7 +113,7 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 	if (left == true)
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(-rotation_speed * dt, 0, 1, 0);
+		rotation.SetToRotation(-rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
@@ -123,7 +123,7 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 	else
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(rotation_speed * dt, 0, 1, 0);
+		rotation.SetToRotation(rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);

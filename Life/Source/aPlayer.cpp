@@ -27,8 +27,8 @@ scalar multiplier for time related movements like Velocity/acceleration
 void aPlayer::update(double dt, float speed)
 {
 	this->acc = this->force / this->mass;
-	this->velo += acc * dt;
-	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
+	this->velo += acc * static_cast<float>(dt);
+	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
 	
 
 }

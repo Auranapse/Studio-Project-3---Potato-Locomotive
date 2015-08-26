@@ -28,7 +28,7 @@ void Projectile::update(double dt, float speed)
 {
 	this->acc = this->force / this->mass;
 	this->velo += acc;
-	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
+	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
 	this->lifetime -= 1;
 	if (this->lifetime <= 0)
 		delete this;

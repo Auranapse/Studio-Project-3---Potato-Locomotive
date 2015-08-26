@@ -28,7 +28,7 @@ void Enemy::update(double dt, float speed)
 {
 	this->acc = this->force * (this->mass / 40.f);
 	this->velo += acc;
-	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
+	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
 	
 	//PERFORM SOME STRAT BASED ON GAME STATE
 }

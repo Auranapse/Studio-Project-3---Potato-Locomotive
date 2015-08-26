@@ -39,9 +39,9 @@ void SceneManager::Update(double dt, float speed)
 {
 	//std::cout<<"\nUpdate~\n";
 	//Transverse through for Collision
-	for (int i = 0; i < SceneAssets.size(); ++i)
+	for (unsigned i = 0; i < SceneAssets.size(); ++i)
 	{
-		for (int k = i + 1; k < SceneAssets.size(); ++k)
+		for (unsigned k = i + 1; k < SceneAssets.size(); ++k)
 		{
 			if (checkCollision(SceneAssets[i], SceneAssets[k]))//Does it collide?
 			{
@@ -54,7 +54,7 @@ void SceneManager::Update(double dt, float speed)
 
 
 	//Transverse through for Living Assets Update
-	for (int i = 0; i < SceneAssets.size(); ++i)
+	for (unsigned i = 0; i < SceneAssets.size(); ++i)
 	{
 		if (SceneAssets[i]->getFixed() == false)
 		{

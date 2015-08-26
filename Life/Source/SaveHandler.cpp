@@ -128,7 +128,7 @@ void SaveHandler::assign(int &data, int default_data, unsigned int ID, bool save
 		}
 		else
 		{
-			data = static_cast<float>(std::stoi(Data[ID - 1]));
+			data = static_cast<int>(std::stoi(Data[ID - 1]));
 		}
 	}
 }

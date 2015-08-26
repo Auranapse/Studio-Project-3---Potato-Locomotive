@@ -28,6 +28,7 @@ public:
 	bool dynamicRendering;
 	bool holdable;
 	bool isHeld;
+	bool gravityEnabled;
 	float mass;
 	Mesh* mesh;
 
