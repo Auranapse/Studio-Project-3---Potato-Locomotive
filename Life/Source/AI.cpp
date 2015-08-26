@@ -43,6 +43,7 @@ f_alert_timer(0.f)
 	d_totalRotation = 0.0;
 	d_enemyRotation = 0.0;
 	b_rotateClockwiseFirst = NULL;
+	currentLookat = NULL;
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
 }
@@ -270,6 +271,70 @@ AI::E_AI_STATE AI::getState()
 	return e_State;
 }
 
+void AI::UpdateLookat(const double &dt)
+{
+	if(currentLookat != NULL)
+	{
+		b_updateAI = false;
+
+		if(Lookat != currentLookat)
+		{
+			if(Lookat.x != currentLookat.x)
+			{
+				if(Lookat.x < currentLookat.x)
+				{
+					Lookat.x += 50 * dt;
+
+					if(Lookat.x > currentLookat.x)
+					{
+						Lookat.x = currentLookat.x;
+					}
+				}
+				else
+				{
+					Lookat.x -= 50 * dt;
+
+					if(Lookat.x < currentLookat.x)
+					{
+						Lookat.x = currentLookat.x;
+					}
+				}
+			}
+
+			if(Lookat.z != currentLookat.z)
+			{
+				if(Lookat.z < currentLookat.z)
+				{
+					Lookat.z += 50 * dt;
+
+					if(Lookat.z > currentLookat.z)
+					{
+						Lookat.z = currentLookat.z;
+					}
+				}
+				else
+				{
+					Lookat.z -= 50 * dt;
+
+					if(Lookat.z < currentLookat.z)
+					{
+						Lookat.z = currentLookat.z;
+					}
+				}
+			}
+		}
+		else
+		{
+			destination = currentLookat;
+			prevPosition = Position;
+			e_State = ALERT;
+			b_aiCooldown = false;
+			b_updateAI = true;
+			currentLookat = NULL;
+		}
+	}
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -282,7 +347,6 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
 {
-	static Vector3 currentLookat = NULL;
 	switch (e_State)
 	{
 	case WALKING:
@@ -302,69 +366,11 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 				//if ai saw player but is too far way, the ai will investigate
 				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
 				{
-					destination.x = playerPos.x;
+					/*destination.x = playerPos.x;
 					destination.z = playerPos.z;
-					currentLookat = destination;
-				}
-			}
-
-			if(currentLookat != NULL)
-			{
-				b_updateAI = false;
-
-				if(Lookat != currentLookat)
-				{
-					if(Lookat.x != currentLookat.x)
-					{
-						if(Lookat.x < currentLookat.x)
-						{
-							Lookat.x += 50 * dt;
-
-							if(Lookat.x > currentLookat.x)
-							{
-								Lookat.x = currentLookat.x;
-							}
-						}
-						else
-						{
-							Lookat.x -= 50 * dt;
-							
-							if(Lookat.x < currentLookat.x)
-							{
-								Lookat.x = currentLookat.x;
-							}
-						}
-					}
-
-					if(Lookat.z != currentLookat.z)
-					{
-						if(Lookat.z < currentLookat.z)
-						{
-							Lookat.z += 50 * dt;
-							
-							if(Lookat.z > currentLookat.z)
-							{
-								Lookat.z = currentLookat.z;
-							}
-						}
-						else
-						{
-							Lookat.z -= 50 * dt;
-
-							if(Lookat.z < currentLookat.z)
-							{
-								Lookat.z = currentLookat.z;
-							}
-						}
-					}
-				}
-				else
-				{
-					currentLookat = NULL;
-					prevPosition = Position;
-					e_State = ALERT;
-					b_aiCooldown = false;
-					b_updateAI = true;
+					currentLookat = destination;*/
+					currentLookat.x = playerPos.x;
+					currentLookat.z = playerPos.z;
 				}
 			}
 

@@ -50,7 +50,7 @@ public:
 	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
 
 	void ai_ScanArea(const double &dt);
-
+	void UpdateLookat(const double &dt);
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
@@ -69,6 +69,7 @@ private:
 
 	Vector3 prevPosition;
 	Vector3 destination;
+	Vector3 currentLookat;
 	bool b_updateAI;
 	double d_totalRotation;
 	double d_enemyRotation;
