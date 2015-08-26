@@ -476,6 +476,8 @@ void mainscene::Init()
 
 	//Generate meshes------------------------------------------------------------------------
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
+	meshList[GEO_REDLINE] = MeshBuilder::GenerateLine("Red Line", Color(1, 0, 0), 0.f, 0.f, 1.f);
+	meshList[GEO_GREENLINE] = MeshBuilder::GenerateLine("Green Line", Color(0, 1, 0), 0.f, 0.f, 1.f);
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", Color(0.f, 1.f, 1.f), 0.1f, 0.5f, 1.f);
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
@@ -1962,6 +1964,32 @@ void mainscene::RenderGO(GameObject *go)
 	}
 }
 
+void mainscene::RenderAIDebugging(CharacterObject * CO)
+{
+	AI *ai = dynamic_cast<AI*>(CO);
+
+	if (ai != NULL)
+	{
+		modelStack.PushMatrix();
+		modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
+		modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+		RenderMesh(meshList[GEO_REDLINE], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
+		modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+		RenderMesh(meshList[GEO_REDLINE], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		//modelStack.Rotate(ai->Lookat, 0, 1, 0);
+		modelStack.Scale(0, 0, (ai->getPosition() - ai->getDestination()).Length());
+		RenderMesh(meshList[GEO_REDLINE], false);
+		modelStack.PopMatrix();
+	}
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -2000,6 +2028,8 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	modelStack.Translate(CO->getPosition());
 	modelStack.Translate(CO->ModelPos);
 	modelStack.Rotate(YRotation, 0, 1, 0);
+
+	RenderAIDebugging(CO);
 
 	modelStack.PushMatrix();
 	modelStack.Scale(CO->Scale);

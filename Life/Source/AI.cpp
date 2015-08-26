@@ -10,6 +10,9 @@ Handles AI position and physics
 #include "AI.h"
 #include "Application.h"
 
+double AI::d_detectionAngle = 60;
+double AI::d_detectionRange = 6400;
+double AI::d_playerEscapeRange = 10000;
 /******************************************************************************/
 /*!
 \brief
@@ -220,6 +223,26 @@ void AI::ai_ScanArea(const double &dt)
 	Lookat = Lookat + Position;
 }
 
+double AI::getPlayerEscapeRange()
+{
+	return d_playerEscapeRange;
+}
+
+double AI::getDetectionAngle()
+{
+	return d_detectionAngle;
+}
+
+double AI::getDetectionRange()
+{
+	return d_detectionRange;
+}
+
+Vector3 AI::getDestination()
+{
+	return destination;
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -239,10 +262,10 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			//Have the AI partol a certain area
 			//Need Pathfinding i think
 
-			if (isVisible(Position, Lookat, 60, playerPos))
+			if (isVisible(Position, Lookat, d_detectionAngle, playerPos))
 			{
 				//If player is infront and near player, then ai will switch to attack state
-				if ((playerPos - Position).LengthSquared() < 400)
+				if ((playerPos - Position).LengthSquared() < d_detectionRange)
 				{
 					prevPosition = Position;
 					e_State = ATTACK;
@@ -290,7 +313,7 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			}
 
 			//If player is infront and near player, then ai will switch to attack state
-			if (isVisible(Position, Lookat, 60, playerPos) && (playerPos - Position).LengthSquared() < 6400)
+			if (isVisible(Position, Lookat, d_detectionAngle, playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
 			{
 				e_State = ATTACK;
 				b_updateAI = true;
@@ -373,7 +396,7 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			}
 
 			//AI return to alert state if player have avoided enemy
-			if ((Position - playerPos).LengthSquared() > 10000)
+			if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
 			{
 				b_aiCooldown = true;
 				e_State = ALERT;
