@@ -53,6 +53,16 @@ Main scene
 
 class mainscene : public Scene
 {
+	enum GRAPHICS_SETTINGS
+	{
+		GRA_MAX,
+		GRA_MEDIUM,
+		GRA_LOW,
+		GRA_SHIT,
+	};
+
+	int Graphics;
+
 	enum GEOMETRY_TYPE
 	{
 		GEO_AXES,
@@ -254,10 +264,9 @@ class mainscene : public Scene
 
 		// -- Interactions
 		E_CTRL_INTERACT,
+		E_CTRL_THROW,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
-		E_CTRL_THROW,
-		E_CTRL_RELOAD,
 		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
@@ -352,6 +361,7 @@ private:
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
 	std::vector<BulletInfo*> BIv_BulletList;
+	CharacterObject *TEST;
 
 	Player P_Player;
 
@@ -407,7 +417,8 @@ private:
 	void UpdatePlayer(double &dt);
 	void UpdatePlayerPower(double &dt);
 	void UpdateGO(double &dt);
-	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type = Particle::PAR_DEFAULT, float lifetime = 5.f);
+	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, Vector3 &Rotation = Vector3(0.f, 0.f, 0.f), int type = Particle::PAR_MESH, float lifetime = 5.f, Mesh *mesh = NULL);
+	void generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel);
 	void UpdateParticles(double &dt);
 	void UpdateBullets(double &dt);
 

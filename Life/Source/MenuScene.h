@@ -33,6 +33,13 @@ Class Assignment3:
 /******************************************************************************/
 class MenuScene : public Scene
 {
+	enum GRAPHICS_SETTINGS
+	{
+		GRA_MAX,
+		GRA_MEDIUM,
+		GRA_LOW,
+		GRA_SHIT,
+	};
 
 	/******************************************************************************/
 	/*!
@@ -58,7 +65,6 @@ class MenuScene : public Scene
 		E_CTRL_THROW,
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
-		E_CTRL_RELOAD,
 		E_CTRL_ABILITY_1,
 
 		E_CTRL_TOTAL
@@ -162,6 +168,8 @@ class MenuScene : public Scene
 		BI_FOV_DECREASE,
 		BI_SENSITIVITY_INCREASE,
 		BI_SENSITIVITY_DECREASE,
+		BI_GRAPHICS_INCREASE,
+		BI_GRAPHICS_DECREASE,
 	};
 
 	struct CONTROL_CHANGE_BUTTON
@@ -300,6 +308,8 @@ private:
 	*/
 	/******************************************************************************/
 	unsigned short *us_ControlChange;
+
+	int Graphics;
 
 	/******************************************************************************/
 	/*!

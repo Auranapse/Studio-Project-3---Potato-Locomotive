@@ -6,7 +6,7 @@ Particle::Particle(void)
 	Vel.SetZero();
 	Scale.Set(1.f, 1.f, 1.f);
 	active = false;
-	ParticleType = PAR_DEFAULT;
+	ParticleType = PAR_SPARKS;
 	lifetime = 1.f;
 }
 
