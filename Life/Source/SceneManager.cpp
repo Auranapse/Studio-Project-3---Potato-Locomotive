@@ -17,7 +17,7 @@ SceneManager::~SceneManager()
 \brief	Adds Asset into Manager
 
 \param	newAsset
-	Asset To Add
+Asset To Add
 */
 /******************************************************************************/
 void SceneManager::Add(Asset* newAsset)
@@ -30,13 +30,14 @@ void SceneManager::Add(Asset* newAsset)
 \brief	Updates Collision Checks/Effects and call Living Assets' Updates
 
 \param	dt
-	Time used for the Update
+Time used for the Update
 \param speed
-	Speed of Living Assets in Scene
+Speed of Living Assets in Scene
 */
 /******************************************************************************/
 void SceneManager::Update(double dt, float speed)
 {
+	//std::cout<<"\nUpdate~\n";
 	//Transverse through for Collision
 	for (int i = 0; i < SceneAssets.size(); ++i)
 	{
@@ -48,10 +49,10 @@ void SceneManager::Update(double dt, float speed)
 			}
 		}
 	}
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
 
 
-	
+
 	//Transverse through for Living Assets Update
 	for (int i = 0; i < SceneAssets.size(); ++i)
 	{
@@ -66,14 +67,14 @@ void SceneManager::Update(double dt, float speed)
 /******************************************************************************/
 /*!
 \brief	
-	Checks if two Assets collided with each other
+Checks if two Assets collided with each other
 \param	a1
-	First Asset for Check Collision
+First Asset for Check Collision
 \param a2
-	Second Asset to Check Collision With a1
+Second Asset to Check Collision With a1
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::checkCollision(Asset* a1, Asset* a2)//Collision Check
@@ -141,11 +142,11 @@ bool SceneManager::checkCollision(Asset* a1, Asset* a2)//Collision Check
 /******************************************************************************/
 /*!
 \brief	
-	Performs the Effect due to Collision on the two Assets
+Performs the Effect due to Collision on the two Assets
 \param	a1
-	First Asset for Check Collision
+First Asset for Check Collision
 \param a2
-	Second Asset to Check Collision With a1
+Second Asset to Check Collision With a1
 */
 /******************************************************************************/
 void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
@@ -153,7 +154,7 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 	int c1, c2;
 	c1 = (a1->getType() < a2->getType()) ? (c1 = a1->getType()) : (c1 = a2->getType());
 	c2 = (a2->getType() >= a1->getType()) ? (c2 = a2->getType()) : (c2 = a1->getType());
-	
+
 	switch(c1)
 	{
 	case 0://Player Effects
@@ -218,14 +219,14 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Sphere/Sphere collided with each other
+Checks if Sphere/Sphere collided with each other
 \param	a1
-	Sphere Shape for Collision
+Sphere Shape for Collision
 \param a2
-	Sphere Shape for Collision
+Sphere Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::SPHERE_SPHERE(Asset* a1, Asset* a2)
@@ -245,14 +246,14 @@ bool SceneManager::SPHERE_SPHERE(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Sphere/AABB collided with each other
+Checks if Sphere/AABB collided with each other
 \param	a1
-	Sphere Shape for Collision
+Sphere Shape for Collision
 \param a2
-	AABB Shape for Collision
+AABB Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::SPHERE_AABB(Asset* a1, Asset* a2)
@@ -301,28 +302,28 @@ bool SceneManager::SPHERE_AABB(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Sphere/Ray collided with each other
+Checks if Sphere/Ray collided with each other
 \param	a1
-	Sphere Shape for Collision
+Sphere Shape for Collision
 \param a2
-	Ray Shape for Collision
+Ray Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::SPHERE_RAY(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Sphere/Plane collided with each other
+Checks if Sphere/Plane collided with each other
 \param	a1
-	Sphere Shape for Collision
+Sphere Shape for Collision
 \param a2
-	Plane Shape for Collision
+Plane Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::SPHERE_PLANE(Asset*, Asset*){return false;}
@@ -331,42 +332,42 @@ bool SceneManager::SPHERE_PLANE(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if AABB/AABB collided with each other
+Checks if AABB/AABB collided with each other
 \param	a1
-	AABB Shape for Collision
+AABB Shape for Collision
 \param a2
-	AABB Shape for Collision
+AABB Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::AABB_AABB(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if AABB/Ray collided with each other
+Checks if AABB/Ray collided with each other
 \param	a1
-	AABB Shape for Collision
+AABB Shape for Collision
 \param a2
-	Ray Shape for Collision
+Ray Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::AABB_RAY(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if AABB/Plane collided with each other
+Checks if AABB/Plane collided with each other
 \param	a1
-	AABB Shape for Collision
+AABB Shape for Collision
 \param a2
-	Plane Shape for Collision
+Plane Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::AABB_PLANE(Asset*, Asset*){return false;}
@@ -375,28 +376,28 @@ bool SceneManager::AABB_PLANE(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Ray/Ray collided with each other
+Checks if Ray/Ray collided with each other
 \param	a1
-	Ray Shape for Collision
+Ray Shape for Collision
 \param a2
-	Ray Shape for Collision
+Ray Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::RAY_RAY(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Ray/Plane collided with each other
+Checks if Ray/Plane collided with each other
 \param	a1
-	Ray Shape for Collision
+Ray Shape for Collision
 \param a2
-	Plane Shape for Collision
+Plane Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::RAY_PLANE(Asset*, Asset*){return false;}
@@ -405,14 +406,14 @@ bool SceneManager::RAY_PLANE(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Checks if Plane/Plane collided with each other
+Checks if Plane/Plane collided with each other
 \param	a1
-	Plane Shape for Collision
+Plane Shape for Collision
 \param a2
-	Plane Shape for Collision
+Plane Shape for Collision
 
 \return
-	TRUE if collided
+TRUE if collided
 */
 /******************************************************************************/
 bool SceneManager::PLANE_PLANE(Asset*, Asset*){return false;}
@@ -424,29 +425,29 @@ bool SceneManager::PLANE_PLANE(Asset*, Asset*){return false;}
 /******************************************************************************/
 /*!
 \brief	
-	Performs Player/Player Collision Effect
+Performs Player/Player Collision Effect
 \param	a1
-	Player Asset for Collision
+Player Asset for Collision
 \param a2
-	Player Asset for Collision
+Player Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_PLAYER(Asset*, Asset*){}
 /******************************************************************************/
 /*!
 \brief	
-	Performs Player/Enemy Collision Effect
+Performs Player/Enemy Collision Effect
 \param	a1
-	Player Asset for Collision
+Player Asset for Collision
 \param a2
-	Enemy Asset for Collision
+Enemy Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_ENEMY(Asset* a1, Asset* a2)
 {
 	aPlayer* c1 = (aPlayer*)a1;
 	Enemy* c2 = (Enemy*)a2;
-	 
+
 	c1->setHealth(c1->getHealth() - c2->getDamage());
 	if (c1->getHealth() <= 0)
 		delete c1;
@@ -454,11 +455,11 @@ void SceneManager::PLAYER_ENEMY(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Performs Player/Projectile Collision Effect
+Performs Player/Projectile Collision Effect
 \param	a1
-	Player Asset for Collision
+Player Asset for Collision
 \param a2
-	Projectile Asset for Collision
+Projectile Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_PROJECTILE(Asset* a1, Asset* a2)
@@ -468,11 +469,11 @@ void SceneManager::PLAYER_PROJECTILE(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Performs Player/Room Collision Effect
+Performs Player/Room Collision Effect
 \param	a1
-	Player Asset for Collision
+Player Asset for Collision
 \param a2
-	Room Asset for Collision
+Room Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
@@ -502,11 +503,11 @@ void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Performs Player/Sound Collision Effect
+Performs Player/Sound Collision Effect
 \param	a1
-	Player Asset for Collision
+Player Asset for Collision
 \param a2
-	Sound Asset for Collision
+Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_SOUND(Asset*, Asset*){}
@@ -515,22 +516,22 @@ void SceneManager::PLAYER_SOUND(Asset*, Asset*){}
 /******************************************************************************/
 /*!
 \brief	
-	Performs Enemy/Enemy Collision Effect
+Performs Enemy/Enemy Collision Effect
 \param	a1
-	Enemy Asset for Collision
+Enemy Asset for Collision
 \param a2
-	Enemy Asset for Collision
+Enemy Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::ENEMY_ENEMY(Asset*, Asset*){}
 /******************************************************************************/
 /*!
 \brief	
-	Performs Enemy/Projectile Collision Effect
+Performs Enemy/Projectile Collision Effect
 \param	a1
-	Enemy Asset for Collision
+Enemy Asset for Collision
 \param a2
-	Projectile Asset for Collision
+Projectile Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::ENEMY_PROJECTILE(Asset* a1, Asset* a2)
@@ -548,11 +549,11 @@ void SceneManager::ENEMY_PROJECTILE(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Performs Enemy/Room Collision Effect
+Performs Enemy/Room Collision Effect
 \param	a1
-	Enemy Asset for Collision
+Enemy Asset for Collision
 \param a2
-	Room Asset for Collision
+Room Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
@@ -562,33 +563,36 @@ void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
 	float gravity = 10;
 
 	float netForce = c1->getForce().Length();
-	if (!(c1->getMove()))//Standing Still
+	if (c1->getForce().Length() != 0)
 	{
-		Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
-		if (netForce > budgingForce.Length())
+		if (!(c1->getMove()))//Standing Still
 		{
-			c1->setMove(true);
-			Vector3 opposingForce = c1->getForce().Normalized() * -(budgingForce.LengthSquared());
-			c1->setForce(c1->getForce() - opposingForce);
+			Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
+			if (netForce > budgingForce.Length())
+			{
+				c1->setMove(true);
+				Vector3 opposingForce = c1->getForce().Normalized() * (-(budgingForce.LengthSquared()));
+				c1->setForce(c1->getForce() - opposingForce);
+			}
 		}
-	}
-	else if (c1->getMove())//Moving
-	{
-		Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
-		Vector3 opposingForce = c1->getForce().Normalized() * -(kineticForce.LengthSquared());
-		c1->setForce(c1->getForce() - opposingForce);
-		if (c1->getForce().Length() <= 0) 
-			c1->setMove(false);
+		else if (c1->getMove())//Moving
+		{
+			Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
+			Vector3 opposingForce = c1->getForce().Normalized() * (-(kineticForce.LengthSquared()));
+			c1->setForce(c1->getForce() - opposingForce);
+			if (c1->getForce().Length() <= 0) 
+				c1->setMove(false);
+		}
 	}
 }
 /******************************************************************************/
 /*!
 \brief	
-	Performs Enemy/Sound Collision Effect
+Performs Enemy/Sound Collision Effect
 \param	a1
-	Enemy Asset for Collision
+Enemy Asset for Collision
 \param a2
-	Sound Asset for Collision
+Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::ENEMY_SOUND(Asset*, Asset*){}//sound thingy destination
@@ -597,11 +601,11 @@ void SceneManager::ENEMY_SOUND(Asset*, Asset*){}//sound thingy destination
 /******************************************************************************/
 /*!
 \brief	
-	Performs Projectile/Projectile Collision Effect
+Performs Projectile/Projectile Collision Effect
 \param	a1
-	Projectile Asset for Collision
+Projectile Asset for Collision
 \param a2
-	Projectile Asset for Collision
+Projectile Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PROJECTILE_PROJECTILE(Asset* a1, Asset* a2)
@@ -612,22 +616,22 @@ void SceneManager::PROJECTILE_PROJECTILE(Asset* a1, Asset* a2)
 /******************************************************************************/
 /*!
 \brief	
-	Performs Projectile/Room Collision Effect
+Performs Projectile/Room Collision Effect
 \param	a1
-	Projectile Asset for Collision
+Projectile Asset for Collision
 \param a2
-	Room Asset for Collision
+Room Asset for Collision
 */
 /******************************************************************************/ 
 void SceneManager::PROJECTILE_ROOM(Asset*, Asset*){}
 /******************************************************************************/
 /*!
 \brief	
-	Performs Projectile/Sound Collision Effect
+Performs Projectile/Sound Collision Effect
 \param	a1
-	Projectile Asset for Collision
+Projectile Asset for Collision
 \param a2
-	Sound Asset for Collision
+Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PROJECTILE_SOUND(Asset*, Asset*){}
