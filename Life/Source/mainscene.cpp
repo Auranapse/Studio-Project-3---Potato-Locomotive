@@ -1128,7 +1128,17 @@ void mainscene::UpdatePlayer(double &dt)
 			}
 		}
 
-		P_Player.Velocity += gravity_force * static_cast<float>(dt);
+		if (d_dt != d_dt2)
+		{
+			double tempDT = (d_dt + d_dt2) / 2;
+			P_Player.Velocity += gravity_force * static_cast<float>(tempDT);
+		}
+		else
+		{
+			P_Player.Velocity += gravity_force * static_cast<float>(dt);
+		}
+
+
 		inAir = true;
 	}
 	else
@@ -1302,9 +1312,19 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
-	P_Player.Lookat = FPC.target;
-	P_Player.Update(dt);
+	if (d_dt2 != d_dt)
+	{
+		double tempDT = (d_dt + d_dt2) / 2;
+		FPC = FPC + (P_Player.Velocity * static_cast<float>(tempDT));
+		P_Player.Lookat = FPC.target;
+		P_Player.Update(tempDT);
+	}
+	else
+	{
+		FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
+		P_Player.Lookat = FPC.target;
+		P_Player.Update(dt);
+	}
 
 	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
 	{
