@@ -362,9 +362,9 @@ void mainscene::Init()
 	lights[0].position.Set(10.f, 100.f, 0.f);
 	lights[0].color.Set(.85f, .92f, 1.f);
 	lights[0].kC = 1.f;
-	lights[0].kL = 0.000001f;
-	lights[0].kQ = 0.00000001f;
-	lights[0].power = 1.5f;
+	lights[0].kL = 0.00000001f;
+	lights[0].kQ = 0.00000000001f;
+	lights[0].power = 1.f;
 
 
 	//Viewing room 2 light
@@ -447,6 +447,9 @@ void mainscene::Init()
 	m_parameters[U_TRANSPARENCY] = glGetUniformLocation(m_programID, "alpha");
 	m_parameters[U_GLOW] = glGetUniformLocation(m_programID, "glow");
 	m_parameters[U_GLOW_COLOR] = glGetUniformLocation(m_programID, "glowColor");
+	m_parameters[U_LENS_EFFECT] = glGetUniformLocation(m_programID, "lenseffect");
+
+	glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
 
 	m_parameters[U_FOG_COLOR] = glGetUniformLocation(m_programID, "fogParam.color");
 	m_parameters[U_FOG_START] = glGetUniformLocation(m_programID, "fogParam.start");
@@ -480,11 +483,17 @@ void mainscene::Init()
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
-	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(0.7f, 0.7f, 0.7f), 1, 1, 1);
+	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(0.8f, 0.8f, 0.8f), 1, 1, 1);
 	meshList[GEO_WORLD_CUBE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
-	meshList[GEO_WORLD_CUBE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+	meshList[GEO_WORLD_CUBE]->material.kDiffuse.Set(0.8f, 0.8f, 0.8f);
 	meshList[GEO_WORLD_CUBE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_WORLD_CUBE]->material.kShininess = 1.0f;
+
+	meshList[GEO_WORLD_QUAD] = MeshBuilder::GenerateQuad("World Quad", Color(0.8f, 0.8f, 0.8f), 1, 1, 1);
+	meshList[GEO_WORLD_QUAD]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
+	meshList[GEO_WORLD_QUAD]->material.kDiffuse.Set(0.8f, 0.8f, 0.8f);
+	meshList[GEO_WORLD_QUAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_WORLD_QUAD]->material.kShininess = 1.0f;
 
 	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
 
@@ -615,7 +624,6 @@ void mainscene::Init()
 
 	currentLevel = 1;
 	loadLevel(currentLevel);
-	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 
 	gravity_force.Set(0.f, -9.82f * 25, 0.f);
 
@@ -791,6 +799,11 @@ bool mainscene::loadLevel(int level)
 						SizeX = worldsize;
 					}
 
+					if (SizeY > worldsize * 2)
+					{
+						SizeY = worldsize*2.f;
+					}
+
 					if (SizeZ > worldsize)
 					{
 						SizeZ = worldsize;
@@ -820,19 +833,72 @@ bool mainscene::loadLevel(int level)
 		}
 	}
 
+	//World Floor
 	WorldObject *WO;
 	WO = new WorldObject();
-	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0, (GAME_MAP.map_height*0.5f)*worldsize);
-	WO->rotation.x = -90;
-	WO->scale.Set(400, 400, 400);
-	WO->ColBox.Set(4000, 5, 4000);
+	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0.f, (GAME_MAP.map_height*0.5f)*worldsize);
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, 1, GAME_MAP.map_height * worldsize * 2.f);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
-	WO->mesh = meshList[GEO_FLOOR_TILE];
+	WO->mesh = meshList[GEO_WORLD_CUBE];
+	m_goList.push_back(WO);
+	//World Celling
+	WO = new WorldObject();
+	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, worldsize*4.f, (GAME_MAP.map_height*0.5f)*worldsize);
+	WO->rotation.x = 90.f;
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, GAME_MAP.map_height * worldsize * 2.f, 1);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_WORLD_QUAD];
 	m_goList.push_back(WO);
 
-	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(1.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
+	WO = new WorldObject();
+	WO->pos.Set(worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.2f, worldsize);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.2f, worldsize);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_WORLD_CUBE];
+	m_goList.push_back(WO);
+
+	WO = new WorldObject();
+	WO->pos.Set(worldsize * 2.f, worldsize * 2.f, 0.f);
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.2f, worldsize * 2.2f, worldsize);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.2f, worldsize * 2.2f, worldsize);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_WORLD_CUBE];
+	m_goList.push_back(WO);
+
+	WO = new WorldObject();
+	WO->pos.Set(-worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize);
+	WO->scale.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->ColBox.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_WORLD_CUBE];
+	m_goList.push_back(WO);
+
+	WO = new WorldObject();
+	WO->pos.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize);
+	WO->scale.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->ColBox.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->active = true;
+	WO->enablePhysics = false;
+	WO->colEnable = true;
+	WO->mesh = meshList[GEO_WORLD_CUBE];
+	m_goList.push_back(WO);
+
+	lights[0].position.y = worldsize * 4.f;
+
+	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
 }
@@ -1033,7 +1099,7 @@ void mainscene::UpdatePlayer(double &dt)
 	{
 		LookDir *= 25;
 		RightDir *= 25;
-		walkSoundDelay /= 2;
+		walkSoundDelay *= 0.5f;
 	}
 	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
 	{
@@ -1118,7 +1184,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 
 	//Collision handling
-	if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 50.f, 0.f))))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 20.f, 0.f))))
 	{
 		if (P_Player.Velocity.x > 0)
 		{
@@ -1126,7 +1192,7 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, 10.f))))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 20.f, 10.f))))
 	{
 		if (P_Player.Velocity.z > 0)
 		{
@@ -1134,7 +1200,7 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 50.f, 0.f))))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 20.f, 0.f))))
 	{
 		if (P_Player.Velocity.x < 0)
 		{
@@ -1142,7 +1208,7 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 50.f, -10.f))))
+	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 20.f, -10.f))))
 	{
 		if (P_Player.Velocity.z < 0)
 		{
@@ -2491,7 +2557,7 @@ void mainscene::RenderWorldNoShadow(void)
 		modelStack.PopMatrix();
 	}
 
-	RenderSkybox();
+	//RenderSkybox();
 }
 
 /******************************************************************************/
@@ -2505,12 +2571,20 @@ void mainscene::RenderUI(void)
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_DEATH:
-	case mainscene::GS_PLAY:
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 0.f);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
 		modelStack.PopMatrix();
+		break;
+	case mainscene::GS_PLAY:
+		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(10));
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+		modelStack.PopMatrix();
+		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
 		break;
 	case mainscene::GS_END:
 	case mainscene::GS_PAUSED:
@@ -2564,7 +2638,7 @@ void mainscene::RenderUI(void)
 
 	RenderButtons();
 
-	if (DisplayInfo == true)
+	if (DisplayInfo)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
 	}
@@ -2644,7 +2718,6 @@ void mainscene::RenderPassGPass(void)
 	}
 
 	lights[0].position.x = P_Player.getPosition().x;
-	lights[0].position.y = 100.f + P_Player.getPosition().y;
 	lights[0].position.z = P_Player.getPosition().z;
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
 	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
