@@ -74,6 +74,7 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
+	SH_1.assign(Graphics, GRA_MAX, 15, save);
 
 	SH_1.saveData();
 }
@@ -89,6 +90,7 @@ void MenuScene::Init()
 	SE_Engine.Init();
 	f_fov = 0.f;
 	f_mouseSensitivity = 0.f;
+	Graphics = GRA_MAX;
 
 	for (size_t i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -243,14 +245,14 @@ void MenuScene::InitMenu(void)
 
 	//OPTIONS-----------------------------------------------------
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 100.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 120.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Controls";
 	S_MB->gamestate = E_M_OPTIONS;
 	v_textButtonList.push_back(S_MB);
 
 	S_MB = new TextButton;
-	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 140.f, 0.1f);
+	S_MB->pos.Set(Application::GetWindowWidth()*0.22f - 4.f, Application::GetWindowHeight()*0.6f - 160.f, 0.1f);
 	S_MB->scale.Set(25, 25, 25);
 	S_MB->text = "Toggle Fullscreen";
 	S_MB->gamestate = E_M_OPTIONS;
@@ -289,6 +291,24 @@ void MenuScene::InitMenu(void)
 	m_B->Scale.Set(20, 20, 20);
 	m_B->mesh = P_meshArray[E_GEO_BUTTON_RIGHT];
 	m_B->ID = BI_SENSITIVITY_INCREASE;
+	m_B->labeltype = Button::LT_NONE;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f, Application::GetWindowHeight()*0.6f - 80.f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON_LEFT];
+	m_B->ID = BI_GRAPHICS_DECREASE;
+	m_B->labeltype = Button::LT_NONE;
+	m_B->gamestate = E_M_OPTIONS;
+	v_buttonList.push_back(m_B);
+
+	m_B = new Button;
+	m_B->Position.Set(Application::GetWindowWidth()*0.4f + 60.f, Application::GetWindowHeight()*0.6f - 80.f, 0.1f);
+	m_B->Scale.Set(20, 20, 20);
+	m_B->mesh = P_meshArray[E_GEO_BUTTON_RIGHT];
+	m_B->ID = BI_GRAPHICS_INCREASE;
 	m_B->labeltype = Button::LT_NONE;
 	m_B->gamestate = E_M_OPTIONS;
 	v_buttonList.push_back(m_B);
@@ -673,6 +693,20 @@ void MenuScene::Update(double dt)	//TODO: Reduce complexity of MenuScene::Update
 				if (f_mouseSensitivity > 0.1)
 				{
 					f_mouseSensitivity -= 0.1f;
+				}
+			}
+			else if (FetchBUTTON(BI_GRAPHICS_INCREASE)->active)
+			{
+				if (Graphics > GRA_MAX)
+				{
+					--Graphics;
+				}
+			}
+			else if (FetchBUTTON(BI_GRAPHICS_DECREASE)->active)
+			{
+				if (Graphics < GRA_SHIT)
+				{
+					++Graphics;
 				}
 			}
 		}
@@ -1358,7 +1392,7 @@ void MenuScene::Render()
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(v3_Menupos[MENU_STATE]);
-
+		//FOV
 		modelStack.PushMatrix();
 		modelStack.Translate(FetchBUTTON(BI_FOV_DECREASE)->Position);
 		modelStack.Translate(-100, 0, 0);
@@ -1375,7 +1409,7 @@ void MenuScene::Render()
 		ss << f_fov_target;
 		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
 		modelStack.PopMatrix();
-
+		//Mouse
 		modelStack.PushMatrix();
 		modelStack.Translate(FetchBUTTON(BI_SENSITIVITY_DECREASE)->Position);
 		modelStack.Translate(-150, 0, 0);
@@ -1390,6 +1424,39 @@ void MenuScene::Render()
 
 		ss.str("");
 		ss << (f_mouseSensitivity*100.f);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
+		modelStack.PopMatrix();
+		//Graphics
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_GRAPHICS_DECREASE)->Position);
+		modelStack.Translate(-225, 0, 0);
+		modelStack.Scale(25, 25, 25);
+		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], "Graphics", UIColor);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(FetchBUTTON(BI_GRAPHICS_INCREASE)->Position);
+		modelStack.Translate(50, 0, 0);
+		modelStack.Scale(25, 25, 25);
+
+		ss.str("");
+		if (Graphics == GRA_MAX)
+		{
+			ss << "Max";
+		}
+		else if (Graphics == GRA_MEDIUM)
+		{
+			ss << "Medium";
+		}
+		else if (Graphics == GRA_LOW)
+		{
+			ss << "Low";
+		}
+		else
+		{
+			ss << "Shit";
+		}
+
 		RenderTextOnScreen(P_meshArray[E_GEO_TEXT], ss.str(), UIColor);
 		modelStack.PopMatrix();
 

@@ -9,18 +9,19 @@ class Particle
 public:
 	enum Type
 	{
-		PAR_DEFAULT,
-		PAR_GEL,
-		PAR_TOTAL,
+		PAR_SPARKS,
+		PAR_MESH,
 	};
 
 	int ParticleType;
 	Material material;
 	Vector3 Pos;
+	Vector3 Rotation;
 	Vector3 Vel;
 	Vector3 Scale;
 	float lifetime;
 	bool active;
+	Mesh *mesh;
 
 	Particle(void);
 	~Particle(void);

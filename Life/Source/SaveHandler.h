@@ -31,6 +31,7 @@ public:
 	void init(std::string file);
 
 	void assign(float &data, float default_data, unsigned int ID, bool save = false);
+	void assign(int &data, int default_data, unsigned int ID, bool save = false);
 	void assign(unsigned short &data, unsigned short default_data, unsigned int ID, bool save = false);
 
 	void loadData(void);

@@ -64,6 +64,7 @@ void mainscene::assignSave(void)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
+	SH_1.assign(Graphics, GRA_MAX, 15);
 }
 
 /******************************************************************************/
@@ -193,6 +194,7 @@ Initialize default variables, create meshes, lighting
 void mainscene::Init()
 {
 	SE_Engine.Init();
+	Graphics = GRA_MAX;
 	//Control initialization--------------
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -343,7 +345,26 @@ void mainscene::Init()
 	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 
 	m_gBuffer.Init(Application::GetWindowWidth(), Application::GetWindowHeight());
-	m_lightDepthFBO.Init(8192, 8192);
+
+	switch (Graphics)
+	{
+	case GRA_MAX:
+		m_lightDepthFBO.Init(8192, 8192);
+		break;
+	case GRA_MEDIUM:
+		m_lightDepthFBO.Init(4096, 4096);
+		break;
+	case GRA_LOW:
+		m_lightDepthFBO.Init(2048, 2048);
+		break;
+	case GRA_SHIT:
+		m_lightDepthFBO.Init(512, 512);
+		break;
+	default:
+		m_lightDepthFBO.Init(2048, 2048);
+		break;
+	}
+
 	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
 	//Main Lighting (VIewing room sign)
 	/*lights[0].type = LIGHT_POINT;
@@ -361,10 +382,10 @@ void mainscene::Init()
 	lights[0].type = LIGHT_POINT;
 	lights[0].position.Set(10.f, 100.f, 0.f);
 	lights[0].color.Set(.85f, .92f, 1.f);
-	lights[0].kC = 1.f;
-	lights[0].kL = 0.00000001f;
-	lights[0].kQ = 0.00000000001f;
-	lights[0].power = 1.f;
+	lights[0].kC = 0.f;
+	lights[0].kL = 0.f;
+	lights[0].kQ = 0.f;
+	lights[0].power = 1.5f;
 
 
 	//Viewing room 2 light
@@ -464,7 +485,21 @@ void mainscene::Init()
 	float f_end = 1000;
 	float f_density = 0.005f;
 	int f_type = 1;
-	enableFOG = true;
+
+	if (Graphics >= GRA_MEDIUM)
+	{
+		enableFOG = true;
+	}
+	else
+	{
+		enableFOG = false;
+	}
+
+	if (Graphics == GRA_SHIT)
+	{
+		lights[0].power = 1.f;
+	}
+
 	glUniform3fv(m_parameters[U_FOG_COLOR], 1, &FogCol.r);
 	glUniform1i(m_parameters[U_FOG_START], static_cast<GLint>(f_start));
 	glUniform1i(m_parameters[U_FOG_END], static_cast<GLint>(f_end));
@@ -486,13 +521,13 @@ void mainscene::Init()
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
-	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(0.8f, 0.8f, 0.8f), 1, 1, 1);
+	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(1.f, 1.f, 1.f), 1, 1, 1);
 	meshList[GEO_WORLD_CUBE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
 	meshList[GEO_WORLD_CUBE]->material.kDiffuse.Set(0.8f, 0.8f, 0.8f);
 	meshList[GEO_WORLD_CUBE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_WORLD_CUBE]->material.kShininess = 1.0f;
 
-	meshList[GEO_WORLD_QUAD] = MeshBuilder::GenerateQuad("World Quad", Color(0.8f, 0.8f, 0.8f), 1, 1, 1);
+	meshList[GEO_WORLD_QUAD] = MeshBuilder::GenerateQuad("World Quad", Color(1.f, 1.f, 1.f), 1, 1, 1);
 	meshList[GEO_WORLD_QUAD]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
 	meshList[GEO_WORLD_QUAD]->material.kDiffuse.Set(0.8f, 0.8f, 0.8f);
 	meshList[GEO_WORLD_QUAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -831,6 +866,7 @@ bool mainscene::loadLevel(int level)
 					ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
 					ai->Scale.Set(10, 10, 10);
 					m_charList.push_back(ai);
+					TEST = ai;
 				}
 			}
 		}
@@ -921,7 +957,7 @@ Particle* mainscene::FetchParticle(void)
 		if (!m_ParList[i]->active)
 		{
 			m_ParList[i]->active = true;
-			m_ParList[i]->ParticleType = Particle::PAR_DEFAULT;
+			m_ParList[i]->ParticleType = Particle::PAR_SPARKS;
 			return m_ParList[i];
 			break;
 		}
@@ -1291,6 +1327,11 @@ void mainscene::UpdatePlayer(double &dt)
 			}
 		}
 	}
+
+	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
+	{
+		generateCharacterParticle(TEST, Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0));
+	}
 }
 
 /******************************************************************************/
@@ -1457,15 +1498,44 @@ void mainscene::UpdateGO(double &dt)
 Generates particles at position
 */
 /******************************************************************************/
-void mainscene::generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, int type, float lifetime)
+void mainscene::generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, Vector3 &Rotation, int type, float lifetime, Mesh *mesh)
 {
 	Particle *Par = FetchParticle();
 	Par->ParticleType = type;
 	Par->Pos = Pos;
+	Par->Rotation = Rotation;
 	Par->Scale = scale;
 	Par->Vel = Velocity;
 	Par->lifetime = lifetime;
+	Par->mesh = mesh;
 	Par->active = true;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Generates particles at position
+*/
+/******************************************************************************/
+void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel)
+{
+	float CharRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->HeadPos, CO->Scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Head);
+
+	Mtx44 Rotation;
+	Rotation.SetToRotation(CharRotation, 0, 1, 0);
+	Vector3 tempArm = CO->ArmPos;
+	tempArm = Rotation * tempArm;
+	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Arm_right);
+	tempArm = Vector3(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
+	tempArm = Rotation * tempArm;
+	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Arm_left);
+
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Leg_left);
+
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Leg_right);
+
+	generateParticle(CO->getPosition() + CO->ModelPos, CO->Scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
 }
 
 /******************************************************************************/
@@ -1513,7 +1583,7 @@ void mainscene::UpdateBullets(double &dt)
 				BI->setStatus(false);
 				for (unsigned i = 0; i < 5; ++i)
 				{
-					generateParticle(BI->getPosition(), Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Particle::PAR_DEFAULT, 1.0f);
+					generateParticle(BI->getPosition(), Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
 				}
 			}
 			else
@@ -2185,14 +2255,31 @@ void mainscene::RenderParticles(void)
 		{
 			switch (Par->ParticleType)
 			{
-			case Particle::PAR_DEFAULT:
+			case Particle::PAR_SPARKS:
 			{
 				modelStack.PushMatrix();
 				modelStack.Translate(Par->Pos);
+				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 				modelStack.Scale(Par->Scale);
 				RenderMesh(meshList[GEO_BULLET], false);
 				modelStack.PopMatrix();
 				break;
+			}
+			case Particle::PAR_MESH:
+			{
+				if (Par->mesh != NULL)
+				{
+					modelStack.PushMatrix();
+					modelStack.Translate(Par->Pos);
+					modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+					modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+					modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+					modelStack.Scale(Par->Scale);
+					RenderMesh(Par->mesh, true);
+					modelStack.PopMatrix();
+				}
 			}
 			default:
 				break;
@@ -2786,7 +2873,10 @@ void mainscene::RenderPassGPass(void)
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
 	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
 
-	RenderWorldShadow();
+	if (Graphics > GRA_SHIT)
+	{
+		RenderWorldShadow();
+	}
 }
 
 /******************************************************************************/

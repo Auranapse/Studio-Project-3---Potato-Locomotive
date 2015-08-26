@@ -108,6 +108,45 @@ the ID of the data for storing later
 if true, will overwrite savefile, if false it'll load from savefile
 !*/
 /****************************************************************************/
+void SaveHandler::assign(int &data, int default_data, unsigned int ID, bool save)
+{
+	std::string temp;
+	if (ID > Data.size())
+	{
+		data = default_data;
+		temp = std::to_string(static_cast<long double>(data));
+		Data.push_back(temp);
+	}
+	else
+	{
+		if (save)
+		{
+			std::stringstream ss;
+			ss.str("");
+			ss << data << "\0";
+			Data[ID - 1] = ss.str();
+		}
+		else
+		{
+			data = static_cast<float>(std::stoi(Data[ID - 1]));
+		}
+	}
+}
+
+/****************************************************************************/
+/*!
+\brief
+Assign a particular value to the save file, for loading and saving.
+\param data
+the value of the data to keep
+\param default_data
+the data to default to if it doesn't exist in save
+\param ID
+the ID of the data for storing later
+\param save
+if true, will overwrite savefile, if false it'll load from savefile
+!*/
+/****************************************************************************/
 void SaveHandler::assign(unsigned short &data, unsigned short default_data, unsigned int ID, bool save)
 {
 	std::string temp;
