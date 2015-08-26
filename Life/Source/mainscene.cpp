@@ -478,6 +478,7 @@ void mainscene::Init()
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_REDLINE] = MeshBuilder::GenerateLine("Red Line", Color(1, 0, 0), 0.f, 0.f, 1.f);
 	meshList[GEO_GREENLINE] = MeshBuilder::GenerateLine("Green Line", Color(0, 1, 0), 0.f, 0.f, 1.f);
+	meshList[GEO_BLUELINE] = MeshBuilder::GenerateLine("Blue Line", Color(0, 0, 1), 0.f, 0.f, 1.f);
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", Color(0.f, 1.f, 1.f), 0.1f, 0.5f, 1.f);
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
@@ -1970,23 +1971,56 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 
 	if (ai != NULL)
 	{
-		modelStack.PushMatrix();
-		modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
-		modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
-		RenderMesh(meshList[GEO_REDLINE], false);
-		modelStack.PopMatrix();
+		if(ai->getState() == AI::WALKING || ai->getState() == AI::ALERT)
+		{
+			//Detection Range
+			modelStack.PushMatrix();
+			modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
+			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
-		modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
-		RenderMesh(meshList[GEO_REDLINE], false);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
+			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		//modelStack.Rotate(ai->Lookat, 0, 1, 0);
-		modelStack.Scale(0, 0, (ai->getPosition() - ai->getDestination()).Length());
-		RenderMesh(meshList[GEO_REDLINE], false);
-		modelStack.PopMatrix();
+			//Alert Range
+			if(ai->getState() == AI::WALKING)
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -1, 0);
+				modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
+				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				RenderMesh(meshList[GEO_BLUELINE], false);
+				modelStack.PopMatrix();
+
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -1, 0);
+				modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
+				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				RenderMesh(meshList[GEO_BLUELINE], false);
+				modelStack.PopMatrix();
+			}
+			//Destination
+			else
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -17, 0);
+				modelStack.Scale(0, 0, (ai->getPosition() - ai->getDestination()).Length());
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
+			}
+		}
+		//Attack State
+		else
+		{
+			modelStack.PushMatrix();
+			modelStack.Scale(0, 0, sqrt(ai->getPlayerEscapeRange()));
+			RenderMesh(meshList[GEO_GREENLINE], false);
+			modelStack.PopMatrix();
+		}
 	}
 }
 
@@ -2487,7 +2521,7 @@ void mainscene::RenderWorldShadow(void)
 	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
-		if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
+		//if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
 		{
 			RenderCharacter(CO);
 		}

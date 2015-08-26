@@ -10,9 +10,11 @@ Handles AI position and physics
 #include "AI.h"
 #include "Application.h"
 
-double AI::d_detectionAngle = 60;
+double AI::d_detectionAngle = 30;
 double AI::d_detectionRange = 6400;
-double AI::d_playerEscapeRange = 10000;
+double AI::d_detectionRangeMax = d_detectionRange * 2;
+double AI::d_playerEscapeRange = 40000;
+
 /******************************************************************************/
 /*!
 \brief
@@ -179,9 +181,16 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 }
 
 
+/******************************************************************************/
+/*!
+\brief
+AI will scan the area for the player
+\param dt
+use to update the rotation of the ai
+*/
+/******************************************************************************/
 void AI::ai_ScanArea(const double &dt)
 {
-	//====================================AI SCANNING THE AREA FOR PLAYER===================================//
 	b_updateAI = false;
 	static double rotationSpeed = 50.f;
 
@@ -223,6 +232,14 @@ void AI::ai_ScanArea(const double &dt)
 	Lookat = Lookat + Position;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Update the sensors for pathfinding
+\param left
+sensors made to see if there is anything in the way of the AI
+*/
+/******************************************************************************/
 double AI::getPlayerEscapeRange()
 {
 	return d_playerEscapeRange;
@@ -238,9 +255,19 @@ double AI::getDetectionRange()
 	return d_detectionRange;
 }
 
+double AI::getDetectionRange_Max()
+{
+	return d_detectionRangeMax;
+}
+
 Vector3 AI::getDestination()
 {
 	return destination;
+}
+
+AI::E_AI_STATE AI::getState()
+{
+	return e_State;
 }
 
 /******************************************************************************/
@@ -255,6 +282,7 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
 {
+	static Vector3 currentLookat = NULL;
 	switch (e_State)
 	{
 	case WALKING:
@@ -272,13 +300,72 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 					b_aiCooldown = false;
 				}
 				//if ai saw player but is too far way, the ai will investigate
-				else
+				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
 				{
-					prevPosition = Position;
 					destination.x = playerPos.x;
 					destination.z = playerPos.z;
+					currentLookat = destination;
+				}
+			}
+
+			if(currentLookat != NULL)
+			{
+				b_updateAI = false;
+
+				if(Lookat != currentLookat)
+				{
+					if(Lookat.x != currentLookat.x)
+					{
+						if(Lookat.x < currentLookat.x)
+						{
+							Lookat.x += 50 * dt;
+
+							if(Lookat.x > currentLookat.x)
+							{
+								Lookat.x = currentLookat.x;
+							}
+						}
+						else
+						{
+							Lookat.x -= 50 * dt;
+							
+							if(Lookat.x < currentLookat.x)
+							{
+								Lookat.x = currentLookat.x;
+							}
+						}
+					}
+
+					if(Lookat.z != currentLookat.z)
+					{
+						if(Lookat.z < currentLookat.z)
+						{
+							Lookat.z += 50 * dt;
+							
+							if(Lookat.z > currentLookat.z)
+							{
+								Lookat.z = currentLookat.z;
+							}
+						}
+						else
+						{
+							Lookat.z -= 50 * dt;
+
+							
+							if(Lookat.z < currentLookat.z)
+							{
+								Lookat.z = currentLookat.z;
+							}
+						}
+					}
+				}
+				else
+				{
+					currentLookat = NULL;
+					prevPosition = Position;
 					e_State = ALERT;
 					b_aiCooldown = false;
+					b_updateAI = true;
 				}
 			}
 

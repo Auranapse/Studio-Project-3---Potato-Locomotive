@@ -54,7 +54,9 @@ public:
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
+	double getDetectionRange_Max();
 	Vector3 getDestination();
+	E_AI_STATE getState();
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
@@ -74,6 +76,7 @@ private:
 
 	static double d_detectionAngle;
 	static double d_detectionRange;
+	static double d_detectionRangeMax;
 	static double d_playerEscapeRange;
 
 	bool positiveX, positiveZ, negativeX, negativeZ;

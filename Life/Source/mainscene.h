@@ -58,6 +58,7 @@ class mainscene : public Scene
 		GEO_AXES,
 		GEO_REDLINE,
 		GEO_GREENLINE,
+		GEO_BLUELINE,
 		GEO_CROSSHAIR,
 		GEO_SKYPLANE,
 		GEO_FLOOR_TILE,
