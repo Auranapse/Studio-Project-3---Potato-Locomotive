@@ -2873,7 +2873,7 @@ void mainscene::RenderPassGPass(void)
 	//m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y + FPC.position.y*0.1, lights[0].position.z, 0, 0, 0, 0, 1, 0);
 	m_lightDepthView.SetToLookAt(lights[0].position.x, lights[0].position.y, lights[0].position.z, lights[0].position.x + 1, lights[0].position.y - 10, lights[0].position.z + 1, 0, 1, 0);
 
-	if (Graphics > GRA_SHIT)
+	if (Graphics <= GRA_SHIT)
 	{
 		RenderWorldShadow();
 	}
