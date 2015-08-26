@@ -1,5 +1,19 @@
+/******************************************************************************/
+/*!
+\file	Projectile.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to define Projectiles in Scene
+*/
+/******************************************************************************/
 #include "Living.h"
-
+/******************************************************************************/
+/*!
+		Class Projectile:
+\brief	Defines Projectiles in Scene that have Collision(Not Particles)
+*/
+/******************************************************************************/
 class Projectile : public Living
 {
 public:

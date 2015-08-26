@@ -351,7 +351,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 						{
 							Lookat.z -= 50 * dt;
 
-							
 							if(Lookat.z < currentLookat.z)
 							{
 								Lookat.z = currentLookat.z;

@@ -1,10 +1,19 @@
+/******************************************************************************/
+/*!
+\file	Shape.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Abstract Base Class to define Collision Shapes
+*/
+/******************************************************************************/
 #include "Vector3.h"
 #pragma once
 
 /******************************************************************************/
 /*!
 Class Shape:
-\brief	Abstract Base Class of 2D Shapes used for 2D Collision
+\brief	Abstract Base Class of 3D Shapes used for 3D Collision
 */
 /******************************************************************************/
 class Shape
@@ -13,7 +22,8 @@ public:
 	Shape(Vector3);
 	Shape();
 	~Shape();
-	virtual void moveTo(Vector3) = 0;//Moves Shape to New Position
+	//Updates new Position of Shape
+	virtual void moveTo(Vector3) = 0;
 
 	//Accessors
 	Vector3 getOrigin(void)const;

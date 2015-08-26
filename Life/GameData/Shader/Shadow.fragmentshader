@@ -85,6 +85,7 @@ const int MAX_TEXTURES = 8;
 // Values that stay constant for the whole mesh.
 uniform int alpha;
 uniform int glow;
+uniform int lenseffect;
 uniform vec3 glowColor;
 uniform bool lightEnabled;
 uniform Light lights[MAX_LIGHTS];
@@ -144,13 +145,31 @@ float getShadowEffect()
 	return visibility;
 }//*/
 
+float distratio(vec2 pos, vec2 pos2, float ratio)
+{
+	float xvect = pos.x*ratio-pos2.x*ratio;
+	float yvect = pos.y-pos2.y;
+	return sqrt(xvect*xvect + yvect*yvect);
+}
+
+float gen_circular_lens(vec2 center, float size)
+{
+	float aspectRatio = 16.f/9.f;
+	return 1.0-pow(min(distratio(texCoord.xy,center,aspectRatio),size)/size,10.0);
+}
+
+vec2 noisepattern(vec2 pos)
+{
+	return vec2(abs(fract(sin(dot(pos ,vec2(18.9898f,28.633f))) * 4378.5453f)),abs(fract(sin(dot(pos.yx ,vec2(18.9898f,28.633f))) * 4378.5453f)));
+}
+
 void main()
 {
 	TEST.color = vec3(0.5, 0.5, 0.5);
 	TEST.start = 100;
 	TEST.end = 1000;
 	TEST.density = 0.0005f;
-	TEST.type = 1;
+	TEST.type = 0;
 	TEST.enabled = true;
 
 	if(lightEnabled == true)
@@ -278,5 +297,92 @@ void main()
 	{
 		temp = temp / 100;
 		color = mix(color, vec4(color.r, color.g, color.b, 0), (1.f - temp));
+	}
+
+	if(lenseffect != 0)
+	{
+		float dirtylens = 0.0;
+		
+		vec2 pos1 = noisepattern(vec2(0.6,-0.12));
+		dirtylens += gen_circular_lens(pos1,0.05);
+		
+		pos1 = noisepattern(vec2(0.3,-0.4));
+		dirtylens += gen_circular_lens(pos1,0.015);
+		
+		pos1 = noisepattern(vec2(0.8,-0.4));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(0.9,-0.2));
+		dirtylens += gen_circular_lens(pos1,0.03);
+
+		pos1 = noisepattern(vec2(0.9,-0.6));
+		dirtylens += gen_circular_lens(pos1,0.04);
+	
+		pos1 = noisepattern(vec2(0.2,-0.8));
+		dirtylens += gen_circular_lens(pos1,0.04);
+	
+		pos1 = noisepattern(vec2(0.5,-0.9));
+		dirtylens += gen_circular_lens(pos1,0.05);
+	
+		pos1 = noisepattern(vec2(0.5,-0.95));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(0.6,-0.95));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(0.7,-0.1));
+		dirtylens += gen_circular_lens(pos1,0.035);
+	
+		pos1 = noisepattern(vec2(0.9,-0.1));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(0.2,-0.2));
+		dirtylens += gen_circular_lens(pos1,0.037);
+	
+		pos1 = noisepattern(vec2(0.4,-0.2));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(-0.95,-0.8));
+		dirtylens += gen_circular_lens(pos1,0.03);
+	
+		pos1 = noisepattern(vec2(-0.99,-0.8));
+		dirtylens += gen_circular_lens(pos1,0.04);
+	
+		pos1 = noisepattern(vec2(-0.99,0.99));
+		dirtylens += gen_circular_lens(pos1,0.03);
+	
+		pos1 = noisepattern(vec2(-0.2,0.9));
+		dirtylens += gen_circular_lens(pos1,0.043);
+	
+		pos1 = noisepattern(vec2(-0.4,0.99));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(-0.69,0.999));
+		dirtylens += gen_circular_lens(pos1,0.02);
+	
+		pos1 = noisepattern(vec2(-0.69,0.99));
+		dirtylens += gen_circular_lens(pos1,0.025);
+	
+		pos1 = noisepattern(vec2(-0.9,0.3));
+		dirtylens += gen_circular_lens(pos1,0.03);
+	
+		pos1 = noisepattern(vec2(0.9,0.3));
+		dirtylens += gen_circular_lens(pos1,0.04);
+	
+		pos1 = noisepattern(vec2(0.1,0.1));
+		dirtylens += gen_circular_lens(pos1,0.05);
+	
+		pos1 = noisepattern(vec2(0.1,0.15));
+		dirtylens += gen_circular_lens(pos1,0.035);
+	
+		pos1 = noisepattern(vec2(0.15,0.13));
+		dirtylens += gen_circular_lens(pos1,0.025);
+	
+		vec4 tempcolor = color;
+		tempcolor.rgb += dirtylens * 0.8 * vec3(0.6, 0.8, 1.0);
+
+		temp = lenseffect;
+		temp = temp / 100;
+		color = mix(color, tempcolor, temp);
 	}
 }

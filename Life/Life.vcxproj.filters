@@ -249,6 +249,9 @@
     <ClCompile Include="Source\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\aPlayer.cpp">
+      <Filter>Source Files\Assets\Living</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -412,6 +415,9 @@
     </ClInclude>
     <ClInclude Include="Source\SoundEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\aPlayer.h">
+      <Filter>Header Files\Assets\Living</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

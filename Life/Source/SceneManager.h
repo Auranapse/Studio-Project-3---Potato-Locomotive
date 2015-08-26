@@ -1,9 +1,19 @@
+/******************************************************************************/
+/*!
+\file	SceneManager.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to handle Collisions/Updates of Assets in Scenes
+*/
+/******************************************************************************/
 #include "Sphere.h"
 #include "AABB.h"
 #include "Ray.h"
 #include "AABB.h"
 
 #include "Enemy.h"
+#include "aPlayer.h"
 #include "Room.h"
 #include "Projectile.h"
 #include "SoundRange.h"
@@ -12,15 +22,21 @@
 #include "NonLiving.h"
 #include <vector>
 #pragma once
-
+/******************************************************************************/
+/*!
+		Class SceneManager:
+\brief	Handler for Collisions/Updates of Assets in Scenes
+*/
+/******************************************************************************/
 class SceneManager
 {
 public:
 	SceneManager();
 	~SceneManager();
+
+	void Add(Asset*);//Adds an Asset into our Vector
 	void Update(double dt, float speed);
 	void Render();
-
 
 	bool checkCollision(Asset*, Asset*);//Collision Check
 	void effCollision(Asset*, Asset*);//Collision effect
