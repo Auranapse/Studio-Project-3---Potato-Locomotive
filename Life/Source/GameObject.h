@@ -32,6 +32,8 @@ public:
 	float mass;
 	Mesh* mesh;
 
+	float Opacity;
+
 	/*Material material;
 	float lightRadius;
 	float lightPower;*/

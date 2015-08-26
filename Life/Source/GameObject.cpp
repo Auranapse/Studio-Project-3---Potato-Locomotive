@@ -29,7 +29,8 @@ GameObject::GameObject()
 	isHeld(false),
 	holdable(false),
 	gravityEnabled(true),
-	mesh(NULL)
+	mesh(NULL),
+	Opacity(100.f)
 {
 
 }

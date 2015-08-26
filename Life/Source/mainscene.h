@@ -268,6 +268,7 @@ class mainscene : public Scene
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_ABILITY_1,
+		E_CTRL_ABILITY_2,
 
 		E_CTRL_TOTAL
 	};
@@ -305,7 +306,7 @@ class mainscene : public Scene
 		IO_TOTAL,
 	};
 
-	enum WORLDOBJECT_PRESETS
+	enum WEAPONOBJECT_PRESETS
 	{
 		WO_KATANA,
 		WO_M9,
@@ -373,6 +374,8 @@ private:
 	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
+
+	WorldObject *Floor, *Celling, *SWALL1, *SWALL2, *SWALL3, *SWALL4;
 
 	ItemObject IO_presetList[IO_TOTAL];
 	WeaponsObject WO_presetList[WO_TOTAL];

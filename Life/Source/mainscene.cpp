@@ -64,7 +64,8 @@ void mainscene::assignSave(void)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
-	SH_1.assign(Graphics, GRA_MAX, 15);
+	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15);
+	SH_1.assign(Graphics, GRA_MAX, 16);
 }
 
 /******************************************************************************/
@@ -713,6 +714,13 @@ bool mainscene::loadLevel(int level)
 		std::cout << "!!!ERROR!!! Unable to load map\n";
 		return false;
 	}
+	
+	Floor = NULL;
+	Celling = NULL;
+	SWALL1 = NULL;
+	SWALL2 = NULL;
+	SWALL3 = NULL;
+	SWALL4 = NULL;
 
 	P_Player.Velocity.SetZero();
 	P_Player.DropObject();
@@ -905,6 +913,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	Floor = WO;
 	m_goList.push_back(WO);
 	//World Celling
 	WO = new WorldObject();
@@ -916,6 +925,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_QUAD];
+	Celling = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -926,6 +936,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL1 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -936,6 +947,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL2 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -946,6 +958,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL3 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -956,6 +969,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL4 = WO;
 	m_goList.push_back(WO);
 
 	lights[0].position.y = worldsize * 4.5f;
@@ -1364,10 +1378,10 @@ Handles player powers
 /******************************************************************************/
 void mainscene::UpdatePlayerPower(double &dt)
 {
-	static bool abilityPressed = false;
-	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed)
+	static bool abilityPressed_1 = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed_1)
 	{
-		abilityPressed = true;
+		abilityPressed_1 = true;
 		if (PowerActive)
 		{
 			PowerActive = false;
@@ -1383,9 +1397,55 @@ void mainscene::UpdatePlayerPower(double &dt)
 			SE_Engine.playSound2D(soundList[ST_SLOWMO_ENTER]);
 		}
 	}
-	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed)
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed_1)
 	{
-		abilityPressed = false;
+		abilityPressed_1 = false;
+	}
+
+	static bool abilityPressed_2 = false;
+	if(Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
+	{
+		abilityPressed_2 = true;
+		if(!PowerActive)
+		{
+			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+			{
+				GameObject *go = (GameObject *)*it;
+				if (go->active)
+				{
+					WorldObject *WO = dynamic_cast<WorldObject*>(go);
+					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					{
+						WO->Opacity = 10.f;
+					}
+				}
+			}
+			f_powerTintSet = 25.f;
+			c_powerColor.Set(0.f, 0.f, 0.3f);
+			CurrentPower  = PT_SUPERVISION;
+			PowerActive = true;
+		}
+		else
+		{
+			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+			{
+				GameObject *go = (GameObject *)*it;
+				if (go->active)
+				{
+					WorldObject *WO = dynamic_cast<WorldObject*>(go);
+					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					{
+						WO->Opacity = 100.f;
+					}
+				}
+			}
+			f_powerTintSet = 0.f;
+			PowerActive = false;
+		}
+	}
+	else if(!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && abilityPressed_2)
+	{
+		abilityPressed_2 = false;
 	}
 
 	if (PowerActive)
@@ -2127,7 +2187,7 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.Scale(go->scale);
 		if (go->mesh)
 		{
-			RenderMesh(go->mesh, true, true);
+			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
 		modelStack.PopMatrix();
 	}
@@ -2630,6 +2690,31 @@ Renders the entire world with shadow
 /******************************************************************************/
 void mainscene::RenderWorldShadow(void)
 {
+	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	{
+		CharacterObject *CO = (CharacterObject *)*it;
+		if (CO->active)
+		{
+			if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
+			{
+				RenderCharacter(CO);
+			}
+		}
+	}
+
+	for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
+	{
+		SecurityCam *SC = (SecurityCam *)*it;
+		if (SC->active)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos);
+			modelStack.Scale(SC->scale);
+			RenderMesh(meshList[GEO_SECURITYCAMERA], true);
+			modelStack.PopMatrix();
+		}
+	}
+
 	//Render gameobjects
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -2646,34 +2731,9 @@ void mainscene::RenderWorldShadow(void)
 			}
 		}
 	}
-
-	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
-	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		if (CO->active)
-		{
-			if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
-			{
-				RenderCharacter(CO);
-			}
-		}
-	}
-
+	
 	RenderCharacter(&P_Player);
 	RenderParticles();
-
-	for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
-	{
-		SecurityCam *SC = (SecurityCam *)*it;
-		if (SC->active)
-		{
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos);
-			modelStack.Scale(SC->scale);
-			RenderMesh(meshList[GEO_SECURITYCAMERA], true);
-			modelStack.PopMatrix();
-		}
-	}
 }
 
 /******************************************************************************/
