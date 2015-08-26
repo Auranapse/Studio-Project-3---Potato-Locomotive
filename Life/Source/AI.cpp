@@ -306,7 +306,7 @@ AI::E_AI_STATE AI::getState()
 	return e_State;
 }
 
-void AI::UpdateLookat(const double &dt)
+void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 {
 	if(currentLookat != NULL)
 	{
@@ -360,10 +360,24 @@ void AI::UpdateLookat(const double &dt)
 		}
 		else
 		{
-			destination = currentLookat;
-			prevPosition = Position;
-			e_State = ALERT;
-			b_aiCooldown = false;
+			if(e_State == WALKING)
+			{
+				if ((playerPos - Position).LengthSquared() < d_detectionRange)
+				{
+					prevPosition = Position;
+					e_State = ATTACK;
+					b_aiCooldown = false;
+				}
+				//if ai saw player but is too far way, the ai will investigate
+				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
+				{
+					destination = currentLookat;
+					prevPosition = Position;
+					e_State = ALERT;
+					b_aiCooldown = false;
+				}
+			}
+			
 			b_updateAI = true;
 			currentLookat = NULL;
 		}
@@ -394,9 +408,11 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 				//If player is infront and near player, then ai will switch to attack state
 				if ((playerPos - Position).LengthSquared() < d_detectionRange)
 				{
-					prevPosition = Position;
+					/*prevPosition = Position;
 					e_State = ATTACK;
-					b_aiCooldown = false;
+					b_aiCooldown = false;*/
+					currentLookat.x = playerPos.x;
+					currentLookat.z = playerPos.z;
 				}
 				//if ai saw player but is too far way, the ai will investigate
 				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
@@ -424,159 +440,6 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 			}
 		}
 		break;
-
-	//switch (e_State)
-	//{
-	//case WALKING:
-	//	{
-	//		//Have the AI partol a certain area
-	//		//Need Pathfinding i think
-
-	//		if (isVisible(Position, Lookat, 60, playerPos))
-	//		{
-	//			//If player is infront and near player, then ai will switch to attack state
-	//			if ((playerPos - Position).LengthSquared() < 400)
-	//			{
-	//				prevPosition = Position;
-	//				e_State = ATTACK;
-	//				b_aiCooldown = false;
-	//			}
-	//			//if ai saw player but is too far way, the ai will investigate
-	//			else
-	//			{
-	//				prevPosition = Position;
-	//				destination.x = playerPos.x;
-	//				destination.z = playerPos.z;
-	//				e_State = ALERT;
-	//				b_aiCooldown = false;
-	//			}
-	//		}
-
-	//		if(b_aiCooldown)
-	//		{
-	//			//Ai will move towards prev position
-	//			if ((Position - prevPosition).LengthSquared() > 2)
-	//			{
-	//				Lookat = prevPosition;
-	//			}
-	//			//AI is at the destination
-	//			else
-	//			{
-	//				b_aiCooldown = false;
-	//			}
-	//		}
-	//	}
-	//	break;
-
-	//case ALERT:
-	//	{
-	//		//AI will move towards the destination
-	//		if ((Position - destination).LengthSquared() > 2)
-	//		{
-	//			//Move the ai towards the destination
-	//			Lookat = destination;
-	//		}
-	//		//if ai is at the destination
-	//		else
-	//		{
-	//			ai_ScanArea(dt);
-	//		}
-
-	//		//If player is infront and near player, then ai will switch to attack state
-	//		if (isVisible(Position, Lookat, 60, playerPos) && (playerPos - Position).LengthSquared() < 6400)
-	//		{
-	//			e_State = ATTACK;
-	//			b_updateAI = true;
-	//			b_rotateClockwiseFirst = NULL;
-	//		}
-
-	//		////If ai is at destination
-	//		//else
-	//		//{
-	//		//	static float alertTime = 5.f;
-
-	//		//	if (f_alert_timer < alertTime)
-	//		//	{
-	//		//		f_alert_timer += dt;
-	//		//	}
-	//		//	else
-	//		//	{
-	//		//		//Alert enemy within a small radius
-	//		//		for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
-	//		//		{
-	//		//			AI *ai = dynamic_cast<AI*>((CharacterObject*)*it);
-	//		//			if (ai->getPosition() != Position)
-	//		//			{
-	//		//				if ((Position - ai->getPosition()).LengthSquared() < 100)
-	//		//				{
-	//		//					ai->e_State = ATTACK;
-	//		//				}
-	//		//			}
-	//		//		}
-	//		//		e_State = ATTACK;
-	//		//		f_alert_timer = 0;
-	//		//	}
-	//		//}
-
-	//		//if player have escaped ai, cooldown first before returning to walking
-	//		if (b_aiCooldown)
-	//		{
-	//			static float cooldownTiming = 2.f;
-
-	//			if (f_cooldownTime < cooldownTiming)
-	//			{
-	//				f_cooldownTime += static_cast<float>(dt);
-	//			}
-	//			else
-	//			{
-	//				e_State = WALKING;
-	//				f_cooldownTime = 0.f;
-	//			}
-	//		}
-	//	}
-	//	break;
-
-	//case ATTACK:
-	//	{
-	//		Lookat = playerPos;
-
-	//		//if enemy is holding a weapon
-	//		if (holding != NULL)
-	//		{
-	//			if(holding->isWeapon)
-	//			{
-	//				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
-	//				
-	//				//Enemy is holding a gun
-	//				if (WO->isGun)
-	//				{
-	//					//Make enemy move a certain distance away from the enemy before shooting
-	//				}
-	//				//Enemy is holding a melee weapon
-	//				else
-	//				{
-
-	//				}
-	//			}
-	//		}
-	//		//Enemy is not holding a weapon
-	//		else
-	//		{
-	//			//make the enemy move closer to the enemy before attacking
-	//		}
-
-	//		//AI return to alert state if player have avoided enemy
-	//		if ((Position - playerPos).LengthSquared() > 10000)
-	//		{
-	//			b_aiCooldown = true;
-	//			e_State = ALERT;
-	//		}
-	//	}
-	//	break;
-
-	//default:
-	//	break;
-	//}
 
 	case ALERT:
 		{
@@ -688,14 +551,14 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 		break;
 	}
 
-	UpdateLookat(dt);
+	UpdateLookat(dt, playerPos);
 
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
 	Vector3 L, R, C;
 	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
-	L = rotation * Vector3(-15.f, ModelPos.y, 20.f);
-	R = rotation * Vector3(15.f, ModelPos.y, 20.f);
+	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
 
 	SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
 
