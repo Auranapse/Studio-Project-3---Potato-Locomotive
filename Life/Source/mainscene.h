@@ -299,6 +299,19 @@ class mainscene : public Scene
 		PT_SUPERVISION,
 	};
 
+	enum ITEMOBJECT_PRESETS
+	{
+		IO_SYRINGE,
+		IO_TOTAL,
+	};
+
+	enum WORLDOBJECT_PRESETS
+	{
+		WO_KATANA,
+		WO_M9,
+		WO_TOTAL,
+	};
+
 	enum GS_STATE
 	{
 		GS_PLAY,
@@ -363,9 +376,10 @@ private:
 	std::vector<BulletInfo*> BIv_BulletList;
 	CharacterObject *TEST;
 
-	Player P_Player;
+	ItemObject IO_presetList[IO_TOTAL];
+	WeaponsObject WO_presetList[WO_TOTAL];
 
-	SecurityCam sc;
+	Player P_Player;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -429,9 +443,6 @@ private:
 	Light lights[4];
 
 	void editFOV(float &newFOV);
-	void RenderText(Mesh* mesh, std::string text, Color color);
-	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
-	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0));
 
 	void initWeapons(void);
 
@@ -440,6 +451,9 @@ private:
 	void RenderParticles(void);
 	void RenderBullet(void);
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0), Material *material = NULL);
+	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0));
+	void RenderText(Mesh* mesh, std::string text, Color color);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
 	void RenderSkybox(void);
 	void RenderUI(void);
 	bool collide(Vector3 &Position);

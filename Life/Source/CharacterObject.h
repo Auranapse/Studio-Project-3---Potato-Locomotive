@@ -137,6 +137,7 @@ public:
 	void HoldObject(ItemObject *obj);
 	void DropObject(const Vector3 &ThrowVel = Vector3(0, 0, 0));
 	virtual void Update(const double &dt);
+	bool active;
 
 	CharacterObject();
 	~CharacterObject();
