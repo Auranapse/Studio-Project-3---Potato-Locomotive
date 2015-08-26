@@ -44,6 +44,8 @@ f_alert_timer(0.f)
 	d_enemyRotation = 0.0;
 	b_rotateClockwiseFirst = NULL;
 	currentLookat = NULL;
+	b_goAlert = b_goAttack = false;
+
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
 }
@@ -314,68 +316,62 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 
 		if(Lookat != currentLookat)
 		{
-			if(Lookat.x != currentLookat.x)
+			float theta = Math::RadianToDegree(acos((Lookat.Dot(currentLookat)) / (Lookat.Length() * currentLookat.Length())));
+
+			if(theta > 1)
 			{
-				if(Lookat.x < currentLookat.x)
-				{
-					Lookat.x += 50 * dt;
-
-					if(Lookat.x > currentLookat.x)
-					{
-						Lookat.x = currentLookat.x;
-					}
-				}
+				if(Lookat.x > currentLookat.x)
+					Lookat.x -= theta * dt;
 				else
-				{
-					Lookat.x -= 50 * dt;
+					Lookat.x += theta * dt;
 
-					if(Lookat.x < currentLookat.x)
-					{
-						Lookat.x = currentLookat.x;
-					}
-				}
+				if(Lookat.z > currentLookat.z)
+					Lookat.z -= theta * dt;
+				else
+					Lookat.z += theta * dt;
 			}
-
-			if(Lookat.z != currentLookat.z)
+			else if (theta < 1)
 			{
-				if(Lookat.z < currentLookat.z)
-				{
-					Lookat.z += 50 * dt;
-
-					if(Lookat.z > currentLookat.z)
-					{
-						Lookat.z = currentLookat.z;
-					}
-				}
-				else
-				{
-					Lookat.z -= 50 * dt;
-
-					if(Lookat.z < currentLookat.z)
-					{
-						Lookat.z = currentLookat.z;
-					}
-				}
+				Lookat = currentLookat;
 			}
+			std::cout << theta << std::endl;
 		}
 		else
 		{
-			if(e_State == WALKING)
+			std::cout << "Senpai notice me" << std::endl;
+			//if(e_State == WALKING)
+			//{
+			//	if ((playerPos - Position).LengthSquared() < d_detectionRange)
+			//	{
+			//		prevPosition = Position;
+			//		e_State = ATTACK;
+			//		b_aiCooldown = false;
+			//	}
+			//	//if ai saw player but is too far way, the ai will investigate
+			//	else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
+			//	{
+			//		destination = currentLookat;
+			//		prevPosition = Position;
+			//		e_State = ALERT;
+			//		b_aiCooldown = false;
+
+			//	}
+			//}
+
+			if(b_goAttack)
 			{
-				if ((playerPos - Position).LengthSquared() < d_detectionRange)
-				{
-					prevPosition = Position;
-					e_State = ATTACK;
-					b_aiCooldown = false;
-				}
-				//if ai saw player but is too far way, the ai will investigate
-				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
-				{
-					destination = currentLookat;
-					prevPosition = Position;
-					e_State = ALERT;
-					b_aiCooldown = false;
-				}
+				prevPosition = Position;
+				e_State = ATTACK;
+				b_aiCooldown = false;
+				b_goAttack = false;
+			}
+			else if (b_goAlert)
+			{
+				destination = currentLookat;
+				prevPosition = Position;
+				e_State = ALERT;
+				b_aiCooldown = false;
+				b_goAlert = false;
 			}
 			
 			b_updateAI = true;
@@ -413,6 +409,7 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 					b_aiCooldown = false;*/
 					currentLookat.x = playerPos.x;
 					currentLookat.z = playerPos.z;
+					b_goAttack = true;
 				}
 				//if ai saw player but is too far way, the ai will investigate
 				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
@@ -422,6 +419,7 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 					currentLookat = destination;*/
 					currentLookat.x = playerPos.x;
 					currentLookat.z = playerPos.z;
+					b_goAlert = true;
 				}
 			}
 

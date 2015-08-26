@@ -73,6 +73,8 @@ private:
 	bool b_updateAI;
 	double d_totalRotation;
 	double d_enemyRotation;
+	bool b_goAlert;
+	bool b_goAttack;
 	bool b_rotateClockwiseFirst;
 
 	static double d_detectionAngle;
