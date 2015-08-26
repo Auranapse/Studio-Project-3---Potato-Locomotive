@@ -1,4 +1,5 @@
 #include "SceneManager.h"
+#include <math.h>
 
 
 SceneManager::SceneManager()
@@ -39,22 +40,26 @@ void SceneManager::Update(double dt, float speed)
 	//Transverse through for Collision
 	for (int i = 0; i < SceneAssets.size(); ++i)
 	{
-		for (int k = 0; k < SceneAssets.size(); ++k)
+		for (int k = i + 1; k < SceneAssets.size(); ++k)
 		{
 			if (checkCollision(SceneAssets[i], SceneAssets[k]))//Does it collide?
+			{
 				effCollision(SceneAssets[i], SceneAssets[k]);//Enforce collision effect
+			}
 		}
 	}
+	std::cout<<std::endl;
 
 
+	
 	//Transverse through for Living Assets Update
 	for (int i = 0; i < SceneAssets.size(); ++i)
 	{
-		if (!(SceneAssets[i]->getFixed()))
+		if (SceneAssets[i]->getFixed() == false)
 		{
 			Living* targetAsset = (Living*)(SceneAssets[i]);
 			targetAsset->update(dt, speed);
-		}
+		} 
 	}
 }
 
@@ -147,27 +152,27 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 {
 	int c1, c2;
 	c1 = (a1->getType() < a2->getType()) ? (c1 = a1->getType()) : (c1 = a2->getType());
-	c2 = (a2->getType() > a1->getType()) ? (c2 = a2->getType()) : (c2 = a1->getType());
-
+	c2 = (a2->getType() >= a1->getType()) ? (c2 = a2->getType()) : (c2 = a1->getType());
+	
 	switch(c1)
 	{
 	case 0://Player Effects
 		switch(c2)
 		{
 		case 0://Player To Player
-			return PLAYER_PLAYER(a1, a2);
+			PLAYER_PLAYER(a1, a2);
 			break;
 		case 1://Player To Enemy
-			return PLAYER_ENEMY(a1, a2);
+			PLAYER_ENEMY(a1, a2);
 			break;
 		case 2://Player To Projectile
-			return PLAYER_PROJECTILE(a1, a2);
+			PLAYER_PROJECTILE(a1, a2);
 			break;
 		case 3://Player To Room
-			return PLAYER_ROOM(a1, a2);
+			PLAYER_ROOM(a1, a2);
 			break;
 		case 4://Player To SoundRange
-			return PLAYER_SOUND(a1, a2);
+			PLAYER_SOUND(a1, a2);
 			break;
 		}
 		break;
@@ -175,16 +180,16 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 		switch(c2)
 		{
 		case 1://Enemy To Enemy
-			return ENEMY_ENEMY(a1, a2);
+			ENEMY_ENEMY(a1, a2);
 			break;
 		case 2://Enemy To Projectile
-			return ENEMY_PROJECTILE(a1, a2);
+			ENEMY_PROJECTILE(a1, a2);
 			break;
 		case 3://Enemy To Room
-			return ENEMY_ROOM(a1, a2);
+			ENEMY_ROOM(a1, a2);
 			break;
 		case 4://Enemy To SoundRange
-			return ENEMY_SOUND(a1, a2);
+			ENEMY_SOUND(a1, a2);
 			break;
 		}
 		break;
@@ -192,13 +197,13 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 		switch(c2)
 		{
 		case 2://Projectile To Projectile
-			return PROJECTILE_PROJECTILE(a1, a2);
+			PROJECTILE_PROJECTILE(a1, a2);
 			break;
 		case 3://Projectile To Room
-			return PROJECTILE_ROOM(a1, a2);
+			PROJECTILE_ROOM(a1, a2);
 			break;
 		case 4://Projectile To SoundRange
-			return PROJECTILE_SOUND(a1, a2);
+			PROJECTILE_SOUND(a1, a2);
 			break;
 		}
 		break;
@@ -231,11 +236,11 @@ bool SceneManager::SPHERE_SPHERE(Asset* a1, Asset* a2)
 	float d = pow((c1->getOrigin().x - c2->getOrigin().x), 2)
 		+ pow((c1->getOrigin().y - c2->getOrigin().y), 2)
 		+ pow((c1->getOrigin().z - c2->getOrigin().z), 2);
-
 	//Combined Radius of Two Bounding Spheres
 	float tR = pow((c1->getRadius() + c2->getRadius()), 2);
-
-	return (d<=tR);
+	if (d <= tR)
+		return true;
+	return false;
 }
 /******************************************************************************/
 /*!
@@ -456,7 +461,10 @@ void SceneManager::PLAYER_ENEMY(Asset* a1, Asset* a2)
 	Projectile Asset for Collision
 */
 /******************************************************************************/
-void SceneManager::PLAYER_PROJECTILE(Asset*, Asset*){}
+void SceneManager::PLAYER_PROJECTILE(Asset* a1, Asset* a2)
+{
+
+}
 /******************************************************************************/
 /*!
 \brief	
@@ -560,13 +568,15 @@ void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
 		if (netForce > budgingForce.Length())
 		{
 			c1->setMove(true);
-			c1->setForce(c1->getForce() - budgingForce);
+			Vector3 opposingForce = c1->getForce().Normalized() * -(budgingForce.LengthSquared());
+			c1->setForce(c1->getForce() - opposingForce);
 		}
 	}
 	else if (c1->getMove())//Moving
 	{
 		Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
-		c1->setForce(c1->getForce() - kineticForce);
+		Vector3 opposingForce = c1->getForce().Normalized() * -(kineticForce.LengthSquared());
+		c1->setForce(c1->getForce() - opposingForce);
 		if (c1->getForce().Length() <= 0) 
 			c1->setMove(false);
 	}

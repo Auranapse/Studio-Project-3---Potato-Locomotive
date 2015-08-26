@@ -446,6 +446,10 @@ private:
 	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;
 	SoundEngine SE_Engine;
+
+
+	//SCENE MANAGER!!!
+	SceneManager MainManager;
 };
 
 #endif
