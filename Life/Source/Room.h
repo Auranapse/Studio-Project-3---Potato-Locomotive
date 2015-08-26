@@ -1,5 +1,20 @@
+/******************************************************************************/
+/*!
+\file	Room.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to define Rooms in Scene
+*/
+/******************************************************************************/
 #include "NonLiving.h"
 #pragma once
+/******************************************************************************/
+/*!
+		Class Room:
+\brief	Defines a Room in the Scene
+*/
+/******************************************************************************/
 class Room : public NonLiving
 {
 public:

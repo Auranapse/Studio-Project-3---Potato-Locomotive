@@ -83,6 +83,7 @@
     <ClCompile Include="Source\AABB.cpp" />
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Anim4.cpp" />
+    <ClCompile Include="Source\aPlayer.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Asset.cpp" />
     <ClCompile Include="Source\BulletInfo.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\Anim4.h" />
+    <ClInclude Include="Source\aPlayer.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Asset.h" />
     <ClInclude Include="Source\BulletInfo.h" />

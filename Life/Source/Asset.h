@@ -1,3 +1,12 @@
+/******************************************************************************/
+/*!
+\file	Asset.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Abstract Base Class to define Assets in a Scene
+*/
+/******************************************************************************/
 #include "Shape.h"
 #include "Mesh.h"
 

@@ -1,133 +1,128 @@
-#include "Asset.h"
-
-
-/******************************************************************************/
-/*!
-\brief	
-constructor
-\param mesh
-	mesh of Asset
-\param bound
-	collision shape
-\param mass
-	mass of Asset
-*/
-/******************************************************************************/
-Asset::Asset(Mesh *mesh, Shape *bound, float mass)
-{
-	this->mesh = mesh;
-	this->bound = bound;
-	this->mass = mass;
-}
+#include "aPlayer.h"
 /******************************************************************************/
 /*!
 \brief	
 constructor
 */
 /******************************************************************************/
-Asset::Asset(){}
+aPlayer::aPlayer(){}
 /******************************************************************************/
 /*!
 \brief	
 destructor
 */
 /******************************************************************************/
-Asset::~Asset(){}
+aPlayer::~aPlayer(){}
 
 /******************************************************************************/
 /*!
 \brief	
-Sets Mesh of Asset
-\param mesh
-	mesh
+Updates Position/Velo/Acc of player and its Moves during the frame
+\param dt
+time stamp
+\param speed
+scalar multiplier for time related movements like Velocity/acceleration
 */
 /******************************************************************************/
-void Asset::setMesh(Mesh *mesh)
+void aPlayer::update(double dt, float speed)
 {
-	this->mesh = mesh;
-}
-/******************************************************************************/
-/*!
-\brief	
-Sets collision shape of Asset
-\param bound
-	bound
-*/
-/******************************************************************************/
-void Asset::setBound(Shape *bound)
-{
-	this->bound = bound;
-}
-/******************************************************************************/
-/*!
-\brief	
-Sets mass of Asset
-\param mass
-	mass
-*/
-/******************************************************************************/
-void Asset::setMass(float mass)
-{
-	this->mass = mass;
+
 }
 
 /******************************************************************************/
 /*!
 \brief	
-Gets Mesh of Asset
+Gets damage of Player
 \return 
-mesh
+damage
 */
 /******************************************************************************/
-Mesh * Asset::getMesh(void)const
+int aPlayer::getDamage(void)const
 {
-	return this->mesh;
+	return this->damage;
 }
 /******************************************************************************/
 /*!
 \brief	
-Gets shape of Asset
+Gets walk Force of Player
 \return 
-bound
+walkForce
 */
 /******************************************************************************/
-Shape * Asset::getBound(void)const
+float aPlayer::getWalk(void)const
 {
-	return this->bound;
+	return this->walkForce;
 }
 /******************************************************************************/
 /*!
 \brief	
-Gets mass of Asset
+Gets jump force of Player
 \return 
-mass
+jumpForce
 */
 /******************************************************************************/
-float Asset::getMass(void)const
+float aPlayer::getJump(void)const
 {
-	return this->mass;
+	return this->jumpForce;
 }
 /******************************************************************************/
 /*!
 \brief	
-Does Asset Move
-\return
-true = Asset can move
+Gets energy of Player
+\return 
+energy
 */
 /******************************************************************************/
-bool Asset::getFixed(void)const
+float aPlayer::getEnergy(void)const
 {
-	return this->isFixed;
+	return this->energy;
+}
+
+/******************************************************************************/
+/*!
+\brief	
+Sets damage of Player
+\param dmg
+daamge
+*/
+/******************************************************************************/
+void aPlayer::setDamage(int dmg)
+{
+	this->damage = dmg;
 }
 /******************************************************************************/
 /*!
 \brief	
-Gets the type of Asset
-\return 
-type
+Sets walkForce of Player
+\param walk
+walkForce
 */
 /******************************************************************************/
-int Asset::getType(void)const
+void aPlayer::setWalk(float walk)
 {
-	return this->type;
+	this->walkForce = walk;
+}
+/******************************************************************************/
+/*!
+\brief	
+Sets jumpForce of Player
+\param jump
+jumpForce
+*/
+/******************************************************************************/
+void aPlayer::setJump(float jump)
+{
+	this->jumpForce =jump;
+}
+/******************************************************************************/
+/*!
+\brief	
+Sets energy of Player
+\param energy
+energy
+*/
+/******************************************************************************/
+void aPlayer::setEnergy(float energy)
+{
+	this->energy = energy;
 }

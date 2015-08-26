@@ -1,5 +1,20 @@
+/******************************************************************************/
+/*!
+\file	SoundRange.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Abstract Class to define NonLiving Assets in the Scene
+*/
+/******************************************************************************/
 #include "Asset.h"
 #pragma once
+/******************************************************************************/
+/*!
+		Class NonLiving:
+\brief	Defines NonLiving Assets in the Scene
+*/
+/******************************************************************************/
 class NonLiving : public Asset
 {
 public:

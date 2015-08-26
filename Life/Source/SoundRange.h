@@ -1,5 +1,20 @@
+/******************************************************************************/
+/*!
+\file	SoundRange.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to define Sound Ranges in Scene
+*/
+/******************************************************************************/
 #include "NonLiving.h"
 #pragma once
+/******************************************************************************/
+/*!
+		Class SoundRange:
+\brief	Defines a Sound Range to check for possible Sound Detection
+*/
+/******************************************************************************/
 class SoundRange : public NonLiving
 {
 public:

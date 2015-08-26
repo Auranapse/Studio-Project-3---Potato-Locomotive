@@ -1,3 +1,12 @@
+/******************************************************************************/
+/*!
+\file	AABB.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to define AABB Shape for Collision
+*/
+/******************************************************************************/
 #include "Shape.h"
 #pragma once
 /******************************************************************************/
@@ -34,6 +43,7 @@ public:
 	}
 	AABB(){};
 	~AABB(){};
+	//Updates new Position of Shape
 	void moveTo(Vector3);
 
 	//Accessors

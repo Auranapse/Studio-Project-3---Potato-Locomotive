@@ -1,3 +1,12 @@
+/******************************************************************************/
+/*!
+\file	Plane.h
+\author Quen Ryu Guile
+\par	email: ryufiguracion@yahoo.com.sg
+\brief
+Class to define Plane Shape for Collision
+*/
+/******************************************************************************/
 #include "Shape.h"
 #pragma once
 /******************************************************************************/
@@ -16,6 +25,7 @@ public:
 	}
 	Plane(){};
 	~Plane(){};
+	//Updates new Position of Shape
 	void moveTo(Vector3);
 
 	//Accessor
