@@ -133,6 +133,89 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 /******************************************************************************/
 /*!
 \brief
+Update the sensors for pathfinding to player
+\param left
+sensors made to see if there is anything in the way of the AI and also move towards the player
+*/
+/******************************************************************************/
+void AI::SensorUpdate2(double &dt, Vector3 &destination, bool left, bool mid, bool right)
+{
+	float rotationDiff = CalAnglefromPosition(destination, Position, true) - CalAnglefromPosition(Lookat, Position, true);
+	movementLR(dt, false, rotationDiff);
+
+	//when right has nothing to collide
+	if (left == true && mid == true && right == false)
+	{
+		movementLR(dt, false, 720.f);
+	}
+
+	//when left has nothing to collide
+	else if (left == false && mid == true && right == true)
+	{
+		movementLR(dt, true, 720.f);
+	}
+
+	//when middle has nothing to collide
+	else if (left == true && mid == false && right == true)
+	{
+		movementFB(dt, true);
+	}
+
+	//if none of the sensors are colliding... just move forward
+	else if (left == false && mid == false && right == false)
+	{
+		movementFB(dt, true);
+	}
+
+	//set rand inside to do a 50 - 50 chance to go left or right
+	else if (left == true && mid == true && right == true)
+	{
+		movementFB(dt, false);
+	}
+
+	//random betwee walking straight and right
+	else if(left == true && mid == false && right == false)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementFB(dt, true);
+
+		else
+			movementLR(dt, false, 720.f);
+	}
+
+	//random betwee walking straight and left
+	else if(left == false && mid == false && right == true)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementFB(dt, true);
+
+		else
+		{
+			movementFB(dt, false);
+			movementLR(dt, true, 720.f);
+		}
+	}
+
+	else if(left == false && mid == true && right == false)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementLR(dt, true, 720.f);
+
+		else
+			movementLR(dt, false, 720.f);
+	}
+	else
+	{
+		movementFB(dt, true);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 Update the sensors for pathfinding
 \param left
 sensors made to see if there is anything in the way of the AI
@@ -429,7 +512,7 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	L = rotation * Vector3(-15.f, ModelPos.y, 20.f);
 	R = rotation * Vector3(15.f, ModelPos.y, 20.f);
 
-	SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
+	SensorUpdate2(dt, playerPos, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
 
 	if (Velocity.x != 0)
 	{
