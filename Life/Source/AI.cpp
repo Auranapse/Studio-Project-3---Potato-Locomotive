@@ -361,9 +361,13 @@ void AI::ai_ScanArea(const double &dt)
 /******************************************************************************/
 /*!
 \brief
-Update the sensors for pathfinding
-\param left
-sensors made to see if there is anything in the way of the AI
+Return the player escape range
+
+\param 
+		d_playerEscapeRange
+
+\return 
+		d_playerEscapeRange
 */
 /******************************************************************************/
 double AI::getPlayerEscapeRange()
@@ -371,36 +375,120 @@ double AI::getPlayerEscapeRange()
 	return d_playerEscapeRange;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return the AI detection angle range
+
+\param 
+		d_detectionAngle
+
+\return 
+		d_detectionAngle
+*/
+/******************************************************************************/
 double AI::getDetectionAngle()
 {
 	return d_detectionAngle;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return the AI detection range
+
+\param 
+		d_detectionRange
+
+\return 
+		d_detectionRange
+*/
+/******************************************************************************/
 double AI::getDetectionRange()
 {
 	return d_detectionRange;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return the AI detection maximum range
+
+\param 
+		d_detectionRangeMax
+
+\return 
+		d_detectionRangeMax
+*/
+/******************************************************************************/
 double AI::getDetectionRange_Max()
 {
 	return d_detectionRangeMax;
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+Return the AI destination
+
+\param 
+		destination
+
+\return 
+		destination
+*/
+/******************************************************************************/
 Vector3 AI::getDestination()
 {
 	return destination;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Return the AI state
+
+\param 
+		e_State
+
+\return 
+		e_State
+*/
+/******************************************************************************/
 AI::E_AI_STATE AI::getState()
 {
 	return e_State;
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+Set the AI state
+
+\param 
+		e_State
+*/
+/******************************************************************************/
 void AI::setState(E_AI_STATE e_State)
 {
 	this->e_State = e_State;
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+Update the AI Lookat based on its current Lookat
+
+\param 
+		delta time
+		Player Position
+		AI Lookat
+		AI Current Lookat
+*/
+/******************************************************************************/
 void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 {
 	if(currentLookat != NULL)
@@ -473,7 +561,17 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief
+Update AI base on its state
 
+\param 
+		delta time
+		Player Position
+		Enemy state
+*/
+/******************************************************************************/
 void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 {
 	switch (e_State)
@@ -651,6 +749,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		break;
 	}
 }
+
 /******************************************************************************/
 /*!
 \brief

@@ -2208,6 +2208,13 @@ void mainscene::RenderGO(GameObject *go)
 	}
 }
 
+
+/******************************************************************************/
+/*!
+\brief
+Rendering of AI debugging range
+*/
+/******************************************************************************/
 void mainscene::RenderAIDebugging(CharacterObject * CO)
 {
 	AI *ai = dynamic_cast<AI*>(CO);
@@ -2260,7 +2267,7 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 		else
 		{
 			modelStack.PushMatrix();
-			modelStack.Scale(0, 0, sqrt(ai->getPlayerEscapeRange()));
+			modelStack.Scale(0, 0, (P_Player.getPosition() - ai->getPosition()).Length());
 			RenderMesh(meshList[GEO_GREENLINE], false);
 			modelStack.PopMatrix();
 		}
