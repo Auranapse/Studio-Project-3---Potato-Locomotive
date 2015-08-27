@@ -499,6 +499,9 @@ void mainscene::Init()
 
 	//Generate meshes------------------------------------------------------------------------
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000.f, 10000.f, 10000.f);
+	meshList[GEO_REDLINE] = MeshBuilder::GenerateLine("Red Line", Color(1, 0, 0), 0.f, 0.f, 1.f);
+	meshList[GEO_GREENLINE] = MeshBuilder::GenerateLine("Green Line", Color(0, 1, 0), 0.f, 0.f, 1.f);
+	meshList[GEO_BLUELINE] = MeshBuilder::GenerateLine("Blue Line", Color(0, 0, 1), 0.f, 0.f, 1.f);
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", Color(0.f, 1.f, 1.f), 0.1f, 0.5f, 1.f);
 	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
 	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
@@ -1985,7 +1988,7 @@ void mainscene::Update(double dt)
 			SecurityCam *SC = (SecurityCam *)*it;
 			if (SC->active)
 			{
-				SC->update(dt, P_Player.getPosition());
+				SC->update(dt, P_Player.getPosition(), m_charList);
 			}
 		}
 
@@ -2163,7 +2166,7 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	MainManager.Update(dt, 1);
+	//MainManager.Update(dt, 1);
 	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
 	//Living* Whatever = (Living*)MainManager.SceneAssets[1];
 	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().x<<std::endl;
@@ -2190,6 +2193,65 @@ void mainscene::RenderGO(GameObject *go)
 			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
 		modelStack.PopMatrix();
+	}
+}
+
+void mainscene::RenderAIDebugging(CharacterObject * CO)
+{
+	AI *ai = dynamic_cast<AI*>(CO);
+
+	if (ai != NULL)
+	{
+		if(ai->getState() == AI::WALKING || ai->getState() == AI::ALERT)
+		{
+			//Detection Range
+			modelStack.PushMatrix();
+			modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
+			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
+			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+
+			//Alert Range
+			if(ai->getState() == AI::WALKING)
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -1, 0);
+				modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
+				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				RenderMesh(meshList[GEO_BLUELINE], false);
+				modelStack.PopMatrix();
+
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -1, 0);
+				modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
+				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				RenderMesh(meshList[GEO_BLUELINE], false);
+				modelStack.PopMatrix();
+			}
+			//Destination
+			else
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0, -17, 0);
+				modelStack.Scale(0, 0, (ai->getPosition() - ai->getDestination()).Length());
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
+			}
+		}
+		//Attack State
+		else
+		{
+			modelStack.PushMatrix();
+			modelStack.Scale(0, 0, sqrt(ai->getPlayerEscapeRange()));
+			RenderMesh(meshList[GEO_GREENLINE], false);
+			modelStack.PopMatrix();
+		}
 	}
 }
 
@@ -2240,6 +2302,8 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	modelStack.Translate(CO->getPosition());
 	modelStack.Translate(CO->ModelPos);
 	modelStack.Rotate(YRotation, 0, 1, 0);
+
+	RenderAIDebugging(CO);
 
 	modelStack.PushMatrix();
 	modelStack.Scale(CO->Scale);
@@ -2731,7 +2795,7 @@ void mainscene::RenderWorldShadow(void)
 			}
 		}
 	}
-	
+
 	RenderCharacter(&P_Player);
 	RenderParticles();
 }

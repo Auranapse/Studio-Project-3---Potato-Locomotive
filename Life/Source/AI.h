@@ -51,6 +51,15 @@ public:
 	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
 
 	void ai_ScanArea(const double &dt);
+	void UpdateLookat(const double &dt, const Vector3 &playerPos);
+	void aiStateHandling(const double &dt, Vector3 playerPos);
+	double getPlayerEscapeRange();
+	double getDetectionAngle();
+	double getDetectionRange();
+	double getDetectionRange_Max();
+	Vector3 getDestination();
+	E_AI_STATE getState();
+	void setState(E_AI_STATE e_State);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
@@ -63,10 +72,21 @@ private:
 
 	Vector3 prevPosition;
 	Vector3 destination;
+	Vector3 currentLookat;
 	bool b_updateAI;
 	double d_totalRotation;
 	double d_enemyRotation;
+	bool b_goAlert;
+	bool b_goAttack;
 	bool b_rotateClockwiseFirst;
+
+	static double d_detectionAngle;
+	static double d_detectionRange;
+	static double d_detectionRangeMax;
+	static double d_playerEscapeRange;
+	bool b_disableDestination;
+	Vector3 test;
+
 	bool positiveX, positiveZ, negativeX, negativeZ;
 	Vector3 diff;
 };

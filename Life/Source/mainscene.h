@@ -66,6 +66,9 @@ class mainscene : public Scene
 	enum GEOMETRY_TYPE
 	{
 		GEO_AXES,
+		GEO_REDLINE,
+		GEO_GREENLINE,
+		GEO_BLUELINE,
 		GEO_CROSSHAIR,
 		GEO_SKYPLANE,
 		GEO_FLOOR_TILE,
@@ -455,6 +458,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
 	void RenderSkybox(void);
 	void RenderUI(void);
+	void RenderAIDebugging(CharacterObject * CO);
 	bool collide(Vector3 &Position);
 	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;
