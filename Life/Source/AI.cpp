@@ -502,14 +502,14 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 			//if(theta >= 5)
 			{
 				if(Lookat.x > currentLookat.x)
-					Lookat.x -= 50 * dt;
+					Lookat.x -= 50 * static_cast<float>(dt);
 				else
-					Lookat.x += 50 * dt;
+					Lookat.x += 50 * static_cast<float>(dt);
 
 				if(Lookat.z > currentLookat.z)
-					Lookat.z -= 50 * dt;
+					Lookat.z -= 50 * static_cast<float>(dt);
 				else
-					Lookat.z += 50 * dt;
+					Lookat.z += 50 * static_cast<float>(dt);
 			}
 			if (theta < 1)
 			{
@@ -581,7 +581,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		//Have the AI partol a certain area
 		//Need Pathfinding i think
 
-		if (isVisible(Position, Lookat, d_detectionAngle, playerPos))
+		if (isVisible(Position, Lookat, static_cast<float>(d_detectionAngle), playerPos))
 		{
 			//If player is infront and near player, then ai will switch to attack state
 			if ((playerPos - Position).LengthSquared() < d_detectionRange)
@@ -653,7 +653,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		}
 
 		//If player is infront and near player, then ai will switch to attack state
-		if (isVisible(Position, Lookat, d_detectionAngle, playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
+		if (isVisible(Position, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
 		{
 			e_State = ATTACK;
 			b_updateAI = true;
@@ -695,7 +695,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 
 			if (f_cooldownTime < cooldownTiming)
 			{
-				f_cooldownTime += dt;
+				f_cooldownTime += static_cast<float>(dt);
 			}
 			else
 			{

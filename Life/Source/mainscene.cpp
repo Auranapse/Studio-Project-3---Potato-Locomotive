@@ -526,6 +526,10 @@ void mainscene::Init()
 
 	meshList[GEO_SECURITYCAMERA] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//other//SecurityCamera.obj");
 	meshList[GEO_SECURITYCAMERA]->textureID[0] = LoadTGA("GameData//Image//OBJ//SecurityCamera_UV.tga", true);
+	meshList[GEO_SECURITYCAMERA]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+	meshList[GEO_SECURITYCAMERA]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SECURITYCAMERA]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SECURITYCAMERA]->material.kShininess = 10.0f;
 
 	//WEAPONS
 
@@ -770,17 +774,6 @@ bool mainscene::loadLevel(int level)
 		m_ParList.pop_back();
 	}
 
-	while (m_ScamList.size() > 0)
-	{
-		SecurityCam *SC = m_ScamList.back();
-		if (SC != NULL)
-		{
-			delete SC;
-			SC = NULL;
-		}
-		m_ScamList.pop_back();
-	}
-
 	float worldsize = static_cast<float>(GAME_MAP.worldSize);
 
 	std::cout << "Map Size: ";
@@ -909,6 +902,36 @@ bool mainscene::loadLevel(int level)
 				ai->HoldObject(WO);
 				m_goList.push_back(WO);
 				m_charList.push_back(ai);
+			}
+			else if (GAME_MAP.map_data[y][x][0] == 'S')
+			{
+				std::string temp_str_1;
+				temp_str_1 = "";
+
+				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'A'; ++i)
+				{
+					temp_str_1 += GAME_MAP.map_data[y][x][i];
+				}
+				float SCAngle;
+				SCAngle = static_cast<float>(std::stoi(temp_str_1));
+
+				SecurityCam *SC;
+				SC = new SecurityCam();
+				SC->active = true;
+				SC->pos.Set(x*worldsize*2.f, worldsize*4.f - 3.f, y*worldsize*2.f);
+				SC->colEnable = true;
+				SC->ColBox.Set(3, 3, 3);
+				SC->scale.Set(2, 2, 2);
+				SC->rotation.Set(0, SCAngle, 0);
+				SC->isHeld = false;
+				SC->enablePhysics = false;
+				Mtx44 rotationMtx;
+				rotationMtx.SetToRotation(SCAngle, 0, 1, 0);
+				Vector3 templookat(0, 0, -1);
+				SC->Lookat = (rotationMtx * templookat) + SC->pos;
+				SC->dynamicRendering = true;
+				SC->mesh = meshList[GEO_SECURITYCAMERA];
+				m_goList.push_back(SC);
 			}
 		}
 	}
@@ -1547,6 +1570,13 @@ void mainscene::UpdateGO(double &dt)
 				continue;
 			}
 
+			SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
+			if(SC != NULL)
+			{
+				SC->update(dt, P_Player.getPosition(), m_charList);
+				continue;
+			}
+
 			if (go->enablePhysics && !go->isHeld)
 			{
 				go->colEnable = false;
@@ -1996,15 +2026,6 @@ void mainscene::Update(double dt)
 		UpdateGO(dt);
 		UpdateParticles(dt);
 		FPC.Update(dt);
-
-		for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
-		{
-			SecurityCam *SC = (SecurityCam *)*it;
-			if (SC->active)
-			{
-				SC->update(dt, P_Player.getPosition(), m_charList);
-			}
-		}
 
 		weaponsUpdate(dt);
 		UpdateSound(dt);
@@ -2793,20 +2814,7 @@ void mainscene::RenderWorldShadow(void)
 			}
 		}
 	}
-
-	for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
-	{
-		SecurityCam *SC = (SecurityCam *)*it;
-		if (SC->active)
-		{
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos);
-			modelStack.Scale(SC->scale);
-			RenderMesh(meshList[GEO_SECURITYCAMERA], true);
-			modelStack.PopMatrix();
-		}
-	}
-
+	
 	//Render gameobjects
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -3237,17 +3245,6 @@ void mainscene::Exit(void)
 			CO = NULL;
 		}
 		m_charList.pop_back();
-	}
-
-	while (m_ScamList.size() > 0)
-	{
-		SecurityCam *SC = m_ScamList.back();
-		if (SC != NULL)
-		{
-			delete SC;
-			SC = NULL;
-		}
-		m_ScamList.pop_back();
 	}
 
 	for (unsigned i = 0; i < NUM_GEOMETRY; ++i)

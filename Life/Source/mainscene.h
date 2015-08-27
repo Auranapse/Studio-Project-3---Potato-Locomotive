@@ -377,7 +377,6 @@ private:
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 
 	Mesh* meshList[NUM_GEOMETRY];
-	std::vector<SecurityCam*> m_ScamList;
 	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;

@@ -21,9 +21,15 @@ public:
 	void update(const double &dt, Vector3 &playerPos, std::vector<CharacterObject*> charList);
 	float getAngle();
 	CAMERA_STATE getState();
-private:
-	float angle;
+
+	double getCameraRange_Angle();
+	double getCameraRange();
 	Vector3 Lookat;
+
+private:
 	CAMERA_STATE c_State;
+
+	static double d_cameraRange_Angle;
+	static double d_cameraRange;
 };
 
