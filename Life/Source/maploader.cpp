@@ -85,6 +85,8 @@ bool MapLoader::loadMap(std::string file)
 		std::vector<std::string>().swap(Column);
 	}
 
+	worldSize = std::stoi(map_data[0][0]);
+
 	map_height = map_data.size();
 	return true;
 }
