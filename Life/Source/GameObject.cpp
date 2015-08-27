@@ -15,7 +15,7 @@ Game Object base class
 Default constructor
 */
 /******************************************************************************/
-GameObject::GameObject() 
+GameObject::GameObject()
 	: scale(1, 1, 1),
 	ColBox(0, 0, 0),
 	ColBoxOffset(0, 0, 0),
@@ -27,9 +27,12 @@ GameObject::GameObject()
 	mass(1.f),
 	rotation(0, 0, 0),
 	isHeld(false),
-	holdable(false)
+	holdable(false),
+	gravityEnabled(true),
+	mesh(NULL),
+	Opacity(100.f)
 {
-	mesh = NULL;
+
 }
 
 /******************************************************************************/

@@ -66,6 +66,7 @@ class MenuScene : public Scene
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_ABILITY_1,
+		E_CTRL_ABILITY_2,
 
 		E_CTRL_TOTAL
 	};

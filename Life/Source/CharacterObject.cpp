@@ -23,6 +23,7 @@ CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.
 	ModelPos.Set(0.f, 18.f, 0.f);
 	CamOffset.Set(0.f, 30.f, 0.f);
 	holding = NULL;
+	active = true;
 }
 
 /******************************************************************************/

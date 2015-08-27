@@ -45,7 +45,7 @@ f_alert_timer(0.f)
 	b_rotateClockwiseFirst = NULL;
 	currentLookat = NULL;
 	b_goAlert = b_goAttack = false;
-
+	b_disableDestination = false;
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
 }
@@ -100,7 +100,7 @@ void AI::movementFB(double &dt, bool forward)
 	else
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(720 * dt, 0, 1, 0);
+		rotation.SetToRotation(720 * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
@@ -121,7 +121,7 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 	if (left == true)
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(-rotation_speed * dt, 0, 1, 0);
+		rotation.SetToRotation(-rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
@@ -131,10 +131,98 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 	else
 	{
 		Lookat = Lookat - Position;
-		rotation.SetToRotation(rotation_speed * dt, 0, 1, 0);
+		rotation.SetToRotation(rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
 		Lookat = Lookat + Position;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Update the sensors for pathfinding to player
+\param left
+sensors made to see if there is anything in the way of the AI and also move towards the player
+*/
+/******************************************************************************/
+void AI::SensorUpdate2(double &dt, Vector3 &destination, bool left, bool mid, bool right)
+{
+	float rotationDiff = CalAnglefromPosition(destination, Position, true) - CalAnglefromPosition(Lookat, Position, true);
+	movementLR(dt, false, rotationDiff);
+
+	if(mid || left || right)
+	{
+		destination = Position;
+	}
+
+	//when right has nothing to collide
+	if (left == true && mid == true && right == false)
+	{
+		movementLR(dt, false, 720.f);
+	}
+
+	//when left has nothing to collide
+	else if (left == false && mid == true && right == true)
+	{
+		movementLR(dt, true, 720.f);
+	}
+
+	//when middle has nothing to collide
+	else if (left == true && mid == false && right == true)
+	{
+		movementFB(dt, true);
+	}
+
+	//if none of the sensors are colliding... just move forward
+	else if (left == false && mid == false && right == false)
+	{
+		movementFB(dt, true);
+	}
+
+	//set rand inside to do a 50 - 50 chance to go left or right
+	else if (left == true && mid == true && right == true)
+	{
+		movementFB(dt, false);
+	}
+
+	//random betwee walking straight and right
+	else if(left == true && mid == false && right == false)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementFB(dt, true);
+
+		else
+			movementLR(dt, false, 720.f);
+	}
+
+	//random betwee walking straight and left
+	else if(left == false && mid == false && right == true)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementFB(dt, true);
+
+		else
+		{
+			movementFB(dt, false);
+			movementLR(dt, true, 720.f);
+		}
+	}
+
+	else if(left == false && mid == true && right == false)
+	{
+		int dothis = Math::RandIntMinMax(1, 2);
+		if(dothis == 1)
+			movementLR(dt, true, 720.f);
+
+		else
+			movementLR(dt, false, 720.f);
+	}
+	else
+	{
+		movementFB(dt, true);
 	}
 }
 
@@ -460,6 +548,12 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 			ai_ScanArea(dt);
 		}
 
+		if(b_disableDestination)
+		{
+			destination = test;
+			b_disableDestination = false;
+		}
+
 		//If player is infront and near player, then ai will switch to attack state
 		if (isVisible(Position, Lookat, d_detectionAngle, playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
 		{
@@ -517,6 +611,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 	case ATTACK:
 	{
 		Lookat = playerPos;
+		destination = playerPos;
 
 		//if enemy is holding a weapon
 		if (holding != NULL)
@@ -579,8 +674,14 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
 	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
 
-	SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
-
+	if(e_State == WALKING)
+	{
+		SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
+	}
+	else
+	{
+		SensorUpdate2(dt, destination, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
+	}
 	if (Velocity.x != 0)
 	{
 		float SForceX = 0 - Velocity.x;

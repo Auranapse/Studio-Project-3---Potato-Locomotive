@@ -74,7 +74,8 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
-	SH_1.assign(Graphics, GRA_MAX, 15, save);
+	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15, save);
+	SH_1.assign(Graphics, GRA_MAX, 16, save);
 
 	SH_1.saveData();
 }
@@ -440,6 +441,15 @@ void MenuScene::InitMenu(void)
 	S_MB->text = us_controlCB[E_CTRL_ABILITY_1].text;
 	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
 	us_controlCB[E_CTRL_ABILITY_1].button = S_MB;
+	v_textButtonList.push_back(S_MB);
+
+	us_controlCB[E_CTRL_ABILITY_2].text = "Ability 2";
+	S_MB = new TextButton;
+	S_MB->pos.Set(Application::GetWindowWidth()*0.6f, Application::GetWindowHeight()*0.8f - 40.f, 0.1f);
+	S_MB->scale.Set(25, 25, 25);
+	S_MB->text = us_controlCB[E_CTRL_ABILITY_2].text;
+	S_MB->gamestate = E_M_OPTIONS_CONTROLS;
+	us_controlCB[E_CTRL_ABILITY_2].button = S_MB;
 	v_textButtonList.push_back(S_MB);
 
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)

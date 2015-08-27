@@ -26,7 +26,7 @@ Aperture Science Laboratories Underground
 mainscene Constructor
 */
 /******************************************************************************/
-mainscene::mainscene() : TESTMODE(false), NUM_LIGHT_PARAM(11)
+mainscene::mainscene() : TESTMODE(true), NUM_LIGHT_PARAM(11)
 {
 
 }
@@ -64,7 +64,8 @@ void mainscene::assignSave(void)
 	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
 	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
-	SH_1.assign(Graphics, GRA_MAX, 15);
+	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15);
+	SH_1.assign(Graphics, GRA_MAX, 16);
 }
 
 /******************************************************************************/
@@ -528,7 +529,11 @@ void mainscene::Init()
 
 	//WEAPONS
 
-	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.9f, 0.5f), 4, 4, 0.53f);
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("Gun bullet", Color(1.f, 0.8f, 0.5f), 4, 4, 0.53f);
+	meshList[GEO_BULLET]->material.kAmbient.Set(0.8f, 0.8f, 0.8f);
+	meshList[GEO_BULLET]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BULLET]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BULLET]->material.kShininess = 10.0f;
 
 	meshList[GEO_M9] = MeshBuilder::GenerateOBJ("M9", "GameData//OBJ//weapons//M9.obj");
 	meshList[GEO_M9]->textureID[0] = LoadTGA("GameData//Image//weapons//M9.tga", true);
@@ -627,25 +632,10 @@ void mainscene::Init()
 
 	DisplayInfo = true;
 
-	for (unsigned short i = 0; i < 100; ++i)
-	{
-		BulletInfo* BI = new BulletInfo();
-		BI->setStatus(false);
-		BIv_BulletList.push_back(BI);
-	}
-
-
-
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.Scale.Set(10, 10, 10);
 
-	sc.pos.Set(0, 30, 30);
-	sc.scale.Set(5, 5, 5);
-
 	f_step = 0.f;
-
-	currentLevel = 1;
-	loadLevel(currentLevel);
 
 	gravity_force.Set(0.f, -9.82f * 25, 0.f);
 
@@ -683,6 +673,9 @@ void mainscene::Init()
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
 	GAMESTATE = GS_PLAY;
+	currentLevel = 1;
+	loadLevel(currentLevel);
+
 	Shape *sTest = new Sphere(Vector3(0, 0, 0), 100);
 	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
 	MainManager.Add(Test);
@@ -724,23 +717,18 @@ bool mainscene::loadLevel(int level)
 		std::cout << "!!!ERROR!!! Unable to load map\n";
 		return false;
 	}
+	
+	Floor = NULL;
+	Celling = NULL;
+	SWALL1 = NULL;
+	SWALL2 = NULL;
+	SWALL3 = NULL;
+	SWALL4 = NULL;
 
 	P_Player.Velocity.SetZero();
 	P_Player.DropObject();
 	PowerActive = false;
 	f_powerTintSet = 0.f;
-
-	while (BIv_BulletList.size() > 0)
-	{
-		BulletInfo *BI = BIv_BulletList.back();
-		if (BI != NULL)
-		{
-			delete BI;
-			BI = NULL;
-		}
-
-		BIv_BulletList.pop_back();
-	}
 
 	while (m_charList.size() > 0)
 	{
@@ -775,6 +763,17 @@ bool mainscene::loadLevel(int level)
 		m_ParList.pop_back();
 	}
 
+	while (m_ScamList.size() > 0)
+	{
+		SecurityCam *SC = m_ScamList.back();
+		if (SC != NULL)
+		{
+			delete SC;
+			SC = NULL;
+		}
+		m_ScamList.pop_back();
+	}
+
 	float worldsize = static_cast<float>(GAME_MAP.worldSize);
 
 	std::cout << "Map Size: ";
@@ -784,82 +783,125 @@ bool mainscene::loadLevel(int level)
 	{
 		for (unsigned x = 0; x < GAME_MAP.map_width; ++x)
 		{
+			if (GAME_MAP.map_data[y][x] == ".")
+			{
+				continue;
+			}
+
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
 				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, y*worldsize*2.f));
 			}
-			else if (GAME_MAP.map_data[y][x] != ".")
+			else if (GAME_MAP.map_data[y][x][0] == 'I')
 			{
-				if (GAME_MAP.map_data[y][x][0] == 'W')
+				if (GAME_MAP.map_data[y][x][1] == 'W')
 				{
-					std::string temp_str_X, temp_str_Y, temp_str_Z;
-					temp_str_X = "";
-					temp_str_Y = "";
-					temp_str_Z = "";
-
-					float SizeX, SizeY, SizeZ;
-					SizeX = 0.f;
-					SizeY = 0.f;
-					SizeZ = 0.f;
-					int temp_int_1 = 0;
-
-					for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+					WeaponsObject *WO;
+					if (GAME_MAP.map_data[y][x] == "IW_M9")
 					{
-						temp_str_X += GAME_MAP.map_data[y][x][i];
-						temp_int_1 = i + 2;
+						WO = new WeaponsObject(WO_presetList[WO_M9]);
+					}
+					else if (GAME_MAP.map_data[y][x] == "IW_KATANA")
+					{
+						WO = new WeaponsObject(WO_presetList[WO_KATANA]);
 					}
 
-					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'y'; ++i)
+					if (WO != NULL)
 					{
-						temp_str_Y += GAME_MAP.map_data[y][x][i];
-						temp_int_1 = i + 2;
+						WO->pos.Set(x*worldsize*2.f, 10.f, y*worldsize*2.f);
+						m_goList.push_back(WO);
 					}
-
-					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'z'; ++i)
-					{
-						temp_str_Z += GAME_MAP.map_data[y][x][i];
-					}
-
-					SizeX = static_cast<float>(std::atoi(temp_str_X.c_str()));
-					SizeY = static_cast<float>(std::atoi(temp_str_Y.c_str()));
-					SizeZ = static_cast<float>(std::atoi(temp_str_Z.c_str()));
-
-					if (SizeX > worldsize)
-					{
-						SizeX = worldsize;
-					}
-
-					if (SizeY > worldsize * 2)
-					{
-						SizeY = worldsize*2.f;
-					}
-
-					if (SizeZ > worldsize)
-					{
-						SizeZ = worldsize;
-					}
-
-					WorldObject *WO;
-					WO = new WorldObject();
-					WO->active = true;
-					WO->colEnable = true;
-					WO->scale.Set(SizeX, SizeY, SizeZ);
-					WO->pos.Set(x*worldsize*2.f, SizeY, y*worldsize*2.f);
-					WO->ColBox.Set(SizeX, SizeY, SizeZ);
-					WO->dynamicRendering = true;
-					WO->mesh = meshList[GEO_WORLD_CUBE];
-					m_goList.push_back(WO);
+					continue;
 				}
-				else if (GAME_MAP.map_data[y][x][0] == 'A')
+				else if (GAME_MAP.map_data[y][x][1] == 'I')
 				{
-					AI *ai;
-					ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
-					ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
-					ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
-					ai->Scale.Set(10, 10, 10);
-					m_charList.push_back(ai);
-					TEST = ai;
+					ItemObject *IO;
+					if (GAME_MAP.map_data[y][x] == "II_SYRINGE")
+					{
+						IO = new WeaponsObject(WO_presetList[WO_M9]);
+					}
+
+					if (IO != NULL)
+					{
+						IO->pos.Set(x*worldsize*2.f, 10.f, y*worldsize*2.f);
+						m_goList.push_back(IO);
+					}
+					continue;
 				}
+			}
+			else if (GAME_MAP.map_data[y][x][0] == 'W')
+			{
+				std::string temp_str_X, temp_str_Y, temp_str_Z;
+				temp_str_X = "";
+				temp_str_Y = "";
+				temp_str_Z = "";
+
+				float SizeX, SizeY, SizeZ;
+				SizeX = 0.f;
+				SizeY = 0.f;
+				SizeZ = 0.f;
+				int temp_int_1 = 0;
+
+				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+				{
+					temp_str_X += GAME_MAP.map_data[y][x][i];
+					temp_int_1 = i + 2;
+				}
+
+				for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'y'; ++i)
+				{
+					temp_str_Y += GAME_MAP.map_data[y][x][i];
+					temp_int_1 = i + 2;
+				}
+
+				for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'z'; ++i)
+				{
+					temp_str_Z += GAME_MAP.map_data[y][x][i];
+				}
+
+				SizeX = static_cast<float>(std::atoi(temp_str_X.c_str()));
+				SizeY = static_cast<float>(std::atoi(temp_str_Y.c_str()));
+				SizeZ = static_cast<float>(std::atoi(temp_str_Z.c_str()));
+
+				if (SizeX > worldsize)
+				{
+					SizeX = worldsize;
+				}
+
+				if (SizeY > worldsize * 2)
+				{
+					SizeY = worldsize*2.f;
+				}
+
+				if (SizeZ > worldsize)
+				{
+					SizeZ = worldsize;
+				}
+
+				WorldObject *WO;
+				WO = new WorldObject();
+				WO->active = true;
+				WO->colEnable = true;
+				WO->scale.Set(SizeX, SizeY, SizeZ);
+				WO->pos.Set(x*worldsize*2.f, SizeY, y*worldsize*2.f);
+				WO->ColBox.Set(SizeX, SizeY, SizeZ);
+				WO->dynamicRendering = true;
+				WO->mesh = meshList[GEO_WORLD_CUBE];
+				m_goList.push_back(WO);
+			}
+			else if (GAME_MAP.map_data[y][x][0] == 'A')
+			{
+				AI *ai;
+				ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
+				ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
+				ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
+				ai->Scale.Set(10, 10, 10);
+
+				WeaponsObject *WO;
+				WO = new WeaponsObject(WO_presetList[WO_M9]);
+				ai->HoldObject(WO);
+				m_goList.push_back(WO);
+				m_charList.push_back(ai);
 			}
 		}
 	}
@@ -874,6 +916,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	Floor = WO;
 	m_goList.push_back(WO);
 	//World Celling
 	WO = new WorldObject();
@@ -885,6 +928,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_QUAD];
+	Celling = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -895,6 +939,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL1 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -905,6 +950,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL2 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -915,6 +961,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL3 = WO;
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
@@ -925,6 +972,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	SWALL4 = WO;
 	m_goList.push_back(WO);
 
 	lights[0].position.y = worldsize * 4.5f;
@@ -968,31 +1016,37 @@ Particle* mainscene::FetchParticle(void)
 /******************************************************************************/
 /*!
 \brief
-Gets an unsused Bullet in the vector
+Gets an unsused bulletobject in the gameobject vector
 \return
-returns an unactive bullet
+returns an unactive gameobject
 */
 /******************************************************************************/
-BulletInfo* mainscene::FetchBullet(void)
+BulletObject* mainscene::FetchBullet(void)
 {
-	for (unsigned i = 0; i < BIv_BulletList.size(); ++i)
+	for (unsigned i = 0; i < m_goList.size(); ++i)
 	{
-		if (!BIv_BulletList[i]->getStatus())
+		BulletObject *BO = dynamic_cast<BulletObject*>(m_goList[i]);
+		if (BO != NULL)
 		{
-			BIv_BulletList[i]->setStatus(true);
-			return BIv_BulletList[i];
-			break;
+			if (!BO->active)
+			{
+				BO->active = true;
+				BO->gravityEnabled = false;
+				return dynamic_cast<BulletObject*>(m_goList[i]);
+				break;
+			}
 		}
 	}
 
 	for (unsigned i = 0; i < 10; ++i)
 	{
-		BulletInfo *BI;
-		BI = new BulletInfo();
-		BI->setStatus(false);
-		BIv_BulletList.push_back(BI);
+		BulletObject *BO;
+		BO = new BulletObject();
+		BO->active = true;
+		BO->gravityEnabled = false;
+		m_goList.push_back(BO);
 	}
-	return BIv_BulletList.back();
+	return dynamic_cast<BulletObject*>(m_goList.back());
 }
 
 /******************************************************************************/
@@ -1005,60 +1059,53 @@ void mainscene::initWeapons(void)
 {
 	firerate = 0.f;
 
-	ItemObject *IO;
-	IO = new ItemObject();
-	IO->active = true;
-	IO->pos.Set(-20, 10, 0);
-	IO->pos1.Set(-5, -4, 5);
-	IO->scale.Set(0.5f, 0.5f, 0.5f);
-	IO->ColBox.Set(1, 1, 1);
-	IO->ColBoxOffset.Set(0, 1, 0);
-	IO->enablePhysics = true;
-	IO->holdable = true;
-	IO->mesh = meshList[GEO_ITEM_SYRINGE];
-	IO->isWeapon = false;
-	IO->isGun = false;
-	m_goList.push_back(IO);
+	//ItemObject *IO;
+	IO_presetList[IO_SYRINGE].active = true;
+	IO_presetList[IO_SYRINGE].pos.Set(-20, 10, 0);
+	IO_presetList[IO_SYRINGE].pos1.Set(-5, -4, 5);
+	IO_presetList[IO_SYRINGE].scale.Set(0.5f, 0.5f, 0.5f);
+	IO_presetList[IO_SYRINGE].ColBox.Set(1, 1, 1);
+	IO_presetList[IO_SYRINGE].ColBoxOffset.Set(0, 1, 0);
+	IO_presetList[IO_SYRINGE].enablePhysics = true;
+	IO_presetList[IO_SYRINGE].holdable = true;
+	IO_presetList[IO_SYRINGE].mesh = meshList[GEO_ITEM_SYRINGE];
+	IO_presetList[IO_SYRINGE].isWeapon = false;
+	IO_presetList[IO_SYRINGE].isGun = false;
 
-	WeaponsObject *WPO;
-	WPO = new WeaponsObject();
-	WPO->active = true;
-	WPO->adsZoom = 1.5f;
-	WPO->mesh = meshList[GEO_M9];
-	WPO->attackRate = 0.02f;
-	WPO->scale.Set(0.03f, 0.03f, 0.03f);
-	WPO->shootvelocity = 400.f;
-	WPO->pos.Set(0, 10, 0);
-	WPO->pos1.Set(-5, -4, 9);
-	WPO->pos2.Set(0, -2.1f, 8);
-	WPO->CurrentClip = 150000;
-	WPO->recoilEffect = 20.f;
-	WPO->isGun = true;
-	WPO->isWeapon = true;
-	WPO->enablePhysics = true;
-	WPO->colEnable = true;
-	WPO->ColBox.Set(3, 3, 3);
-	WPO->AttackSound = ST_WEAPON_M9_SHOOT;
-	m_goList.push_back(WPO);
+	WO_presetList[WO_M9].active = true;
+	WO_presetList[WO_M9].adsZoom = 1.5f;
+	WO_presetList[WO_M9].mesh = meshList[GEO_M9];
+	WO_presetList[WO_M9].attackRate = 0.5f;
+	WO_presetList[WO_M9].scale.Set(0.03f, 0.03f, 0.03f);
+	WO_presetList[WO_M9].shootvelocity = 400.f;
+	WO_presetList[WO_M9].pos.Set(0, 10, 0);
+	WO_presetList[WO_M9].pos1.Set(-5, -4, 9);
+	WO_presetList[WO_M9].pos2.Set(0, -2.1f, 8);
+	WO_presetList[WO_M9].CurrentClip = 15;
+	WO_presetList[WO_M9].recoilEffect = 30.f;
+	WO_presetList[WO_M9].isGun = true;
+	WO_presetList[WO_M9].isWeapon = true;
+	WO_presetList[WO_M9].enablePhysics = true;
+	WO_presetList[WO_M9].colEnable = true;
+	WO_presetList[WO_M9].ColBox.Set(3, 3, 3);
+	WO_presetList[WO_M9].AttackSound = ST_WEAPON_M9_SHOOT;
 
-	WPO = new WeaponsObject();
-	WPO->active = true;
-	WPO->mesh = meshList[GEO_KATANA];
-	WPO->attackRate = 0.05f;
-	WPO->AnimSpeed = 9.f;
-	WPO->scale.Set(0.1f, 0.1f, 0.1f);
-	WPO->pos.Set(20, 10, 0);
-	WPO->pos1.Set(4, -7.5f, 9);
-	WPO->pos2.Set(10, -9.f, 12);
-	WPO->Rotation1.Set(5, 0, 45);
-	WPO->Rotation2.Set(90, 180, 90);
-	WPO->isGun = false;
-	WPO->isWeapon = true;
-	WPO->enablePhysics = true;
-	WPO->colEnable = true;
-	WPO->ColBox.Set(3, 3, 3);
-	WPO->AttackSound = ST_WEAPON_KATANA;
-	m_goList.push_back(WPO);
+	WO_presetList[WO_KATANA].active = true;
+	WO_presetList[WO_KATANA].mesh = meshList[GEO_KATANA];
+	WO_presetList[WO_KATANA].attackRate = 0.05f;
+	WO_presetList[WO_KATANA].AnimSpeed = 9.f;
+	WO_presetList[WO_KATANA].scale.Set(0.1f, 0.1f, 0.1f);
+	WO_presetList[WO_KATANA].pos.Set(20, 10, 0);
+	WO_presetList[WO_KATANA].pos1.Set(4, -7.5f, 9);
+	WO_presetList[WO_KATANA].pos2.Set(10, -9.f, 12);
+	WO_presetList[WO_KATANA].Rotation1.Set(5, 0, 45);
+	WO_presetList[WO_KATANA].Rotation2.Set(90, 180, 90);
+	WO_presetList[WO_KATANA].isGun = false;
+	WO_presetList[WO_KATANA].isWeapon = true;
+	WO_presetList[WO_KATANA].enablePhysics = true;
+	WO_presetList[WO_KATANA].colEnable = true;
+	WO_presetList[WO_KATANA].ColBox.Set(3, 3, 3);
+	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
 
 	f_curRecoil = 0.f;
 }
@@ -1098,7 +1145,17 @@ void mainscene::UpdatePlayer(double &dt)
 			}
 		}
 
-		P_Player.Velocity += gravity_force * static_cast<float>(dt);
+		if (d_dt != d_dt2)
+		{
+			double tempDT = (d_dt + d_dt2) / 2;
+			P_Player.Velocity += gravity_force * static_cast<float>(tempDT);
+		}
+		else
+		{
+			P_Player.Velocity += gravity_force * static_cast<float>(dt);
+		}
+
+
 		inAir = true;
 	}
 	else
@@ -1272,58 +1329,48 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
-	P_Player.Lookat = FPC.target;
-	P_Player.Update(dt);
-
-	/*for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	if (d_dt2 != d_dt)
 	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		AI *ai = dynamic_cast<AI*>(CO);
-		if (ai != NULL)
-		{
-			Mtx44 rotation;
-			rotation.SetToRotation(CalAnglefromPosition(ai->Lookat, ai->getPosition(), true), 0.f, 1.f, 0.f);
-			Vector3 L, R, C;
-			C = rotation * Vector3(0.f, 0.f, 10.f);
-			L = rotation * Vector3(-5.f, 0.f, 7.f);
-			R = rotation * Vector3(5.f, 0.f, 7.f);
-
-			ai->SensorUpdate(dt, collide(ai->getPosition() + L), collide(ai->getPosition() + R), collide(ai->getPosition() + C));
-			ai->Update(dt, P_Player.getPosition());
-		}
-		else
-		{
-			if (CO->holding != NULL)
-			{
-				CO->holding->Update(dt);
-			}
-		}
-
-		CO->Update(dt);
-	}*/
+		double tempDT = (d_dt + d_dt2) / 2;
+		FPC = FPC + (P_Player.Velocity * static_cast<float>(tempDT));
+		P_Player.Lookat = FPC.target;
+		P_Player.Update(tempDT);
+	}
+	else
+	{
+		FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
+		P_Player.Lookat = FPC.target;
+		P_Player.Update(dt);
+	}
 
 	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
 	{
 		CharacterObject *CO = (CharacterObject *)*it;
-		AI *ai = dynamic_cast<AI*>(CO);
-		if (ai != NULL)
+		if (CO->active)
 		{
-			ai->Update(dt, P_Player.getPosition(), m_charList, m_goList);
-		}
-		else
-		{
-			if (CO->holding != NULL)
+			AI *ai = dynamic_cast<AI*>(CO);
+			if (ai != NULL)
 			{
-				CO->holding->Update(dt);
+				ai->Update(dt, P_Player.getPosition(), m_charList, m_goList);
+			}
+			else
+			{
+				if (CO->holding != NULL)
+				{
+					CO->holding->Update(dt);
+				}
 			}
 		}
 	}
 
-	if (Application::IsKeyPressed(us_control[E_CTRL_AIM]))
+	/* Set AI to die
+	if (TEST->active)
 	{
+		TEST->DropObject();
+		TEST->active = false;
 		generateCharacterParticle(TEST, Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0));
 	}
+	*/
 }
 
 /******************************************************************************/
@@ -1334,10 +1381,10 @@ Handles player powers
 /******************************************************************************/
 void mainscene::UpdatePlayerPower(double &dt)
 {
-	static bool abilityPressed = false;
-	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed)
+	static bool abilityPressed_1 = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed_1)
 	{
-		abilityPressed = true;
+		abilityPressed_1 = true;
 		if (PowerActive)
 		{
 			PowerActive = false;
@@ -1353,9 +1400,55 @@ void mainscene::UpdatePlayerPower(double &dt)
 			SE_Engine.playSound2D(soundList[ST_SLOWMO_ENTER]);
 		}
 	}
-	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed)
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed_1)
 	{
-		abilityPressed = false;
+		abilityPressed_1 = false;
+	}
+
+	static bool abilityPressed_2 = false;
+	if(Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
+	{
+		abilityPressed_2 = true;
+		if(!PowerActive)
+		{
+			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+			{
+				GameObject *go = (GameObject *)*it;
+				if (go->active)
+				{
+					WorldObject *WO = dynamic_cast<WorldObject*>(go);
+					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					{
+						WO->Opacity = 10.f;
+					}
+				}
+			}
+			f_powerTintSet = 25.f;
+			c_powerColor.Set(0.f, 0.f, 0.3f);
+			CurrentPower  = PT_SUPERVISION;
+			PowerActive = true;
+		}
+		else
+		{
+			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+			{
+				GameObject *go = (GameObject *)*it;
+				if (go->active)
+				{
+					WorldObject *WO = dynamic_cast<WorldObject*>(go);
+					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					{
+						WO->Opacity = 100.f;
+					}
+				}
+			}
+			f_powerTintSet = 0.f;
+			PowerActive = false;
+		}
+	}
+	else if(!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && abilityPressed_2)
+	{
+		abilityPressed_2 = false;
 	}
 
 	if (PowerActive)
@@ -1414,6 +1507,32 @@ void mainscene::UpdateGO(double &dt)
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
+			BulletObject *BO = dynamic_cast<BulletObject*>(go);
+			if (BO != NULL)
+			{
+				if (collide(BO->pos))
+				{
+					for (unsigned i = 0; i < 5; ++i)
+					{
+						generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
+					}
+
+					BO->active = false;
+				}
+
+				if (BO->life > 0)
+				{
+					BO->life -= static_cast<float>(dt);
+				}
+				else
+				{
+					BO->active = false;
+				}
+
+				BO->pos += BO->vel * static_cast<float>(dt);
+				continue;
+			}
+
 			if (go->enablePhysics && !go->isHeld)
 			{
 				go->colEnable = false;
@@ -1438,7 +1557,10 @@ void mainscene::UpdateGO(double &dt)
 				}
 				else
 				{
-					go->vel += gravity_force * static_cast<float>(dt);
+					if (go->gravityEnabled)
+					{
+						go->vel += gravity_force * static_cast<float>(dt);
+					}
 				}
 
 				if (collide(Vector3(go->pos.x + go->ColBox.x, go->pos.y, go->pos.z)))
@@ -1512,27 +1634,27 @@ Generates particles at position
 void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel)
 {
 	float CharRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->HeadPos, CO->Scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Head);
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->HeadPos, CO->Scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 1.f, CO->Head);
 
 	Mtx44 Rotation;
 	Rotation.SetToRotation(CharRotation, 0, 1, 0);
 	Vector3 tempArm = CO->ArmPos;
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Arm_right);
+	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_right);
 	tempArm = Vector3(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Arm_left);
+	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_left);
 
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Leg_left);
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_left);
 
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Leg_right);
+	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_right);
 
 	generateParticle(CO->getPosition() + CO->ModelPos, CO->Scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
 
-	for (unsigned i = 0; i < 8; ++i)
+	for (unsigned i = 0; i < 64; ++i)
 	{
 		float bloodsize = Math::RandFloatMinMax(0.1f, .8f);
-		generateParticle(CO->getPosition() + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 1.0f);
+		generateParticle(CO->getPosition() + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 4.f);
 	}
 }
 
@@ -1565,56 +1687,18 @@ void mainscene::UpdateParticles(double &dt)
 /******************************************************************************/
 /*!
 \brief
-Updates bullet
-*/
-/******************************************************************************/
-void mainscene::UpdateBullets(double &dt)
-{
-	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
-	{
-		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus())
-		{
-			if (collide(BI->getPosition()))
-			{
-				BI->verticalvelocity = 0.f;
-				BI->setStatus(false);
-				for (unsigned i = 0; i < 5; ++i)
-				{
-					generateParticle(BI->getPosition(), Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BI->getDirection()*-20, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
-				}
-			}
-			else
-			{
-				if (d_dt != d_dt2)
-				{
-					BI->Update(dt*0.4);
-				}
-				else
-				{
-					BI->Update(dt);
-				}
-			}
-		}
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 Fires bullet
 */
 /******************************************************************************/
-void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity, float dmg)
+void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity)
 {
-	BulletInfo *BI;
-	BI = FetchBullet();
-	BI->damage = dmg;
-	BI->setLife(Longevity);
-	BI->setSpeed(Speed);
-	BI->setPosition(Pos);
-	BI->setDirection(Dir);
-	BI->setStatus(true);
+	BulletObject *BO;
+	BO = FetchBullet();
+	BO->pos = Pos;
+	BO->vel = Dir * Speed;
+	BO->life = Longevity;
+	BO->scale.Set(0.5f, 0.5f, 0.5f);
+	BO->mesh = meshList[GEO_BULLET];
 }
 
 /******************************************************************************/
@@ -1898,8 +1982,16 @@ void mainscene::Update(double dt)
 		UpdateGO(dt);
 		UpdateParticles(dt);
 		FPC.Update(dt);
-		sc.update(dt, P_Player.getPosition(), m_charList);
-		UpdateBullets(dt);
+
+		for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
+		{
+			SecurityCam *SC = (SecurityCam *)*it;
+			if (SC->active)
+			{
+				SC->update(dt, P_Player.getPosition(), m_charList);
+			}
+		}
+
 		weaponsUpdate(dt);
 		UpdateSound(dt);
 		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
@@ -2098,7 +2190,7 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.Scale(go->scale);
 		if (go->mesh)
 		{
-			RenderMesh(go->mesh, true, true);
+			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
 		modelStack.PopMatrix();
 	}
@@ -2171,8 +2263,17 @@ Rendering of character objects
 /******************************************************************************/
 void mainscene::RenderCharacter(CharacterObject *CO)
 {
-	float YRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
-	float Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition() + CO->CamOffset, false);
+	float YRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);;
+	float Pitch;
+	if (CO == &P_Player)
+	{
+		Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition() + CO->CamOffset, false);
+	}
+	else
+	{
+		Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition(), false);
+	}
+
 
 	if (CO->holding != NULL)
 	{
@@ -2266,7 +2367,7 @@ void mainscene::RenderParticles(void)
 				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false);
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
 				modelStack.PopMatrix();
 				break;
 			}
@@ -2278,7 +2379,7 @@ void mainscene::RenderParticles(void)
 				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false, true, 100, 100, Color(1.f, 0.f, 0.f));
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
 				modelStack.PopMatrix();
 				break;
 			}
@@ -2306,36 +2407,21 @@ void mainscene::RenderParticles(void)
 /******************************************************************************/
 /*!
 \brief
-Rendering of bullets
-*/
-/******************************************************************************/
-void mainscene::RenderBullet(void)
-{
-	for (std::vector<BulletInfo *>::iterator it = BIv_BulletList.begin(); it != BIv_BulletList.end(); ++it)
-	{
-		BulletInfo *BI = (BulletInfo *)*it;
-		if (BI->getStatus() && BI->getLife() < 5.9f)
-		{
-			modelStack.PushMatrix();
-			modelStack.Translate(BI->getPosition());
-			RenderMesh(meshList[GEO_BULLET], false);
-			modelStack.PopMatrix();
-		}
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 Renders mesh in 3D
 */
 /******************************************************************************/
 void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, float glow, Color &glowColor)
 {
+	if (visibility <= 0)
+	{
+		return;
+	}
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
 	glUniform1i(m_parameters[U_FOG_ENABLED], 0);
+	glUniform1i(m_parameters[U_LIGHTENABLED], static_cast<GLint>(enableLight));
+
 	Mtx44 ortho;
 	ortho.SetToOrtho(0, Application::GetWindowWidth()*0.1, 0, Application::GetWindowHeight()*0.1, -10, 10);
 	projectionStack.PushMatrix();
@@ -2511,7 +2597,6 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 			}
 		}
 		mesh->Render();
-
 		break;
 	}
 	}
@@ -2669,6 +2754,31 @@ Renders the entire world with shadow
 /******************************************************************************/
 void mainscene::RenderWorldShadow(void)
 {
+	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
+	{
+		CharacterObject *CO = (CharacterObject *)*it;
+		if (CO->active)
+		{
+			if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
+			{
+				RenderCharacter(CO);
+			}
+		}
+	}
+
+	for (std::vector<SecurityCam*>::iterator it = m_ScamList.begin(); it != m_ScamList.end(); ++it)
+	{
+		SecurityCam *SC = (SecurityCam *)*it;
+		if (SC->active)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos);
+			modelStack.Scale(SC->scale);
+			RenderMesh(meshList[GEO_SECURITYCAMERA], true);
+			modelStack.PopMatrix();
+		}
+	}
+
 	//Render gameobjects
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -2686,22 +2796,8 @@ void mainscene::RenderWorldShadow(void)
 		}
 	}
 
-	for (std::vector<CharacterObject *>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
-	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		//if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
-		{
-			RenderCharacter(CO);
-		}
-	}
-
 	RenderCharacter(&P_Player);
-
-	modelStack.PushMatrix();
-	modelStack.Translate(sc.pos.x, sc.pos.y, sc.pos.z);
-	modelStack.Scale(sc.scale.x, sc.scale.y, sc.scale.z);
-	RenderMesh(meshList[GEO_SECURITYCAMERA], false);
-	modelStack.PopMatrix();
+	RenderParticles();
 }
 
 /******************************************************************************/
@@ -2712,9 +2808,6 @@ Renders the entire world without shadow
 /******************************************************************************/
 void mainscene::RenderWorldNoShadow(void)
 {
-	RenderParticles();
-	RenderBullet();
-
 	if (renderAxis == true)
 	{
 		modelStack.PushMatrix();
@@ -2722,8 +2815,6 @@ void mainscene::RenderWorldNoShadow(void)
 		RenderMesh(meshList[GEO_AXES], false);
 		modelStack.PopMatrix();
 	}
-
-	//RenderSkybox();
 }
 
 /******************************************************************************/
@@ -2764,6 +2855,8 @@ void mainscene::RenderUI(void)
 		break;
 	}
 
+	RenderButtons();
+
 	if (P_Player.holding != NULL)
 	{
 		if (P_Player.holding->isGun)
@@ -2802,8 +2895,6 @@ void mainscene::RenderUI(void)
 		}
 	}
 
-	RenderButtons();
-
 	if (DisplayInfo)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
@@ -2833,8 +2924,7 @@ void mainscene::RenderPassMain(void)
 	m_lightDepthFBO.BindForReading(GL_TEXTURE8);
 	glUniform1i(m_parameters[U_SHADOW_MAP], 8);
 
-	RenderWorldShadow();
-	RenderWorldNoShadow();
+
 	/*
 	RenderMeshin2D(meshList[GEO_POSITION_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.09f);
 	RenderMeshin2D(meshList[GEO_NORMAL_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.075f);
@@ -2842,14 +2932,20 @@ void mainscene::RenderPassMain(void)
 	RenderMeshin2D(meshList[GEO_DIFFUSE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.045f);
 	RenderMeshin2D(meshList[GEO_SPECULAR_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.03f);
 	RenderMeshin2D(meshList[GEO_EMISSIVE_QUAD], false, 5, Application::GetWindowWidth()*0.095f, Application::GetWindowHeight()*0.015f);//*/
-	modelStack.PushMatrix();
-	modelStack.Translate(Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f, 0);
-	modelStack.Scale(5, 5, 5);
-	RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false);
-	modelStack.PopMatrix();
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	RenderWorldShadow();
+	RenderWorldNoShadow();
+
+	if (TESTMODE)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.08f, Application::GetWindowHeight()*0.09f, 0);
+		modelStack.Scale(5, 5, 5);
+		RenderMeshin2D(meshList[GEO_LIGHT_DEPTH_QUAD], false);
+		modelStack.PopMatrix();
+	}
 
 	RenderUI();
 
@@ -3074,18 +3170,6 @@ void mainscene::Exit(void)
 	Application::SetCursor(true);
 	SE_Engine.Exit();
 
-	while (BIv_BulletList.size() > 0)
-	{
-		BulletInfo *BI = BIv_BulletList.back();
-		if (BI != NULL)
-		{
-			delete BI;
-			BI = NULL;
-		}
-
-		BIv_BulletList.pop_back();
-	}
-
 	while (m_goList.size() > 0)
 	{
 		GameObject *go = m_goList.back();
@@ -3118,6 +3202,17 @@ void mainscene::Exit(void)
 			CO = NULL;
 		}
 		m_charList.pop_back();
+	}
+
+	while (m_ScamList.size() > 0)
+	{
+		SecurityCam *SC = m_ScamList.back();
+		if (SC != NULL)
+		{
+			delete SC;
+			SC = NULL;
+		}
+		m_ScamList.pop_back();
 	}
 
 	for (unsigned i = 0; i < NUM_GEOMETRY; ++i)

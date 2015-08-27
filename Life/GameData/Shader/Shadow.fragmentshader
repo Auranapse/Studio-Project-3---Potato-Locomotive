@@ -384,5 +384,5 @@ void main()
 		temp = lenseffect;
 		temp = temp / 100;
 		color = mix(color, tempcolor, temp);
-	}
+	}//*/
 }

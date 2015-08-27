@@ -144,9 +144,6 @@
     <ClCompile Include="Source\CustomCam1.cpp">
       <Filter>Source Files\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BulletInfo.cpp">
-      <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="Source\LoadOBJ.cpp">
       <Filter>Source Files\Visuals\Mesh\Model/Texture</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
     <ClCompile Include="Source\aPlayer.cpp">
       <Filter>Source Files\Assets\Living</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BulletObject.cpp">
+      <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -301,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="Source\CustomCam1.h">
       <Filter>Header Files\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BulletInfo.h">
-      <Filter>Header Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\Vertex.h">
       <Filter>Header Files\Visuals\Mesh</Filter>
@@ -418,6 +415,9 @@
     </ClInclude>
     <ClInclude Include="Source\aPlayer.h">
       <Filter>Header Files\Assets\Living</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BulletObject.h">
+      <Filter>Header Files\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

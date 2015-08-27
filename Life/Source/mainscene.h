@@ -21,7 +21,7 @@ Main scene
 #include "maploader.h"
 
 #include "TextButton.h"
-#include "BulletInfo.h"
+#include "BulletObject.h"
 #include "GameObject.h"
 #include "WorldObject.h"
 #include "ItemObject.h"
@@ -271,6 +271,7 @@ class mainscene : public Scene
 		E_CTRL_ATTACK,
 		E_CTRL_AIM,
 		E_CTRL_ABILITY_1,
+		E_CTRL_ABILITY_2,
 
 		E_CTRL_TOTAL
 	};
@@ -300,6 +301,19 @@ class mainscene : public Scene
 	{
 		PT_SLOWMO,
 		PT_SUPERVISION,
+	};
+
+	enum ITEMOBJECT_PRESETS
+	{
+		IO_SYRINGE,
+		IO_TOTAL,
+	};
+
+	enum WEAPONOBJECT_PRESETS
+	{
+		WO_KATANA,
+		WO_M9,
+		WO_TOTAL,
 	};
 
 	enum GS_STATE
@@ -363,12 +377,13 @@ private:
 	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
-	std::vector<BulletInfo*> BIv_BulletList;
-	CharacterObject *TEST;
+
+	WorldObject *Floor, *Celling, *SWALL1, *SWALL2, *SWALL3, *SWALL4;
+
+	ItemObject IO_presetList[IO_TOTAL];
+	WeaponsObject WO_presetList[WO_TOTAL];
 
 	Player P_Player;
-
-	SecurityCam sc;
 
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
@@ -414,7 +429,7 @@ private:
 	bool loadLevel(int level);
 	int currentLevel;
 	Particle* FetchParticle(void);
-	BulletInfo* FetchBullet(void);
+	BulletObject* FetchBullet(void);
 
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
@@ -423,26 +438,24 @@ private:
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, Vector3 &Rotation = Vector3(0.f, 0.f, 0.f), int type = Particle::PAR_MESH, float lifetime = 5.f, Mesh *mesh = NULL);
 	void generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel);
 	void UpdateParticles(double &dt);
-	void UpdateBullets(double &dt);
 
-	void Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity = 10, float dmg = 100);
+	void Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity = 10);
 	void weaponsUpdate(double &dt);
 
 	const int NUM_LIGHT_PARAM;
 	Light lights[4];
 
 	void editFOV(float &newFOV);
-	void RenderText(Mesh* mesh, std::string text, Color color);
-	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
-	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0));
 
 	void initWeapons(void);
 
 	void RenderGO(GameObject *go);
 	void RenderCharacter(CharacterObject *CO);
 	void RenderParticles(void);
-	void RenderBullet(void);
 	void RenderMesh(Mesh *mesh, bool enableLight, bool enableFog = true, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0), Material *material = NULL);
+	void RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility = 100.f, float glow = 0.f, Color &glowColor = Color(1, 0, 0));
+	void RenderText(Mesh* mesh, std::string text, Color color);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
 	void RenderSkybox(void);
 	void RenderUI(void);
 	void RenderAIDebugging(CharacterObject * CO);
