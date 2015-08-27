@@ -57,9 +57,13 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<Chara
 			for (std::vector<CharacterObject*>::iterator it = charList.begin(); it != charList.end(); it++)
 			{
 				AI * ai = dynamic_cast<AI*>((CharacterObject*)*it);
-				if(ai != NULL)
+				if(ai != NULL && ai->getState() != AI::ATTACK)
 				{
 					ai->setState(AI::ALERT);
+
+					Vector3 cameraPos = pos;
+					cameraPos.y = 0;
+					ai->setDestination(cameraPos);
 				}
 			}
 		}

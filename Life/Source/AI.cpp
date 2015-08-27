@@ -476,6 +476,19 @@ void AI::setState(E_AI_STATE e_State)
 	this->e_State = e_State;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Set the AI destination
+
+\param 
+		destination
+*/
+/******************************************************************************/
+void AI::setDestination(Vector3 destination)
+{
+	this->destination = destination;
+}
 
 /******************************************************************************/
 /*!
@@ -515,11 +528,9 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 			{
 				Lookat = currentLookat;
 			}
-			std::cout << theta << std::endl;
 		}
 		else
 		{
-			std::cout << "Senpai notice me" << std::endl;
 			//if(e_State == WALKING)
 			//{
 			//	if ((playerPos - Position).LengthSquared() < d_detectionRange)
@@ -644,12 +655,6 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		else
 		{
 			ai_ScanArea(dt);
-		}
-
-		if(b_disableDestination)
-		{
-			destination = test;
-			b_disableDestination = false;
 		}
 
 		//If player is infront and near player, then ai will switch to attack state

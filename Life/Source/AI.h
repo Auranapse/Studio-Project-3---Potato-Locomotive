@@ -60,6 +60,7 @@ public:
 	Vector3 getDestination();
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
+	void setDestination(Vector3 destination);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;

@@ -921,10 +921,10 @@ bool mainscene::loadLevel(int level)
 				SecurityCam *SC;
 				SC = new SecurityCam();
 				SC->active = true;
-				SC->pos.Set(x*worldsize*2.f, worldsize*4.f - 3.f, y*worldsize*2.f);
+				SC->pos.Set(x*worldsize*2.f, worldsize*4.f, y*worldsize*2.f);
 				SC->colEnable = true;
 				SC->ColBox.Set(3, 3, 3);
-				SC->scale.Set(2, 2, 2);
+				SC->scale.Set(6, 6, 6);
 				SC->rotation.Set(0, SCAngle, 0);
 				SC->isHeld = false;
 				SC->enablePhysics = false;
@@ -2247,6 +2247,52 @@ void mainscene::RenderGO(GameObject *go)
 			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
 		modelStack.PopMatrix();
+
+		//to be removed
+		SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
+		if(SC != NULL)
+		{
+			static float offset = -0;
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+			modelStack.Rotate(SC->getCameraRange_Angle(), 0, 1, 0);
+			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+			modelStack.Rotate(-SC->getCameraRange_Angle(), 0, 1, 0);
+			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+			modelStack.Rotate(-SC->getCameraRange_Angle(), 1, 0, 0);
+			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+			modelStack.Rotate(SC->getCameraRange_Angle(), 1, 0, 0);
+			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+			RenderMesh(meshList[GEO_REDLINE], false);
+			modelStack.PopMatrix();
+		}
 	}
 }
 
