@@ -185,6 +185,12 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 		case 4://Player To SoundRange
 			PLAYER_SOUND(a1, a2);
 			break;
+		case 5:
+			PLAYER_WALL(a1, a2);
+			break;
+		case 6:
+			PLAYER_WEAPON(a1, a2);
+			break;
 		}
 		break;
 	case 1://Enemy Collisions
@@ -202,6 +208,10 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 		case 4://Enemy To SoundRange
 			ENEMY_SOUND(a1, a2);
 			break;
+		case 5:
+			ENEMY_WALL(a1, a2);
+		case 6:
+			ENEMY_WEAPON(a1, a2);
 		}
 		break;
 	case 2://Projectile Collisions
@@ -216,8 +226,38 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 		case 4://Projectile To SoundRange
 			PROJECTILE_SOUND(a1, a2);
 			break;
+		case 5:
+			PROJECTILE_WALL(a1, a2);
+			break;
+		case 6:
+			PROJECTILE_WEAPON(a1, a2);
+			break;
 		}
 		break;
+
+	case 3: //Room Collisions
+		{
+			switch (c2)
+			{
+			case 6:
+				ROOM_WEAPON(a1, a2);
+				break;
+			}
+			break;
+		}
+	case 6: //Weapon Collisions
+		{
+			switch(c2)
+			{
+				case 5:
+				WEAPON_WALL(a1, a2);
+				break;
+			case 6:
+				WEAPON_WEAPON(a1, a2);
+				break;
+			}
+			break;
+		}
 	}
 }
 
@@ -457,10 +497,14 @@ void SceneManager::PLAYER_ENEMY(Asset* a1, Asset* a2)
 {
 	aPlayer* c1 = (aPlayer*)a1;
 	Enemy* c2 = (Enemy*)a2;
+	float multiplier = 0.2;
+	if (c2->getForce().LengthSquared() == 0)
+	{
+		c1->applyForce(Vector3(50,0,50));
+	}
+	c1->applyForce(c2->getForce() * multiplier);
 
 	c1->setHealth(c1->getHealth() - c2->getDamage());
-	if (c1->getHealth() <= 0)
-		delete c1;
 }
 /******************************************************************************/
 /*!
@@ -494,11 +538,14 @@ void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
 
 	float netForce = c1->getForce().Length();
 
-	if (c1->getForce().LengthSquared() != 0)
+	std::cout<<"\n"<<c1->getForce().x<<", "<<c1->getForce().z<<"\n";
+	//Friction 
+	if (netForce != 0)
 	{
 		if (!(c1->getMove()))//Standing Still
 		{
 			Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
+			budgingForce.y = 0;
 			if (netForce > budgingForce.Length())
 			{
 				c1->setMove(true);
@@ -508,22 +555,51 @@ void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
 		}
 		else if (c1->getMove())//Moving
 		{
+			if (c1->getVelo() == Vector3(0,0,0) || c1->getAcc() == Vector3(0,0,0))
+			{
+			c1->setVelo(Vector3(0,0,0));
+			c1->setAcc(Vector3(0,0,0));
+			return;
+			}
 			Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
 			Vector3 opposingForce = c1->getVelo().Normalize() * kineticForce.Length();
-			Vector3 deceleration = opposingForce * (1/c1->getMass());//The Deceleration applied from Friction
-			if (c1->getVelo().Normalize() != c1->getAcc().Normalize())
+			opposingForce.y = 0;
+
+			if ((c1->getForce().LengthSquared() < opposingForce.LengthSquared()))//Kinetic Force > Forward Force
 			{
-				if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())
+				if (c1->getVelo().Normalize() != c1->getAcc().Normalize())//It is Decelerating
 				{
-					c1->setVelo(Vector3(0, 0, 0));
-					c1->setAcc(Vector3(0, 0, 0));
-					c1->setForce(Vector3(0, 0, 0));
-					c1->setMove(false);
+					if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())//Deceleration > Velocity
+					{
+						c1->setVelo(Vector3(0, 0, 0));
+						c1->setAcc(Vector3(0, 0, 0));
+						c1->setMove(false);
+					}
+				}
+				else
+				{	
+					c1->setForce(c1->getForce() - opposingForce);
 				}
 			}
 			else
-				c1->setForce(c1->getForce() - opposingForce);
+			{
+				c1->setVelo(Vector3(0, 0, 0));
+				c1->setAcc(Vector3(0, 0, 0));
+				c1->setMove(false);
+			}
 		}
+	}
+
+	//Gravity
+	if (c1->getBound()->getOrigin().y > 0)
+	{
+		c1->applyForce(Vector3(0,-10,0));
+	}
+	else if (c1->getBound()->getOrigin().y < 0)
+	{
+		Vector3 newBound = c1->getBound()->getOrigin();
+		newBound.y = 0;
+		c1->getBound()->setOrigin(newBound);
 	}
 }
 /******************************************************************************/
@@ -537,6 +613,28 @@ Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PLAYER_SOUND(Asset*, Asset*){}
+/******************************************************************************/
+/*!
+\brief	
+Performs Player/Wall Collision Effect
+\param	a1
+Player Asset for Collision
+\param a2
+Wall Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::PLAYER_WALL(Asset*, Asset*){}
+/******************************************************************************/
+/*!
+\brief	
+Performs Player/Weapon Collision Effect
+\param	a1
+Player Asset for Collision
+\param a2
+Weapon Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::PLAYER_WEAPON(Asset*, Asset*){}
 
 //Enemy Effects
 /******************************************************************************/
@@ -609,9 +707,9 @@ void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
 		{
 			if (c1->getVelo() == Vector3(0,0,0) || c1->getAcc() == Vector3(0,0,0))
 			{
-				c1->setVelo(Vector3(0,0,0));
-				c1->setAcc(Vector3(0,0,0));
-				return;
+			c1->setVelo(Vector3(0,0,0));
+			c1->setAcc(Vector3(0,0,0));
+			return;
 			}
 			Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
 			Vector3 opposingForce = c1->getVelo().Normalize() * kineticForce.Length();
@@ -619,15 +717,15 @@ void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
 
 			if ((c1->getForce().LengthSquared() < opposingForce.LengthSquared()))//Kinetic Force > Forward Force
 			{
-					if (c1->getVelo().Normalize() != c1->getAcc().Normalize())//It is Decelerating
+				if (c1->getVelo().Normalize() != c1->getAcc().Normalize())//It is Decelerating
+				{
+					if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())//Deceleration > Velocity
 					{
-						if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())//Deceleration > Velocity
-						{
-							c1->setVelo(Vector3(0, 0, 0));
-							c1->setAcc(Vector3(0, 0, 0));
-							c1->setMove(false);
-						}
+						c1->setVelo(Vector3(0, 0, 0));
+						c1->setAcc(Vector3(0, 0, 0));
+						c1->setMove(false);
 					}
+				}
 				else
 				{	
 					c1->setForce(c1->getForce() - opposingForce);
@@ -665,6 +763,29 @@ Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::ENEMY_SOUND(Asset*, Asset*){}//sound thingy destination
+/******************************************************************************/
+/*!
+\brief	
+Performs Enemy/Wall Collision Effect
+\param	a1
+Enemy Asset for Collision
+\param a2
+Wall Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::ENEMY_WALL(Asset*, Asset*){}
+
+/******************************************************************************/
+/*!
+\brief	
+Performs Enemy/Weapon Collision Effect
+\param	a1
+Enemy Asset for Collision
+\param a2
+Weapon Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::ENEMY_WEAPON(Asset*, Asset*){}
 
 //Projectile Effects 
 /******************************************************************************/
@@ -704,3 +825,64 @@ Sound Asset for Collision
 */
 /******************************************************************************/
 void SceneManager::PROJECTILE_SOUND(Asset*, Asset*){}
+/******************************************************************************/
+/*!
+\brief	
+Performs Projectile/Wall Collision Effect
+\param	a1
+Projectile Asset for Collision
+\param a2
+Wall Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::PROJECTILE_WALL(Asset*, Asset*){}
+
+/******************************************************************************/
+/*!
+\brief	
+Performs Projectile/Weapon Collision Effect
+\param	a1
+Projectile Asset for Collision
+\param a2
+Weapon Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::PROJECTILE_WEAPON(Asset*, Asset*){}
+
+/******************************************************************************/
+/*!
+\brief	
+Performs Room/Weapon Collision Effect
+\param	a1
+Room Asset for Collision
+\param a2
+Weapon Asset for Collision
+*/
+/******************************************************************************/
+void SceneManager::ROOM_WEAPON(Asset*, Asset*){}
+
+//Weapon Effects
+/******************************************************************************/
+/*!
+\brief	
+Performs Weapon/Weapon Collision Effect
+\param	a1
+Weapon Asset for Collision
+\param a2
+Weapon Asset for Collision
+*/
+/******************************************************************************/
+
+void SceneManager::WEAPON_WEAPON(Asset*, Asset*){}
+/******************************************************************************/
+/*!
+\brief	
+Performs Weapon/Wall Collision Effect
+\param	a1
+Weapon Asset for Collision
+\param a2
+Wall Asset for Collision
+*/
+/******************************************************************************/
+
+void SceneManager::WEAPON_WALL(Asset*, Asset*){}

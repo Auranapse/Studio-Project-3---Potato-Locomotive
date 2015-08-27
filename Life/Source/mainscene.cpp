@@ -690,10 +690,13 @@ void mainscene::Init()
 	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
 	MainManager.Add(Test);
 
-	Shape *aTest = new Sphere(Vector3(0,0,0), 5);
+	Shape *aTest = new Sphere(Vector3(0,0,0), 10);
 	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 10, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 20, 0);
-
 	MainManager.Add(Test2);
+
+	Shape *wTest = new AABB(Vector3(20,0,20),10);
+	Asset *Test3 = new aPlayer(meshList[GEO_SECURITYCAMERA], wTest, 5, 5, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 50, 100, 100); 
+	MainManager.Add(Test3);
 }
 
 /******************************************************************************/
@@ -2206,12 +2209,21 @@ void mainscene::Update(double dt)
 	MainManager.Update(dt, 1);
 	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
 	Living* Whatever = (Living*)MainManager.SceneAssets[1];
+	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
 	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().Length()<<std::endl;
 	if (Application::IsKeyPressed('P'))
 	{
 		//std::cout<<"50 Force Added!\n";
 		Whatever->applyForce(Vector3(50,0,50));
 	}
+	if (Application::IsKeyPressed('I'))
+		Whatever1->applyForce(Vector3(0, 0, -50));
+	if (Application::IsKeyPressed('K'))
+		Whatever1->applyForce(Vector3(0, 0, 50));
+	if (Application::IsKeyPressed('L'))
+		Whatever1->applyForce(Vector3(50, 0, 0));
+	if (Application::IsKeyPressed('J'))
+		Whatever1->applyForce(Vector3(-50, 0, 0));
 }
 
 /******************************************************************************/
@@ -2839,6 +2851,13 @@ void mainscene::RenderWorldShadow(void)
 	modelStack.PushMatrix();
 	modelStack.Translate(Whatever->getBound()->getOrigin().x, Whatever->getBound()->getOrigin().y, Whatever->getBound()->getOrigin().z);
 	modelStack.Scale(10,10,10);
+	RenderMesh(meshList[GEO_OBJCAKE], true);
+	modelStack.PopMatrix();
+
+	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
+	modelStack.PushMatrix();
+	modelStack.Translate(Whatever1->getBound()->getOrigin().x, Whatever1->getBound()->getOrigin().y, Whatever1->getBound()->getOrigin().z);
+	modelStack.Scale(15,15,15);
 	RenderMesh(meshList[GEO_OBJCAKE], true);
 	modelStack.PopMatrix();
 }

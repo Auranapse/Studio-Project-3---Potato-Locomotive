@@ -30,7 +30,6 @@ void Enemy::update(double dt, float speed)
 	{ 
 		this->acc = this->force * (double)(1 / this->mass);
 		this->velo += acc;
-		//if (this->velo.Length() <= 0
 		this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
 	}
 

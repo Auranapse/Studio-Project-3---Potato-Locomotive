@@ -68,18 +68,30 @@ public:
 	void PLAYER_PROJECTILE(Asset*, Asset*);
 	void PLAYER_ROOM(Asset*, Asset*);
 	void PLAYER_SOUND(Asset*, Asset*);
+	void PLAYER_WALL(Asset*, Asset*);
+	void PLAYER_WEAPON(Asset*, Asset*);
 
 	//Enemy Effects
 	void ENEMY_ENEMY(Asset*, Asset*);
 	void ENEMY_PROJECTILE(Asset*, Asset*);
 	void ENEMY_ROOM(Asset*, Asset*);
 	void ENEMY_SOUND(Asset*, Asset*);
+	void ENEMY_WALL(Asset*, Asset*);
+	void ENEMY_WEAPON(Asset*, Asset*);
 
 	//Projectile Effects 
 	void PROJECTILE_PROJECTILE(Asset*, Asset*);
 	void PROJECTILE_ROOM(Asset*, Asset*);
 	void PROJECTILE_SOUND(Asset*, Asset*);
+	void PROJECTILE_WALL(Asset*, Asset*);
+	void PROJECTILE_WEAPON(Asset*, Asset*);
 
+	//Room Effects
+	void ROOM_WEAPON(Asset*, Asset*);
+
+	//Weapon Effects
+	void WEAPON_WEAPON(Asset*, Asset*);
+	void WEAPON_WALL(Asset*, Asset*);
 	std::vector<Asset*>SceneAssets;//go private later, this is just for testing...
 private:
 };

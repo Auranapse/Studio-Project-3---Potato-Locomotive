@@ -29,7 +29,7 @@ void aPlayer::update(double dt, float speed)
 	if (this->getMove())
 	{
 		this->acc = this->force * (double)(1 / this->mass);
-		this->velo += acc * static_cast<float>(dt);
+		this->velo += acc;
 		this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
 	}
 }
