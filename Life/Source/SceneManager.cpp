@@ -37,7 +37,7 @@ Speed of Living Assets in Scene
 /******************************************************************************/
 void SceneManager::Update(double dt, float speed)
 {
-	//std::cout<<"\nUpdate~\n";
+	std::cout<<"\nUpdate~\n";
 	//Transverse through for Collision
 	for (unsigned i = 0; i < SceneAssets.size(); ++i)
 	{
@@ -49,7 +49,7 @@ void SceneManager::Update(double dt, float speed)
 			}
 		}
 	}
-	//std::cout<<std::endl;
+	std::cout<<"-end\n";
 
 
 
@@ -83,6 +83,13 @@ bool SceneManager::checkCollision(Asset* a1, Asset* a2)//Collision Check
 	int c1, c2;
 	c1 = (a1->getBound()->getType() < a2->getBound()->getType()) ? (c1 = a1->getBound()->getType()) : (c1 = a2->getBound()->getType());
 	c2 = (a2->getBound()->getType() > a1->getBound()->getType()) ? (c2 = a2->getBound()->getType()) : (c2 = a1->getBound()->getType());
+
+	if (a2->getBound()->getType() < a1->getBound()->getType())
+	{
+		Asset* Temp = a1;
+		a1 = a2;
+		a2 = Temp;
+	}
 
 	switch(c1)
 	{
@@ -153,7 +160,14 @@ void SceneManager::effCollision(Asset* a1, Asset* a2)//Collision effect
 {
 	int c1, c2;
 	c1 = (a1->getType() < a2->getType()) ? (c1 = a1->getType()) : (c1 = a2->getType());
-	c2 = (a2->getType() >= a1->getType()) ? (c2 = a2->getType()) : (c2 = a1->getType());
+	c2 = (a2->getType() > a1->getType()) ? (c2 = a2->getType()) : (c2 = a1->getType());
+
+	if (a2->getType() < a1->getType())
+	{
+		Asset* Temp = a1;
+		a1 = a2;
+		a2 = Temp;
+	}
 
 	switch(c1)
 	{
@@ -483,21 +497,37 @@ void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
 	float gravity = 10;
 
 	float netForce = c1->getForce().Length();
-	if (!(c1->getMove()))//Standing Still
+
+	if (c1->getForce().LengthSquared() != 0)
 	{
-		Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
-		if (netForce > budgingForce.Length())
+		if (!(c1->getMove()))//Standing Still
 		{
-			c1->setMove(true);
-			c1->setForce(c1->getForce() - budgingForce);
+			Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
+			if (netForce > budgingForce.Length())
+			{
+				c1->setMove(true);
+				Vector3 opposingForce = c1->getForce().Normalized() * budgingForce.Length();
+				c1->setForce(c1->getForce() - opposingForce);
+			}
 		}
-	}
-	else if (c1->getMove())//Moving
-	{
-		Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
-		c1->setForce(c1->getForce() - kineticForce);
-		if (c1->getForce().Length() <= 0) 
-			c1->setMove(false);
+		else if (c1->getMove())//Moving
+		{
+			Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
+			Vector3 opposingForce = c1->getVelo().Normalize() * kineticForce.Length();
+			Vector3 deceleration = opposingForce * (1/c1->getMass());//The Deceleration applied from Friction
+			if (c1->getVelo().Normalize() != c1->getAcc().Normalize())
+			{
+				if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())
+				{
+					c1->setVelo(Vector3(0, 0, 0));
+					c1->setAcc(Vector3(0, 0, 0));
+					c1->setForce(Vector3(0, 0, 0));
+					c1->setMove(false);
+				}
+			}
+			else
+				c1->setForce(c1->getForce() - opposingForce);
+		}
 	}
 }
 /******************************************************************************/
@@ -563,26 +593,69 @@ void SceneManager::ENEMY_ROOM(Asset* a1, Asset* a2)
 	float gravity = 10;
 
 	float netForce = c1->getForce().Length();
-	if (c1->getForce().Length() != 0)
+
+
+	//Friction 
+	if (netForce != 0)
 	{
 		if (!(c1->getMove()))//Standing Still
 		{
 			Vector3 budgingForce = c1->getMass() * gravity * c2->getStatic();
+			budgingForce.y = 0;
 			if (netForce > budgingForce.Length())
 			{
 				c1->setMove(true);
-				Vector3 opposingForce = c1->getForce().Normalized() * (-(budgingForce.LengthSquared()));
+				Vector3 opposingForce = c1->getForce().Normalized() * budgingForce.Length();
 				c1->setForce(c1->getForce() - opposingForce);
 			}
 		}
 		else if (c1->getMove())//Moving
 		{
+			if (c1->getVelo() == Vector3(0,0,0) || c1->getAcc() == Vector3(0,0,0))
+			{
+				c1->setVelo(Vector3(0,0,0));
+				c1->setAcc(Vector3(0,0,0));
+				return;
+			}
 			Vector3 kineticForce = c1->getMass() * gravity * c2->getKinetic();
-			Vector3 opposingForce = c1->getForce().Normalized() * (-(kineticForce.LengthSquared()));
-			c1->setForce(c1->getForce() - opposingForce);
-			if (c1->getForce().Length() <= 0) 
+			Vector3 opposingForce = c1->getVelo().Normalize() * kineticForce.Length();
+			opposingForce.y = 0;
+
+			if ((c1->getForce().LengthSquared() < opposingForce.LengthSquared()))//Kinetic Force > Forward Force
+			{
+					if (c1->getVelo().Normalize() != c1->getAcc().Normalize())//It is Decelerating
+					{
+						if (c1->getVelo().LengthSquared() < c1->getAcc().LengthSquared())//Deceleration > Velocity
+						{
+							c1->setVelo(Vector3(0, 0, 0));
+							c1->setAcc(Vector3(0, 0, 0));
+							c1->setMove(false);
+						}
+					}
+				else
+				{	
+					c1->setForce(c1->getForce() - opposingForce);
+				}
+			}
+			else
+			{
+				c1->setVelo(Vector3(0, 0, 0));
+				c1->setAcc(Vector3(0, 0, 0));
 				c1->setMove(false);
+			}
 		}
+	}
+
+	//Gravity
+	if (c1->getBound()->getOrigin().y > 0)
+	{
+		c1->applyForce(Vector3(0,-10,0));
+	}
+	else if (c1->getBound()->getOrigin().y < 0)
+	{
+		Vector3 newBound = c1->getBound()->getOrigin();
+		newBound.y = 0;
+		c1->getBound()->setOrigin(newBound);
 	}
 }
 /******************************************************************************/

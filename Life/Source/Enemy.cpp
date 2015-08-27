@@ -12,7 +12,7 @@ Enemy::Enemy(){}
 destructor
 */
 /******************************************************************************/
-Enemy::~Enemy(){}
+Enemy::~Enemy(){  }
 
 /******************************************************************************/
 /*!
@@ -26,10 +26,13 @@ Updates the Acceleration/Velocity and Strategies of Enemies
 /******************************************************************************/
 void Enemy::update(double dt, float speed)
 {
-	this->acc = this->force * (this->mass / 40.f);
-	this->velo += acc;
-	this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
-	
+	if (this->getMove())
+	{ 
+		this->acc = this->force * (double)(1 / this->mass);
+		this->velo += acc;
+		//if (this->velo.Length() <= 0
+		this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
+	}
 	//PERFORM SOME STRAT BASED ON GAME STATE
 }
 
