@@ -665,7 +665,7 @@ void mainscene::Init()
 
 	soundList[ST_WALL_POWER_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_enter.mp3");
 	soundList[ST_WALL_POWER_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_exit.mp3");
-	
+
 	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
 	soundList[ST_STEP_2] = SE_Engine.preloadSound("GameData//sounds//other//step2.wav");
 	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
@@ -682,7 +682,7 @@ void mainscene::Init()
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
 	GAMESTATE = GS_PLAY;
-	
+
 	currentLevel = 1;
 	loadLevel(currentLevel);
 
@@ -690,12 +690,14 @@ void mainscene::Init()
 	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
 	MainManager.Add(Test);
 
-	Shape *aTest = new Sphere(Vector3(0,0,0), 10);
-	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 10, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 20, 0);
+
+	Shape *aTest = new Sphere(Vector3(0, 0, 0), 5);
+	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 5, 1, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 1, 20, 0);
+
 	MainManager.Add(Test2);
 
-	Shape *wTest = new AABB(Vector3(20,0,20),10);
-	Asset *Test3 = new aPlayer(meshList[GEO_SECURITYCAMERA], wTest, 5, 5, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 50, 100, 100); 
+	Shape *wTest = new AABB(Vector3(20, 0, 20), 10);
+	Asset *Test3 = new aPlayer(meshList[GEO_SECURITYCAMERA], wTest, 5, 5, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 1, 50, 100, 100);
 	MainManager.Add(Test3);
 }
 
@@ -778,6 +780,7 @@ bool mainscene::loadLevel(int level)
 	}
 
 	float worldsize = static_cast<float>(GAME_MAP.worldSize);
+	float worldHeight = static_cast<float>(GAME_MAP.worldHeight);
 
 	std::cout << "Map Size: ";
 	std::cout << GAME_MAP.map_width << ", " << GAME_MAP.map_height << "\n";
@@ -871,9 +874,9 @@ bool mainscene::loadLevel(int level)
 					SizeX = worldsize;
 				}
 
-				if (SizeY > worldsize * 2)
+				if (SizeY > worldHeight)
 				{
-					SizeY = worldsize*2.f;
+					SizeY = worldHeight;
 				}
 
 				if (SizeZ > worldsize)
@@ -921,7 +924,7 @@ bool mainscene::loadLevel(int level)
 				SecurityCam *SC;
 				SC = new SecurityCam();
 				SC->active = true;
-				SC->pos.Set(x*worldsize*2.f, worldsize*4.f, y*worldsize*2.f);
+				SC->pos.Set(x*worldsize*2.f, worldHeight*2.f, y*worldsize*2.f);
 				SC->colEnable = true;
 				SC->ColBox.Set(3, 3, 3);
 				SC->scale.Set(6, 6, 6);
@@ -953,7 +956,7 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 	//World Celling
 	WO = new WorldObject();
-	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, worldsize*4.f, (GAME_MAP.map_height*0.5f)*worldsize);
+	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, worldHeight*2.f, (GAME_MAP.map_height*0.5f)*worldsize);
 	WO->rotation.x = 90.f;
 	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, GAME_MAP.map_height * worldsize * 2.f, 1);
 	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
@@ -965,9 +968,9 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
-	WO->pos.Set(worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize * 2.f);
-	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.2f, worldsize);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.2f, worldsize);
+	WO->pos.Set(worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize * 2.f);
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight*1.2f, worldsize);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight*1.2f, worldsize);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -976,9 +979,9 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
-	WO->pos.Set(worldsize * 2.f, worldsize * 2.f, 0.f);
-	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.2f, worldsize * 2.2f, worldsize);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.2f, worldsize * 2.2f, worldsize);
+	WO->pos.Set(worldsize * 2.f, worldHeight, 0.f);
+	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.2f, worldHeight*1.2f, worldsize);
+	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.2f, worldHeight*1.2f, worldsize);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -987,9 +990,9 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
-	WO->pos.Set(-worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize);
-	WO->scale.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
-	WO->ColBox.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->pos.Set(-worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize);
+	WO->scale.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -998,9 +1001,9 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	WO = new WorldObject();
-	WO->pos.Set(GAME_MAP.map_width * worldsize * 2.f, worldsize * 2.f, GAME_MAP.map_height * worldsize);
-	WO->scale.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
-	WO->ColBox.Set(worldsize, worldsize * 2.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->pos.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize);
+	WO->scale.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -1008,7 +1011,7 @@ bool mainscene::loadLevel(int level)
 	SWALL4 = WO;
 	m_goList.push_back(WO);
 
-	lights[0].position.y = worldsize * 4.5f;
+	lights[0].position.y = worldHeight * 2.5f;
 
 	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
@@ -1114,7 +1117,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_M9].pos.Set(0, 10, 0);
 	WO_presetList[WO_M9].pos1.Set(-5, -4, 9);
 	WO_presetList[WO_M9].pos2.Set(0, -2.1f, 8);
-	WO_presetList[WO_M9].CurrentClip = 15;
+	WO_presetList[WO_M9].CurrentClip = 5;
 	WO_presetList[WO_M9].recoilEffect = 30.f;
 	WO_presetList[WO_M9].isGun = true;
 	WO_presetList[WO_M9].isWeapon = true;
@@ -1350,7 +1353,7 @@ void mainscene::UpdatePlayer(double &dt)
 					{
 						if (isVisible2(FPC.position, FPC.target, 10, IO->pos))
 						{
-							if ((IO->pos - P_Player.getPosition()).LengthSquared() < 1000)
+							if ((IO->pos - P_Player.getPosition()).LengthSquared() < 1500)
 							{
 								P_Player.HoldObject(IO);
 								break;
@@ -1385,13 +1388,45 @@ void mainscene::UpdatePlayer(double &dt)
 			if (ai != NULL)
 			{
 				ai->Update(dt, P_Player.getPosition(), m_charList, m_goList);
-			}
-			else
-			{
-				if (CO->holding != NULL)
+
+				//Temp collision for AI to weapon
+				for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 				{
-					CO->holding->Update(dt);
+					GameObject *go = (GameObject *)*it;
+					if (go->active)
+					{
+						if (intersect(ai->getPosition() + Vector3(6, 30, 6), ai->getPosition() + Vector3(-6, 0, -6), go->pos))
+						{
+							if (go->vel.LengthSquared() > 2000)
+							{
+								BulletObject *BO = dynamic_cast<BulletObject*>(go);
+								if (BO != NULL)
+								{
+									for (unsigned i = 0; i < 5; ++i)
+									{
+										generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
+									}
+
+									BO->active = false;
+
+									CO->DropObject();
+									CO->active = false;
+									generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)));
+								}
+								else
+								{
+									CO->DropObject(Vector3(-go->vel.x*0.1f, Math::RandFloatMinMax(20, 120), -go->vel.z*0.1f));
+								}
+							}
+						}
+					}
 				}
+				//Temp collision for AI to weapon^^^^^^^^^^^^^^^^
+			}
+
+			if (CO->holding != NULL)
+			{
+				CO->holding->Update(dt);
 			}
 		}
 	}
@@ -1418,8 +1453,8 @@ void mainscene::UpdatePlayerPower(double &dt)
 	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed_1)
 	{
 		abilityPressed_1 = true;
-		
-		if(!PowerActive)
+
+		if (!PowerActive)
 		{
 			PowerActive = true;
 			CurrentPower = PT_SLOWMO;
@@ -1574,7 +1609,7 @@ void mainscene::UpdateGO(double &dt)
 			}
 
 			SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
-			if(SC != NULL)
+			if (SC != NULL)
 			{
 				SC->update(dt, P_Player.getPosition(), m_charList);
 				continue;
@@ -1775,7 +1810,7 @@ void mainscene::weaponsUpdate(double &dt)
 					}
 				}
 			}
-
+			firerate = 0.f;
 			P_Player.DropObject(P_Player.getDirection().Normalized() * 400.f);
 		}
 		else if (P_Player.holding->isWeapon)
@@ -2204,9 +2239,10 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	
+
 
 	MainManager.Update(dt, 1);
+
 	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
 	Living* Whatever = (Living*)MainManager.SceneAssets[1];
 	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
@@ -2214,7 +2250,7 @@ void mainscene::Update(double dt)
 	if (Application::IsKeyPressed('P'))
 	{
 		//std::cout<<"50 Force Added!\n";
-		Whatever->applyForce(Vector3(50,0,50));
+		Whatever->applyForce(Vector3(50, 0, 50));
 	}
 	if (Application::IsKeyPressed('I'))
 		Whatever1->applyForce(Vector3(0, 0, -50));
@@ -2224,6 +2260,14 @@ void mainscene::Update(double dt)
 		Whatever1->applyForce(Vector3(50, 0, 0));
 	if (Application::IsKeyPressed('J'))
 		Whatever1->applyForce(Vector3(-50, 0, 0));
+
+	//std::cout << "Pos: " << MainManager.SceneAssets[1]->getBound()->getOrigin().x << std::endl;
+	//std::cout << "Velo: " << Whatever->getVelo().x << std::endl << "Acc: " << Whatever->getAcc().x << std::endl << "Force: " << Whatever->getForce().Length() << std::endl;
+	if (Application::IsKeyPressed('P'))
+	{
+		std::cout << "5 Force Added!\n";
+		Whatever->applyForce(Vector3(50, 0, 0));
+	}
 }
 
 /******************************************************************************/
@@ -2250,7 +2294,7 @@ void mainscene::RenderGO(GameObject *go)
 
 		//to be removed
 		SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
-		if(SC != NULL)
+		if (SC != NULL)
 		{
 			static float offset = -0;
 			modelStack.PushMatrix();
@@ -2309,7 +2353,7 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 
 	if (ai != NULL)
 	{
-		if(ai->getState() == AI::WALKING || ai->getState() == AI::ALERT)
+		if (ai->getState() == AI::WALKING || ai->getState() == AI::ALERT)
 		{
 			//Detection Range
 			modelStack.PushMatrix();
@@ -2325,7 +2369,7 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 			modelStack.PopMatrix();
 
 			//Alert Range
-			if(ai->getState() == AI::WALKING)
+			if (ai->getState() == AI::WALKING)
 			{
 				modelStack.PushMatrix();
 				modelStack.Translate(0, -1, 0);
@@ -2872,7 +2916,7 @@ void mainscene::RenderWorldShadow(void)
 			}
 		}
 	}
-	
+
 	//Render gameobjects
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -2892,18 +2936,18 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&P_Player);
 	RenderParticles();
-	
+
 	Living* Whatever = (Living*)MainManager.SceneAssets[1];
 	modelStack.PushMatrix();
 	modelStack.Translate(Whatever->getBound()->getOrigin().x, Whatever->getBound()->getOrigin().y, Whatever->getBound()->getOrigin().z);
-	modelStack.Scale(10,10,10);
+	modelStack.Scale(10, 10, 10);
 	RenderMesh(meshList[GEO_OBJCAKE], true);
 	modelStack.PopMatrix();
 
 	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
 	modelStack.PushMatrix();
 	modelStack.Translate(Whatever1->getBound()->getOrigin().x, Whatever1->getBound()->getOrigin().y, Whatever1->getBound()->getOrigin().z);
-	modelStack.Scale(15,15,15);
+	modelStack.Scale(15, 15, 15);
 	RenderMesh(meshList[GEO_OBJCAKE], true);
 	modelStack.PopMatrix();
 }
