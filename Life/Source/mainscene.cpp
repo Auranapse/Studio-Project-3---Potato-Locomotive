@@ -656,7 +656,12 @@ void mainscene::Init()
 
 	soundList[ST_SLOWMO_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_enter.mp3");
 	soundList[ST_SLOWMO_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_exit.mp3");
+	soundList[ST_HEARTBEAT] = SE_Engine.preloadSound("GameData//sounds//effects//heartbeat.mp3");
+	soundList[ST_HEARTBEAT]->setDefaultVolume(0.5f);
 
+	soundList[ST_WALL_POWER_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_enter.mp3");
+	soundList[ST_WALL_POWER_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_exit.mp3");
+	
 	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
 	soundList[ST_STEP_2] = SE_Engine.preloadSound("GameData//sounds//other//step2.wav");
 	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
@@ -717,7 +722,7 @@ bool mainscene::loadLevel(int level)
 		std::cout << "!!!ERROR!!! Unable to load map\n";
 		return false;
 	}
-	
+
 	Floor = NULL;
 	Celling = NULL;
 	SWALL1 = NULL;
@@ -1385,19 +1390,20 @@ void mainscene::UpdatePlayerPower(double &dt)
 	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && !abilityPressed_1)
 	{
 		abilityPressed_1 = true;
-		if (PowerActive)
-		{
-			PowerActive = false;
-			f_powerTintSet = 0.f;
-			SE_Engine.playSound2D(soundList[ST_SLOWMO_EXIT]);
-		}
-		else
+		
+		if(!PowerActive)
 		{
 			PowerActive = true;
 			CurrentPower = PT_SLOWMO;
 			f_powerTintSet = 25.f;
 			c_powerColor.Set(0.1f, 0.f, 0.f);
 			SE_Engine.playSound2D(soundList[ST_SLOWMO_ENTER]);
+		}
+		else if (PowerActive && CurrentPower == PT_SLOWMO)
+		{
+			PowerActive = false;
+			f_powerTintSet = 0.f;
+			SE_Engine.playSound2D(soundList[ST_SLOWMO_EXIT]);
 		}
 	}
 	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_1]) && abilityPressed_1)
@@ -1406,10 +1412,10 @@ void mainscene::UpdatePlayerPower(double &dt)
 	}
 
 	static bool abilityPressed_2 = false;
-	if(Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
+	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
 	{
 		abilityPressed_2 = true;
-		if(!PowerActive)
+		if (!PowerActive)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 			{
@@ -1417,7 +1423,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 				if (go->active)
 				{
 					WorldObject *WO = dynamic_cast<WorldObject*>(go);
-					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					if (WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
 					{
 						WO->Opacity = 10.f;
 					}
@@ -1425,10 +1431,11 @@ void mainscene::UpdatePlayerPower(double &dt)
 			}
 			f_powerTintSet = 25.f;
 			c_powerColor.Set(0.f, 0.f, 0.3f);
-			CurrentPower  = PT_SUPERVISION;
+			CurrentPower = PT_SUPERVISION;
+			SE_Engine.playSound2D(soundList[ST_WALL_POWER_ENTER]);
 			PowerActive = true;
 		}
-		else
+		else if (PowerActive && CurrentPower == PT_SUPERVISION)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 			{
@@ -1436,17 +1443,18 @@ void mainscene::UpdatePlayerPower(double &dt)
 				if (go->active)
 				{
 					WorldObject *WO = dynamic_cast<WorldObject*>(go);
-					if(WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+					if (WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
 					{
 						WO->Opacity = 100.f;
 					}
 				}
 			}
 			f_powerTintSet = 0.f;
+			SE_Engine.playSound2D(soundList[ST_WALL_POWER_EXIT]);
 			PowerActive = false;
 		}
 	}
-	else if(!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && abilityPressed_2)
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && abilityPressed_2)
 	{
 		abilityPressed_2 = false;
 	}
@@ -1470,6 +1478,10 @@ void mainscene::UpdatePlayerPower(double &dt)
 				{
 					dt = d_dt;
 				}
+			}
+			if (!SE_Engine.isSoundPlaying(soundList[ST_HEARTBEAT]))
+			{
+				SE_Engine.playSound2D(soundList[ST_HEARTBEAT]);
 			}
 			break;
 		case mainscene::PT_SUPERVISION:
