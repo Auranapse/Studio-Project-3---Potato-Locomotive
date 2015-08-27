@@ -1,132 +1,113 @@
-#include "aPlayer.h"
-/******************************************************************************/
-/*!
-\brief	
-constructor
-*/
-/******************************************************************************/
-aPlayer::aPlayer(){}
-/******************************************************************************/
-/*!
-\brief	
-destructor
-*/
-/******************************************************************************/
-aPlayer::~aPlayer(){}
+#include "Weapon.h"
 
 /******************************************************************************/
 /*!
 \brief	
-Updates Position/Velo/Acc of player and its Moves during the frame
-\param dt
-time stamp
-\param speed
-scalar multiplier for time related movements like Velocity/acceleration
+Constructor
 */
 /******************************************************************************/
-void aPlayer::update(double dt, float speed)
+Weapon::Weapon(){}
+/******************************************************************************/
+/*!
+\brief	
+Destructor
+*/
+/******************************************************************************/
+Weapon::~Weapon(){}
+/******************************************************************************/
+/*!
+\brief	
+Gets Current Ammo of Weapon
+\return
+ammo
+*/
+/******************************************************************************/
+float Weapon::getAmmo(void)const
 {
-	if (this->getMove())
-	{
-		this->acc = this->force * (double)(1 / this->mass);
-		this->velo += acc * static_cast<float>(dt);
-		this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * static_cast<float>(dt)));
-	}
+	return this->ammo;
 }
 /******************************************************************************/
 /*!
 \brief	
-Gets damage of Player
-\return 
+Gets Cooldown before next shot
+\return
+cooldown
+*/
+/******************************************************************************/
+float Weapon::getCD(void)const
+{
+	return this->cooldown;
+}
+/******************************************************************************/
+/*!
+\brief	
+Gets Damage of Weapon
+\return
 damage
 */
 /******************************************************************************/
-int aPlayer::getDamage(void)const
+float Weapon::getDamage(void)const
 {
 	return this->damage;
 }
 /******************************************************************************/
 /*!
 \brief	
-Gets walk Force of Player
-\return 
-walkForce
+Gets target of Weapon
+\return
+targetAim
 */
 /******************************************************************************/
-float aPlayer::getWalk(void)const
+Vector3 Weapon::getAim(void)const
 {
-	return this->walkForce;
-}
-/******************************************************************************/
-/*!
-\brief	
-Gets jump force of Player
-\return 
-jumpForce
-*/
-/******************************************************************************/
-float aPlayer::getJump(void)const
-{
-	return this->jumpForce;
-}
-/******************************************************************************/
-/*!
-\brief	
-Gets energy of Player
-\return 
-energy
-*/
-/******************************************************************************/
-float aPlayer::getEnergy(void)const
-{
-	return this->energy;
+	return this->targetAim;
 }
 
 /******************************************************************************/
 /*!
 \brief	
-Sets damage of Player
-\param dmg
-daamge
+Sets ammo of Weapon
+\param ammo
+ammo
 */
 /******************************************************************************/
-void aPlayer::setDamage(int dmg)
+void Weapon::setAmmo(float ammo)
 {
-	this->damage = dmg;
+	this->ammo = ammo;
 }
 /******************************************************************************/
 /*!
 \brief	
-Sets walkForce of Player
-\param walk
-walkForce
+Sets cooldown of Weapon
+\param cooldown
+cooldown
 */
 /******************************************************************************/
-void aPlayer::setWalk(float walk)
+void Weapon::setCD(float cooldown)
 {
-	this->walkForce = walk;
+	this->cooldown = cooldown;
 }
 /******************************************************************************/
 /*!
 \brief	
-Sets jumpForce of Player
-\param jump
-jumpForce
+Sets damage of Weapon
+\param damage
+damage
 */
 /******************************************************************************/
-void aPlayer::setJump(float jump)
+void Weapon::setDmg(float damage)
 {
-	this->jumpForce =jump;
+	this->damage = damage;
 }
 /******************************************************************************/
 /*!
 \brief	
-Sets energy of Player
-\param energy
-energy
+Sets aim of Weapon
+\param aim
+aim
 */
 /******************************************************************************/
-void aPlayer::setEnergy(float energy)
+void Weapon::setAim(Vector3 aim)
 {
-	this->energy = energy;
+	this->targetAim = aim;
 }

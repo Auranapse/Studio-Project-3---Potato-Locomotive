@@ -252,6 +252,12 @@
     <ClCompile Include="Source\BulletObject.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Weapon.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Wall.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -418,6 +424,12 @@
     </ClInclude>
     <ClInclude Include="Source\BulletObject.h">
       <Filter>Header Files\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Wall.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Weapon.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

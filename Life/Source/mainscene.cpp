@@ -686,12 +686,12 @@ void mainscene::Init()
 	currentLevel = 1;
 	loadLevel(currentLevel);
 
-	Shape *sTest = new Sphere(Vector3(0, 0, 0), 10000);
+	Shape *sTest = new Sphere(Vector3(0, 0, 0), 100000);
 	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
 	MainManager.Add(Test);
 
 	Shape *aTest = new Sphere(Vector3(0,0,0), 5);
-	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 5, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 20, 0);
+	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 10, 1, Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0), 1, 20, 0);
 
 	MainManager.Add(Test2);
 }
@@ -2204,13 +2204,13 @@ void mainscene::Update(double dt)
 	
 
 	MainManager.Update(dt, 1);
-	std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
+	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
 	Living* Whatever = (Living*)MainManager.SceneAssets[1];
-	std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().Length()<<std::endl;
+	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().Length()<<std::endl;
 	if (Application::IsKeyPressed('P'))
 	{
-		std::cout<<"5 Force Added!\n";
-		Whatever->applyForce(Vector3(50,0,0));
+		//std::cout<<"50 Force Added!\n";
+		Whatever->applyForce(Vector3(50,0,50));
 	}
 }
 

@@ -33,7 +33,7 @@ void Enemy::update(double dt, float speed)
 		//if (this->velo.Length() <= 0
 		this->getBound()->moveTo(this->getBound()->getOrigin() + (velo * speed * dt));
 	}
-	//PERFORM SOME STRAT BASED ON GAME STATE
+
 }
 
 /******************************************************************************/

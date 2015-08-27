@@ -49,6 +49,8 @@ protected:
 	2 = Projectile
 	3 = Room
 	4 = SoundRange
+	5 = Weapon
+	6 = Wall
 	*/
 	//type = ONLY SET IN CHILD CONSTRUCTORS(No Mutator)
 };

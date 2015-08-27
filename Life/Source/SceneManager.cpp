@@ -37,7 +37,6 @@ Speed of Living Assets in Scene
 /******************************************************************************/
 void SceneManager::Update(double dt, float speed)
 {
-	std::cout<<"\nUpdate~\n";
 	//Transverse through for Collision
 	for (unsigned i = 0; i < SceneAssets.size(); ++i)
 	{
@@ -49,9 +48,6 @@ void SceneManager::Update(double dt, float speed)
 			}
 		}
 	}
-	std::cout<<"-end\n";
-
-
 
 	//Transverse through for Living Assets Update
 	for (unsigned i = 0; i < SceneAssets.size(); ++i)
