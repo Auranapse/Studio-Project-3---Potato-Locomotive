@@ -51,12 +51,14 @@ public:
 
 	void ai_ScanArea(const double &dt);
 	void UpdateLookat(const double &dt, const Vector3 &playerPos);
+	void aiStateHandling(const double &dt, Vector3 playerPos);
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
 	double getDetectionRange_Max();
 	Vector3 getDestination();
 	E_AI_STATE getState();
+	void setState(E_AI_STATE e_State);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;

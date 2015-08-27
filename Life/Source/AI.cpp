@@ -308,6 +308,11 @@ AI::E_AI_STATE AI::getState()
 	return e_State;
 }
 
+void AI::setState(E_AI_STATE e_State)
+{
+	this->e_State = e_State;
+}
+
 void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 {
 	if(currentLookat != NULL)
@@ -318,19 +323,19 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 		{
 			float theta = Math::RadianToDegree(acos((Lookat.Dot(currentLookat)) / (Lookat.Length() * currentLookat.Length())));
 
-			if(theta > 1)
+			//if(theta >= 5)
 			{
 				if(Lookat.x > currentLookat.x)
-					Lookat.x -= theta * dt;
+					Lookat.x -= 50 * dt;
 				else
-					Lookat.x += theta * dt;
+					Lookat.x += 50 * dt;
 
 				if(Lookat.z > currentLookat.z)
-					Lookat.z -= theta * dt;
+					Lookat.z -= 50 * dt;
 				else
-					Lookat.z += theta * dt;
+					Lookat.z += 50 * dt;
 			}
-			else if (theta < 1)
+			if (theta < 1)
 			{
 				Lookat = currentLookat;
 			}
@@ -380,6 +385,177 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 	}
 }
 
+
+void AI::aiStateHandling(const double &dt, Vector3 playerPos)
+{
+	switch (e_State)
+	{
+	case WALKING:
+	{
+		//Have the AI partol a certain area
+		//Need Pathfinding i think
+
+		if (isVisible(Position, Lookat, d_detectionAngle, playerPos))
+		{
+			//If player is infront and near player, then ai will switch to attack state
+			if ((playerPos - Position).LengthSquared() < d_detectionRange)
+			{
+				/*prevPosition = Position;
+				e_State = ATTACK;
+				b_aiCooldown = false;*/
+				prevPosition = Position;
+				e_State = ATTACK;
+				b_aiCooldown = false;
+				b_goAttack = false;
+				/*currentLookat.x = playerPos.x;
+				currentLookat.z = playerPos.z;
+				b_goAttack = true;*/
+			}
+			//if ai saw player but is too far way, the ai will investigate
+			else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax)
+			{
+				///*destination.x = playerPos.x;
+				//destination.z = playerPos.z;
+				//currentLookat = destination;*/
+				//currentLookat.x = playerPos.x;
+				//currentLookat.z = playerPos.z;
+				//destination = currentLookat;
+				destination.x = playerPos.x;
+				destination.z = playerPos.z;
+				prevPosition = Position;
+				e_State = ALERT;
+				b_aiCooldown = false;
+				b_goAlert = false;
+				//b_goAlert = true;
+			}
+		}
+
+		if (b_aiCooldown)
+		{
+			//Ai will move towards prev position
+			if ((Position - prevPosition).LengthSquared() > 2)
+			{
+				Lookat = prevPosition;
+			}
+			//AI is at the destination
+			else
+			{
+				b_aiCooldown = false;
+			}
+		}
+	}
+	break;
+
+	case ALERT:
+	{
+		//AI will move towards the destination
+		if ((Position - destination).LengthSquared() > 2)
+		{
+			//Move the ai towards the destination
+			Lookat = destination;
+		}
+		//if ai is at the destination
+		else
+		{
+			ai_ScanArea(dt);
+		}
+
+		//If player is infront and near player, then ai will switch to attack state
+		if (isVisible(Position, Lookat, d_detectionAngle, playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
+		{
+			e_State = ATTACK;
+			b_updateAI = true;
+			b_rotateClockwiseFirst = NULL;
+		}
+
+		////If ai is at destination
+		//else
+		//{
+		//	static float alertTime = 5.f;
+
+		//	if (f_alert_timer < alertTime)
+		//	{
+		//		f_alert_timer += dt;
+		//	}
+		//	else
+		//	{
+		//		//Alert enemy within a small radius
+		//		for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
+		//		{
+		//			AI *ai = dynamic_cast<AI*>((CharacterObject*)*it);
+		//			if (ai->getPosition() != Position)
+		//			{
+		//				if ((Position - ai->getPosition()).LengthSquared() < 100)
+		//				{
+		//					ai->e_State = ATTACK;
+		//				}
+		//			}
+		//		}
+		//		e_State = ATTACK;
+		//		f_alert_timer = 0;
+		//	}
+		//}
+
+		//if player have escaped ai, cooldown first before returning to walking
+		if (b_aiCooldown)
+		{
+			static float cooldownTiming = 2.f;
+
+			if (f_cooldownTime < cooldownTiming)
+			{
+				f_cooldownTime += dt;
+			}
+			else
+			{
+				e_State = WALKING;
+				f_cooldownTime = 0.f;
+			}
+		}
+	}
+	break;
+
+	case ATTACK:
+	{
+		Lookat = playerPos;
+
+		//if enemy is holding a weapon
+		if (holding != NULL)
+		{
+			if (holding->isWeapon)
+			{
+				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
+
+				//Enemy is holding a gun
+				if (WO->isGun)
+				{
+					//Make enemy move a certain distance away from the enemy before shooting
+				}
+				//Enemy is holding a melee weapon
+				else
+				{
+
+				}
+			}
+		}
+		//Enemy is not holding a weapon
+		else
+		{
+			//make the enemy move closer to the enemy before attacking
+		}
+
+		//AI return to alert state if player have avoided enemy
+		/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
+		{
+		b_aiCooldown = true;
+		e_State = ALERT;
+		}*/
+	}
+	break;
+
+	default:
+		break;
+	}
+}
 /******************************************************************************/
 /*!
 \brief
@@ -392,164 +568,9 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
 {
-	switch (e_State)
-	{
-	case WALKING:
-		{
-			//Have the AI partol a certain area
-			//Need Pathfinding i think
-
-			if (isVisible(Position, Lookat, d_detectionAngle, playerPos))
-			{
-				//If player is infront and near player, then ai will switch to attack state
-				if ((playerPos - Position).LengthSquared() < d_detectionRange)
-				{
-					/*prevPosition = Position;
-					e_State = ATTACK;
-					b_aiCooldown = false;*/
-					currentLookat.x = playerPos.x;
-					currentLookat.z = playerPos.z;
-					b_goAttack = true;
-				}
-				//if ai saw player but is too far way, the ai will investigate
-				else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
-				{
-					/*destination.x = playerPos.x;
-					destination.z = playerPos.z;
-					currentLookat = destination;*/
-					currentLookat.x = playerPos.x;
-					currentLookat.z = playerPos.z;
-					b_goAlert = true;
-				}
-			}
-
-			if(b_aiCooldown)
-			{
-				//Ai will move towards prev position
-				if ((Position - prevPosition).LengthSquared() > 2)
-				{
-					Lookat = prevPosition;
-				}
-				//AI is at the destination
-				else
-				{
-					b_aiCooldown = false;
-				}
-			}
-		}
-		break;
-
-	case ALERT:
-		{
-			//AI will move towards the destination
-			if ((Position - destination).LengthSquared() > 2)
-			{
-				//Move the ai towards the destination
-				Lookat = destination;
-			}
-			//if ai is at the destination
-			else
-			{
-				ai_ScanArea(dt);
-			}
-
-			//If player is infront and near player, then ai will switch to attack state
-			if (isVisible(Position, Lookat, d_detectionAngle, playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
-			{
-				e_State = ATTACK;
-				b_updateAI = true;
-				b_rotateClockwiseFirst = NULL;
-			}
-
-			////If ai is at destination
-			//else
-			//{
-			//	static float alertTime = 5.f;
-
-			//	if (f_alert_timer < alertTime)
-			//	{
-			//		f_alert_timer += dt;
-			//	}
-			//	else
-			//	{
-			//		//Alert enemy within a small radius
-			//		for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
-			//		{
-			//			AI *ai = dynamic_cast<AI*>((CharacterObject*)*it);
-			//			if (ai->getPosition() != Position)
-			//			{
-			//				if ((Position - ai->getPosition()).LengthSquared() < 100)
-			//				{
-			//					ai->e_State = ATTACK;
-			//				}
-			//			}
-			//		}
-			//		e_State = ATTACK;
-			//		f_alert_timer = 0;
-			//	}
-			//}
-
-			//if player have escaped ai, cooldown first before returning to walking
-			if (b_aiCooldown)
-			{
-				static float cooldownTiming = 2.f;
-
-				if (f_cooldownTime < cooldownTiming)
-				{
-					f_cooldownTime += dt;
-				}
-				else
-				{
-					e_State = WALKING;
-					f_cooldownTime = 0.f;
-				}
-			}
-		}
-		break;
-
-	case ATTACK:
-		{
-			Lookat = playerPos;
-
-			//if enemy is holding a weapon
-			if (holding != NULL)
-			{
-				if(holding->isWeapon)
-				{
-					WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
-					
-					//Enemy is holding a gun
-					if (WO->isGun)
-					{
-						//Make enemy move a certain distance away from the enemy before shooting
-					}
-					//Enemy is holding a melee weapon
-					else
-					{
-
-					}
-				}
-			}
-			//Enemy is not holding a weapon
-			else
-			{
-				//make the enemy move closer to the enemy before attacking
-			}
-
-			//AI return to alert state if player have avoided enemy
-			/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
-			{
-				b_aiCooldown = true;
-				e_State = ALERT;
-			}*/
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	UpdateLookat(dt, playerPos);
+	
+	aiStateHandling(dt, playerPos);
+	//UpdateLookat(dt, playerPos);
 
 	Mtx44 rotation;
 	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);

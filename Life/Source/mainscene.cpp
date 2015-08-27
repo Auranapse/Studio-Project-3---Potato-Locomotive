@@ -1905,7 +1905,7 @@ void mainscene::Update(double dt)
 		UpdateGO(dt);
 		UpdateParticles(dt);
 		FPC.Update(dt);
-		sc.update(dt, P_Player.getPosition());
+		sc.update(dt, P_Player.getPosition(), m_charList);
 		UpdateBullets(dt);
 		weaponsUpdate(dt);
 		UpdateSound(dt);

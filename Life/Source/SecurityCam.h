@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "GabrielDLC.h"
 #include "Collision.h"
+#include "AI.h"
+#include "CharacterObject.h"
 
 class SecurityCam : public GameObject
 {
@@ -16,7 +18,7 @@ public:
 	SecurityCam(void);
 	~SecurityCam(void);
 
-	void update(const double dt, Vector3 playerPos);
+	void update(const double &dt, Vector3 &playerPos, std::vector<CharacterObject*> charList);
 	float getAngle();
 	CAMERA_STATE getState();
 private:
