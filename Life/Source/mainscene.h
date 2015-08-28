@@ -430,6 +430,7 @@ private:
 	float f_powerTint;
 	float f_powerTintSet;
 	Color c_powerColor;
+	float f_poweramount;
 
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);

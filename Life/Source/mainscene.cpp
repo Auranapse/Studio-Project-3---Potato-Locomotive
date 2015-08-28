@@ -746,6 +746,7 @@ bool mainscene::loadLevel(int level)
 	P_Player.DropObject();
 	PowerActive = false;
 	f_powerTintSet = 0.f;
+	f_poweramount = 60.f;
 
 	while (m_goList.size() > 0)
 	{
@@ -954,6 +955,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	WO->dynamicRendering = false;
 	Floor = WO;
 	m_goList.push_back(WO);
 	//World Celling
@@ -966,6 +968,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_QUAD];
+	WO->dynamicRendering = false;
 	Celling = WO;
 	m_goList.push_back(WO);
 
@@ -977,6 +980,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	WO->dynamicRendering = false;
 	SWALL1 = WO;
 	m_goList.push_back(WO);
 
@@ -988,6 +992,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	WO->dynamicRendering = false;
 	SWALL2 = WO;
 	m_goList.push_back(WO);
 
@@ -999,6 +1004,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	WO->dynamicRendering = false;
 	SWALL3 = WO;
 	m_goList.push_back(WO);
 
@@ -1010,6 +1016,7 @@ bool mainscene::loadLevel(int level)
 	WO->enablePhysics = false;
 	WO->colEnable = true;
 	WO->mesh = meshList[GEO_WORLD_CUBE];
+	WO->dynamicRendering = false;
 	SWALL4 = WO;
 	m_goList.push_back(WO);
 
@@ -1152,6 +1159,8 @@ void mainscene::initWeapons(void)
 /*!
 \brief
 Function to edit fov
+\param newFOV
+the new fov to change to
 */
 /******************************************************************************/
 void mainscene::editFOV(float &newFOV)
@@ -1165,6 +1174,8 @@ void mainscene::editFOV(float &newFOV)
 /*!
 \brief
 Handles player physics and movement
+\param dt
+delta time
 */
 /******************************************************************************/
 void mainscene::UpdatePlayer(double &dt)
@@ -1380,21 +1391,14 @@ void mainscene::UpdatePlayer(double &dt)
 		P_Player.Lookat = FPC.target;
 		P_Player.Update(dt);
 	}
-
-	/* Set AI to die
-	if (TEST->active)
-	{
-		TEST->DropObject();
-		TEST->active = false;
-		generateCharacterParticle(TEST, Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0), Vector3(0, 100, 0));
-	}
-	*/
 }
 
 /******************************************************************************/
 /*!
 \brief
 Handles player powers
+\param dt
+delta time
 */
 /******************************************************************************/
 void mainscene::UpdatePlayerPower(double &dt)
@@ -1404,7 +1408,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		abilityPressed_1 = true;
 
-		if (!PowerActive)
+		if (!PowerActive && f_poweramount > 50)
 		{
 			PowerActive = true;
 			CurrentPower = PT_SLOWMO;
@@ -1428,7 +1432,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
 	{
 		abilityPressed_2 = true;
-		if (!PowerActive)
+		if (!PowerActive && f_poweramount > 50)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 			{
@@ -1462,9 +1466,9 @@ void mainscene::UpdatePlayerPower(double &dt)
 					}
 				}
 			}
+			PowerActive = false;
 			f_powerTintSet = 0.f;
 			SE_Engine.playSound2D(soundList[ST_WALL_POWER_EXIT]);
-			PowerActive = false;
 		}
 	}
 	else if (!Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && abilityPressed_2)
@@ -1496,11 +1500,46 @@ void mainscene::UpdatePlayerPower(double &dt)
 			{
 				SE_Engine.playSound2D(soundList[ST_HEARTBEAT]);
 			}
+
+			if (f_poweramount <= 0)
+			{
+				PowerActive = false;
+				f_powerTintSet = 0.f;
+				SE_Engine.playSound2D(soundList[ST_SLOWMO_EXIT]);
+			}
+
+			f_poweramount -= static_cast<float>(d_dt) * 6.f;
 			break;
 		case mainscene::PT_SUPERVISION:
+			if (f_poweramount <= 0)
+			{
+				for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+				{
+					GameObject *go = (GameObject *)*it;
+					if (go->active)
+					{
+						WorldObject *WO = dynamic_cast<WorldObject*>(go);
+						if (WO != NULL && WO != Celling && WO != Floor && WO != SWALL1 && WO != SWALL2 && WO != SWALL3 && WO != SWALL4)
+						{
+							WO->Opacity = 100.f;
+						}
+					}
+				}
+				PowerActive = false;
+				f_powerTintSet = 0.f;
+				SE_Engine.playSound2D(soundList[ST_WALL_POWER_EXIT]);
+			}
+			f_poweramount -= static_cast<float>(d_dt) * 12.f;
 			break;
 		default:
 			break;
+		}
+	}
+	else
+	{
+		if (f_poweramount < 100)
+		{
+			f_poweramount += static_cast<float>(d_dt) * 2.f;
 		}
 	}
 
@@ -1753,14 +1792,14 @@ void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel,
 	Rotation.SetToRotation(CharRotation, 0, 1, 0);
 	Vector3 tempArm = CO->ArmPos;
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_right);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Arm_right);
 	tempArm = Vector3(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_left);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Arm_left);
 
-	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_left);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Leg_left);
 
-	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_right);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Leg_right);
 
 	generateParticle(CO->pos + CO->ModelPos, CO->scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
 
@@ -3161,6 +3200,80 @@ void mainscene::RenderUI(void)
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
 		modelStack.PopMatrix();
 		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
+
+		if (P_Player.holding != NULL)
+		{
+			if (P_Player.holding->isGun)
+			{
+				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+				if (WO->animState)
+				{
+					Color c_crosshair(0.f, 1.f, 1.f);
+
+					if (WO->CurrentClip <= 0)
+					{
+						c_crosshair.Set(1.f, 0.f, 0.f);
+					}
+					else if (!(WO->attackRate + firerate < timer))
+					{
+						c_crosshair.Set(0.f, 0.5f, 0.5f);
+					}
+					else
+					{
+						c_crosshair.Set(0.f, 1.f, 1.f);
+					}
+
+					modelStack.PushMatrix();
+					modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
+
+					modelStack.PushMatrix();
+					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+					modelStack.PopMatrix();
+
+					modelStack.PushMatrix();
+					modelStack.Rotate(90, 0, 0, 1);
+					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+					modelStack.PopMatrix();
+
+					modelStack.PushMatrix();
+					modelStack.Rotate(-90, 0, 0, 1);
+					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+					modelStack.PopMatrix();
+
+					modelStack.PushMatrix();
+					modelStack.Rotate(180, 0, 0, 1);
+					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+					modelStack.PopMatrix();
+
+					modelStack.PopMatrix();
+				}
+			}
+		}
+		if (f_poweramount > 0)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(0, 0, 0.1f);
+			modelStack.Scale(1, 10.f, 0.f);
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.f));
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(0, 0, 0.2f);
+			modelStack.Scale(1, f_poweramount*0.1f, 0.f);
+			if (f_poweramount < 50)
+			{
+				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.5f, 0.f, 0.f));
+			}
+			else
+			{
+				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.f, 1.f, 1.f));
+			}
+			modelStack.PopMatrix();
+		}
 		break;
 	case mainscene::GS_END:
 	case mainscene::GS_PAUSED:
@@ -3176,47 +3289,9 @@ void mainscene::RenderUI(void)
 
 	RenderButtons();
 
-	if (P_Player.holding != NULL)
+	if (TESTMODE)
 	{
-		if (P_Player.holding->isGun)
-		{
-			WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-			if (WO->animState)
-			{
-				modelStack.PushMatrix();
-				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
-
-				modelStack.PushMatrix();
-				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-				modelStack.PopMatrix();
-
-				modelStack.PushMatrix();
-				modelStack.Rotate(90, 0, 0, 1);
-				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-				modelStack.PopMatrix();
-
-				modelStack.PushMatrix();
-				modelStack.Rotate(-90, 0, 0, 1);
-				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-				modelStack.PopMatrix();
-
-				modelStack.PushMatrix();
-				modelStack.Rotate(180, 0, 0, 1);
-				modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false);
-				modelStack.PopMatrix();
-
-				modelStack.PopMatrix();
-			}
-		}
-	}
-
-	if (DisplayInfo)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, Application::GetWindowHeight()*0.1f - 1.f);
 	}
 }
 
