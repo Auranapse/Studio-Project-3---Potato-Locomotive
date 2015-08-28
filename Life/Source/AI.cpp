@@ -715,7 +715,6 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 
 	case ATTACK:
 	{
-		Lookat = playerPos;
 		destination = playerPos;
 
 		//if enemy is holding a weapon

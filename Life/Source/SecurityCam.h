@@ -22,17 +22,17 @@ public:
 	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);
 	CAMERA_STATE getState();
 
-	double getCameraRange_Angle();
-	double getCameraRange();
+	float getCameraFOV();
+	float getCameraRange();
 	Vector3 Lookat;
 	float offsetY;
 private:
 	CAMERA_STATE c_State;
 
-	float d_totalRotation;
-	float d_currentRotation;
+	bool rotationState;
+	float f_rotationLimiter;
 	float f_rotationAngle;
-	static double d_cameraRange_Angle;
-	static double d_cameraRange;
+	static float f_cameraFOV;
+	static float f_cameraRange;
 };
 

@@ -2598,14 +2598,14 @@ void mainscene::RenderSCDebugging(SecurityCam * SC)
 {
 	modelStack.PushMatrix();
 	modelStack.Translate(0 , -SC->pos.y / 6.1, 0);
-	modelStack.Rotate(SC->getCameraRange_Angle(), 0, 1, 0);
+	modelStack.Rotate(SC->getCameraFOV(), 0, 1, 0);
 	modelStack.Scale(0 ,0, -sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0 , -SC->pos.y / 6.1, 0);
-	modelStack.Rotate(-SC->getCameraRange_Angle(), 0, 1, 0);
+	modelStack.Rotate(-SC->getCameraFOV(), 0, 1, 0);
 	modelStack.Scale(0 ,0, -sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();

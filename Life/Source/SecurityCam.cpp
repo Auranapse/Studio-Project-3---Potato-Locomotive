@@ -1,13 +1,13 @@
 #include "SecurityCam.h"
 
-double SecurityCam::d_cameraRange_Angle = 30;
-double SecurityCam::d_cameraRange = 48000;
+float SecurityCam::f_cameraFOV = 30;
+float SecurityCam::f_cameraRange = 48000;
 
 SecurityCam::SecurityCam(void) : Lookat(0, 0, -1), c_State(NOTFOUND)
 {
-	d_totalRotation = 0.f;
-	d_currentRotation = 0.f;
-	f_rotationAngle = 0;
+	f_rotationAngle = 0.f;
+	f_rotationLimiter = 0.f;
+	rotationState = false;
 }
 
 
@@ -20,14 +20,14 @@ SecurityCam::CAMERA_STATE SecurityCam::getState()
 	return c_State;
 }
 
-double SecurityCam::getCameraRange_Angle()
+float SecurityCam::getCameraFOV()
 {
-	return d_cameraRange_Angle;
+	return f_cameraFOV;
 }
 
-double SecurityCam::getCameraRange()
+float SecurityCam::getCameraRange()
 {
-	return d_cameraRange;
+	return f_cameraRange;
 }
 
 void SecurityCam::setRotationAngle(float f_rotationAngle)
@@ -42,9 +42,8 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 	Vector3 SCPos = pos;
 	SCPos.y = 0;
 
-	if((isVisible(SCPos, Lookat, static_cast<float>(d_cameraRange_Angle), playerPos)) && (SCPos - playerPos).LengthSquared() < d_cameraRange)
+	if((isVisible(SCPos, Lookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange)
 	{
-		std::cout << "Spotted" << std::endl;
 		c_State = SPOTTED;
 	}
 	else
@@ -63,7 +62,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 				c_State = FOUND;
 			}
 		}
-
+		break;
 	case FOUND:
 		{
 			for (std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
@@ -82,30 +81,37 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 				}
 			}
 		}
+		break;		
+	}
+	
+	float f_currentRotation = 0;
+	
+	if(rotationState)
+	{
+		f_currentRotation = 20;
 
-	case NOTFOUND:
+		if(f_rotationLimiter > f_rotationAngle)
 		{
-			d_totalRotation += abs(d_currentRotation);
-
-			if(d_totalRotation < f_rotationAngle)
-			{
-				d_currentRotation = 10 * dt;
-			}
-			else if (d_totalRotation > f_rotationAngle && d_totalRotation <= f_rotationAngle * 2)
-			{
-				d_currentRotation = -10 * dt;
-			}
-			else
-			{
-				d_totalRotation = 0.0;
-			}
-
-			Mtx44 rotation;
-			Lookat = Lookat - pos;
-			rotation.SetToRotation(d_currentRotation, 0, 1, 0);
-			Lookat = rotation * Lookat;
-			Lookat = Lookat + pos;
+			rotationState = false;
 		}
-		break;
-	};
+	}
+	else
+	{
+		f_currentRotation = -20;
+
+		if(f_rotationLimiter < -f_rotationAngle)
+		{
+			rotationState = true;
+		}
+	}
+
+	if(f_currentRotation != 0)
+	{
+		Mtx44 rotation;
+		Lookat = Lookat - pos;
+		f_rotationLimiter += f_currentRotation * static_cast<float>(dt);
+		rotation.SetToRotation(f_currentRotation * static_cast<float>(dt), 0, 1, 0);
+		Lookat = rotation * Lookat;
+		Lookat = Lookat + pos;
+	}
 }
