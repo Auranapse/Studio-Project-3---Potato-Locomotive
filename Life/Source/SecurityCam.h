@@ -29,6 +29,7 @@ public:
 private:
 	CAMERA_STATE c_State;
 
+	float alerttimer;
 	bool rotationState;
 	float f_rotationLimiter;
 	float f_rotationAngle;

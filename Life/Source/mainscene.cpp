@@ -928,8 +928,8 @@ bool mainscene::loadLevel(int level)
 				SC->pos.Set(x*worldsize*2.f, worldHeight*2.f, y*worldsize*2.f);
 				SC->colEnable = true;
 				SC->ColBox.Set(3, 3, 3);
+				SC->rotation.y = 180.f;
 				SC->scale.Set(6, 6, 6);
-				SC->rotation.Set(0, SCAngle, 0);
 				SC->isHeld = false;
 				SC->enablePhysics = false;
 				SC->setRotationAngle(rotationAngle);
@@ -2348,8 +2348,6 @@ Rendering of game objects
 /******************************************************************************/
 void mainscene::RenderGO(GameObject *go)
 {
-	SecurityCam * SC = dynamic_cast<SecurityCam*>(go);
-
 	if (!go->isHeld)
 	{
 		modelStack.PushMatrix();
@@ -2357,6 +2355,8 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.Rotate(go->rotation.x, 1, 0, 0);
 		modelStack.Rotate(go->rotation.y, 0, 1, 0);
 		modelStack.Rotate(go->rotation.z, 0, 0, 1);
+
+		SecurityCam * SC = dynamic_cast<SecurityCam*>(go);
 		if(SC != NULL)
 		{
 			float YRotation = CalAnglefromPosition(SC->Lookat, SC->pos, true);
@@ -2367,160 +2367,12 @@ void mainscene::RenderGO(GameObject *go)
 		{
 			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
-
 		if(TESTMODE && SC != NULL)
 		{
 			RenderSCDebugging(SC);
 		}
-
-		modelStack.PopMatrix();
-		//to be removed
-		/*if (TESTMODE)
-		{
-			SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
-			if (SC != NULL)
-			{
-				float YRotation = CalAnglefromPosition(SC->Lookat, SC->pos, true);
-	
-				modelStack.PushMatrix();
-				modelStack.Rotate(YRotation, 0, 1, 0);
-
-
-
-				modelStack.PushMatrix();
-				modelStack.Translate(SC->pos.x, SC->Lookat.y, SC->pos.z);
-				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-				modelStack.Rotate(static_cast<float>(SC->getCameraRange_Angle()), 0, 1, 0);
-				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
-				RenderMesh(meshList[GEO_REDLINE], false);
-				modelStack.PopMatrix();
-
-				modelStack.PushMatrix();
-				modelStack.Translate(SC->pos.x, SC->Lookat.y, SC->pos.z);
-				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-				modelStack.Rotate(static_cast<float>(-SC->getCameraRange_Angle()), 0, 1, 0);
-				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
-				RenderMesh(meshList[GEO_REDLINE], false);
-				modelStack.PopMatrix();
-
-				modelStack.PushMatrix();
-				modelStack.Translate(SC->pos);
-				modelStack.Rotate(90, 1, 0, 0);
-				modelStack.Scale(0, 0, (SC->pos - SC->Lookat).Length());
-				RenderMesh(meshList[GEO_GREENLINE], false);
-				modelStack.PopMatrix();
-
-				modelStack.PopMatrix();
-			}*/
-		
-		//if(SC != NULL)
-		//{
-		//	float YRotation = CalAnglefromPosition(SC->Lookat, SC->pos, true);
-
-		//	modelStack.PushMatrix();
-		//	modelStack.Translate(go->pos);
-		//	modelStack.Rotate(go->rotation.x, 1, 0, 0);
-		//	modelStack.Rotate(go->rotation.y, 0, 1, 0);
-		//	modelStack.Rotate(go->rotation.z, 0, 0, 1);
-		//	modelStack.Rotate(YRotation, 0, 1, 0);
-		//	modelStack.Scale(go->scale);
-		//	if (go->mesh)
-		//	{
-		//		RenderMesh(go->mesh, true, true, go->Opacity);
-		//	}
-
-		//	/*if (TESTMODE)
-		//	{
-		//		modelStack.PushMatrix();
-		//		modelStack.Translate(SC->pos.x, SC->Lookat.y, SC->pos.z);
-		//		modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-		//		modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-		//		modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-		//		modelStack.Rotate(static_cast<float>(SC->getCameraRange_Angle()), 0, 1, 0);
-		//		modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
-		//		RenderMesh(meshList[GEO_REDLINE], false);
-		//		modelStack.PopMatrix();
-
-		//		modelStack.PushMatrix();
-		//		modelStack.Translate(SC->pos.x, SC->Lookat.y, SC->pos.z);
-		//		modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-		//		modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-		//		modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-		//		modelStack.Rotate(static_cast<float>(-SC->getCameraRange_Angle()), 0, 1, 0);
-		//		modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
-		//		RenderMesh(meshList[GEO_REDLINE], false);
-		//		modelStack.PopMatrix();
-
-		//		modelStack.PushMatrix();
-		//		modelStack.Translate(SC->pos);
-		//		modelStack.Rotate(90, 1, 0, 0);
-		//		modelStack.Scale(0, 0, (SC->pos - SC->Lookat).Length());
-		//		RenderMesh(meshList[GEO_GREENLINE], false);
-		//		modelStack.PopMatrix();
-		//	}*/
-
-		//	modelStack.PopMatrix();
-		//}
-		//else
-		//{
-		//	modelStack.PushMatrix();
-		//	modelStack.Translate(go->pos);
-		//	modelStack.Rotate(go->rotation.x, 1, 0, 0);
-		//	modelStack.Rotate(go->rotation.y, 0, 1, 0);
-		//	modelStack.Rotate(go->rotation.z, 0, 0, 1);
-		//	modelStack.Scale(go->scale);
-		//	if (go->mesh)
-		//	{
-		//		RenderMesh(go->mesh, true, true, go->Opacity);
-		//	}
-		//	modelStack.PopMatrix();
-		//}
-	}
-
-	/*
-	float YRotation = CalAnglefromPosition(CO->Lookat, CO->pos, true);;
-	float Pitch;
-	if (CO == &P_Player)
-	{
-		Pitch = -CalAnglefromPosition(CO->Lookat, CO->pos + CO->CamOffset, false);
-	}
-	else
-	{
-		Pitch = -CalAnglefromPosition(CO->Lookat, CO->pos, false);
-	}
-
-
-	if (CO->holding != NULL)
-	{
-		modelStack.PushMatrix();
-		modelStack.Translate(CO->pos);
-		modelStack.PushMatrix();
-		modelStack.Translate(CO->CamOffset);
-		modelStack.Rotate(YRotation, 0, 1, 0);
-		modelStack.Rotate(Pitch, 1, 0, 0);
-		modelStack.Translate(CO->holding->pos);
-		modelStack.Rotate(CO->holding->rotation.x, 1, 0, 0);
-		modelStack.Rotate(CO->holding->rotation.y, 0, 1, 0);
-		modelStack.Rotate(CO->holding->rotation.z, 0, 0, 1);
-		modelStack.Scale(CO->holding->scale);
-		RenderMesh(CO->holding->mesh, true);
-		modelStack.PopMatrix();
 		modelStack.PopMatrix();
 	}
-
-	if (CO == &P_Player && m_renderPass != RENDER_PASS_PRE)
-	{
-		return;
-	}
-
-	modelStack.PushMatrix();
-	modelStack.Translate(CO->pos);
-	modelStack.Translate(CO->ModelPos);
-	modelStack.Rotate(YRotation, 0, 1, 0);*/
 }
 
 /******************************************************************************/

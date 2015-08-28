@@ -5,6 +5,7 @@ float SecurityCam::f_cameraRange = 48000;
 
 SecurityCam::SecurityCam(void) : Lookat(0, 0, -1), c_State(NOTFOUND)
 {
+	alerttimer = 0.f;
 	f_rotationAngle = 0.f;
 	f_rotationLimiter = 0.f;
 	rotationState = false;
@@ -37,41 +38,45 @@ void SecurityCam::setRotationAngle(float f_rotationAngle)
 
 void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList)
 {
-	static double test = 0;
-
 	Vector3 SCPos = pos;
 	SCPos.y = 0;
 
-	if((isVisible(SCPos, Lookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange)
+	/*if(c_State != FOUND)
 	{
-		c_State = SPOTTED;
-	}
-	else
-	{
-		c_State = NOTFOUND;
-	}
+		if(((isVisible(SCPos, Lookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
+		{
+			c_State = SPOTTED;
+		}
+		else
+		{
+			alerttimer = 0.f;
+			c_State = NOTFOUND;
+		}
+	}*/
 
 	switch(c_State)
 	{
 	case SPOTTED:
 		{
-			test += dt;
+			alerttimer += dt;
 
-			if(test >= 2)
+			if(alerttimer >= 1)
 			{
 				c_State = FOUND;
 			}
 		}
 		break;
+
 	case FOUND:
 		{
+			Lookat = playerPos;
 			for (std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
 			{
 				GameObject *go = (GameObject *)*it;
 				AI *ai = dynamic_cast<AI*>(go);
 				if(ai != NULL)
 				{
-					if (ai->getState() != AI::ATTACK)
+					if (ai->getState() == AI::WALKING)
 					{
 						ai->setState(AI::ALERT);
 						Vector3 cameraPos = pos;
@@ -81,7 +86,22 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 				}
 			}
 		}
-		break;		
+		break;
+
+	case NOTFOUND:
+		{
+
+			if(((isVisible(SCPos, Lookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
+			{
+				//c_State = SPOTTED;
+				std::cout << "Spotted" << std::endl;
+			}
+			else
+			{
+				std::cout << "Not spotted" << std::endl;
+			}
+		}
+		break;
 	}
 	
 	float f_currentRotation = 0;
