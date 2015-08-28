@@ -15,7 +15,7 @@ Character Object used by AI and player
 Default constructor
 */
 /******************************************************************************/
-CharacterObject::CharacterObject(void) : Position(0.f, 0.f, 0.f), Lookat(0.f, 0.f, 1.f), Velocity(0.f, 0.f, 0.f), Scale(1.f, 1.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
+CharacterObject::CharacterObject(void) : Lookat(0.f, 0.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
 {
 	HeadPos.Set(0.f, 6.f, 0.f);
 	ArmPos.Set(4.f, 4.f, 0.f);
@@ -87,34 +87,6 @@ Anim4 CharacterObject::getAnimation(void)
 /******************************************************************************/
 /*!
 \brief
-Sets a new position for the character
-\param &newpos
-the new position to set to
-
-I recommend not touching position, go touch velocity instead
-*/
-/******************************************************************************/
-void CharacterObject::setPosition(Vector3 &newpos)
-{
-	Position = newpos;
-}
-
-/******************************************************************************/
-/*!
-\brief
-Gets the current position of the character
-\return
-current position
-*/
-/******************************************************************************/
-Vector3 CharacterObject::getPosition(void)
-{
-	return Position;
-}
-
-/******************************************************************************/
-/*!
-\brief
 Gets the current direction character is looking at
 \return
 direction vector
@@ -124,14 +96,14 @@ Vector3 CharacterObject::getDirection(bool XZ)
 {
 	if(XZ)
 	{
-		if(Lookat == Position)
+		if(Lookat == pos)
 		{
 			return Vector3(0, 0, 1);
 		}
-		return Vector3(Lookat.x - Position.x + CamOffset.x, 0, Lookat.z - Position.z + CamOffset.z);
+		return Vector3(Lookat.x - pos.x + CamOffset.x, 0, Lookat.z - pos.z + CamOffset.z);
 	}
 
-	return (Lookat - (Position + CamOffset));
+	return (Lookat - (pos + CamOffset));
 }
 
 /******************************************************************************/
@@ -148,7 +120,7 @@ the texture location
 /******************************************************************************/
 void CharacterObject::Init(const Vector3 &Pos, const Vector3 &Lookat, const char* texturedir)
 {
-	this->Position = Pos;
+	this->pos = Pos;
 	this->Lookat = Lookat;
 	this->defaultLookat = Lookat;
 
@@ -210,13 +182,13 @@ void CharacterObject::DropObject(const Vector3 &ThrowVel)
 	if (holding != NULL)
 	{
 		Mtx44 tempR;
-		tempR.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0, 1, 0);
-		holding->pos = Position + CamOffset + tempR*holding->pos;
-		holding->rotation.y = CalAnglefromPosition(Lookat, getPosition(), true);
+		tempR.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0, 1, 0);
+		holding->pos = pos + CamOffset + tempR*holding->pos;
+		holding->rotation.y = CalAnglefromPosition(Lookat, pos, true);
 		holding->colEnable = true;
 		holding->enablePhysics = true;
 		holding->isHeld = false;
-		holding->vel = Velocity + ThrowVel;
+		holding->vel = vel + ThrowVel;
 		holding = NULL;
 	}
 }
@@ -231,7 +203,7 @@ delta time
 /******************************************************************************/
 void CharacterObject::Update(const double &dt)
 {
-	Animation.Update(dt, Velocity.LengthSquared() * 0.03f);
-	Lookat += Velocity * static_cast<float>(dt);
-	Position += Velocity * static_cast<float>(dt);
+	Animation.Update(dt, vel.LengthSquared() * 0.03f);
+	Lookat += vel * static_cast<float>(dt);
+	pos += vel * static_cast<float>(dt);
 }

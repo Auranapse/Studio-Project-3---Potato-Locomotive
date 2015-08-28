@@ -18,7 +18,7 @@ public:
 	SecurityCam(void);
 	~SecurityCam(void);
 
-	void update(const double &dt, Vector3 &playerPos, std::vector<CharacterObject*> charList);
+	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);
 	float getAngle();
 	CAMERA_STATE getState();
 

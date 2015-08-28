@@ -26,7 +26,7 @@ Aperture Science Laboratories Underground
 mainscene Constructor
 */
 /******************************************************************************/
-mainscene::mainscene() : TESTMODE(true), NUM_LIGHT_PARAM(11)
+mainscene::mainscene() : TESTMODE(false), NUM_LIGHT_PARAM(11)
 {
 
 }
@@ -637,7 +637,7 @@ void mainscene::Init()
 	DisplayInfo = true;
 
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
-	P_Player.Scale.Set(10, 10, 10);
+	P_Player.scale.Set(10, 10, 10);
 
 	f_step = 0.f;
 
@@ -741,21 +741,11 @@ bool mainscene::loadLevel(int level)
 	SWALL3 = NULL;
 	SWALL4 = NULL;
 
-	P_Player.Velocity.SetZero();
+	f_targetfov = f_defaultfov;
+	P_Player.vel.SetZero();
 	P_Player.DropObject();
 	PowerActive = false;
 	f_powerTintSet = 0.f;
-
-	while (m_charList.size() > 0)
-	{
-		CharacterObject *CO = m_charList.back();
-		if (CO != NULL)
-		{
-			delete CO;
-			CO = NULL;
-		}
-		m_charList.pop_back();
-	}
 
 	while (m_goList.size() > 0)
 	{
@@ -796,7 +786,7 @@ bool mainscene::loadLevel(int level)
 
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
-				P_Player.setPosition(Vector3(x*worldsize*2.f, 5.f, y*worldsize*2.f));
+				P_Player.pos.Set(x*worldsize*2.f, 5.f, y*worldsize*2.f);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'I')
 			{
@@ -900,14 +890,14 @@ bool mainscene::loadLevel(int level)
 				AI *ai;
 				ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
 				ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
-				ai->Lookat = ai->getPosition() + Vector3(0, 0, 10);
-				ai->Scale.Set(10, 10, 10);
+				ai->Lookat = ai->pos + Vector3(0, 0, 10);
+				ai->scale.Set(10, 10, 10);
 
 				WeaponsObject *WO;
 				WO = new WeaponsObject(WO_presetList[WO_M9]);
 				ai->HoldObject(WO);
 				m_goList.push_back(WO);
-				m_charList.push_back(ai);
+				m_goList.push_back(ai);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'S')
 			{
@@ -1013,7 +1003,7 @@ bool mainscene::loadLevel(int level)
 
 	lights[0].position.y = worldHeight * 2.5f;
 
-	FPC.Init(P_Player.getPosition() + P_Player.CamOffset, P_Player.getPosition() + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
+	FPC.Init(P_Player.pos + P_Player.CamOffset, P_Player.pos + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
 }
@@ -1171,24 +1161,24 @@ void mainscene::UpdatePlayer(double &dt)
 	bool inAir = false;
 
 	//Y axis collision handling
-	if (!collide(Vector3(P_Player.getPosition())))
+	if (!collide(Vector3(P_Player.pos)))
 	{
-		if (collide(Vector3(P_Player.getPosition() + P_Player.ModelPos + P_Player.HeadPos)))
+		if (collide(Vector3(P_Player.pos + P_Player.ModelPos + P_Player.HeadPos)))
 		{
-			if (P_Player.Velocity.y > 0)
+			if (P_Player.vel.y > 0)
 			{
-				P_Player.Velocity.y = 0;
+				P_Player.vel.y = 0;
 			}
 		}
 
 		if (d_dt != d_dt2)
 		{
 			double tempDT = (d_dt + d_dt2) / 2;
-			P_Player.Velocity += gravity_force * static_cast<float>(tempDT);
+			P_Player.vel += gravity_force * static_cast<float>(tempDT);
 		}
 		else
 		{
-			P_Player.Velocity += gravity_force * static_cast<float>(dt);
+			P_Player.vel += gravity_force * static_cast<float>(dt);
 		}
 
 
@@ -1196,19 +1186,19 @@ void mainscene::UpdatePlayer(double &dt)
 	}
 	else
 	{
-		if (P_Player.Velocity.y != 0)
+		if (P_Player.vel.y != 0)
 		{
-			P_Player.Velocity.y = 0.f;
+			P_Player.vel.y = 0.f;
 		}
 
-		if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
+		if (collide(Vector3(P_Player.pos + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 		{
-			P_Player.Velocity.y = 50 * static_cast<float>(dt);
+			P_Player.vel.y = 50 * static_cast<float>(dt);
 		}
 
-		else if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 2.f, 0.f))))
+		else if (collide(Vector3(P_Player.pos + Vector3(0.f, 2.f, 0.f))))
 		{
-			P_Player.Velocity.y = 20 * static_cast<float>(dt);
+			P_Player.vel.y = 20 * static_cast<float>(dt);
 		}
 	}
 
@@ -1240,8 +1230,8 @@ void mainscene::UpdatePlayer(double &dt)
 	//Player movement
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 	{
-		P_Player.Velocity.x += LookDir.x;
-		P_Player.Velocity.z += LookDir.z;
+		P_Player.vel.x += LookDir.x;
+		P_Player.vel.z += LookDir.z;
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1252,8 +1242,8 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 	{
-		P_Player.Velocity.x -= LookDir.x;
-		P_Player.Velocity.z -= LookDir.z;
+		P_Player.vel.x -= LookDir.x;
+		P_Player.vel.z -= LookDir.z;
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1264,7 +1254,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
 	{
-		P_Player.Velocity -= RightDir;
+		P_Player.vel -= RightDir;
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1275,7 +1265,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
 	{
-		P_Player.Velocity += RightDir;
+		P_Player.vel += RightDir;
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1288,55 +1278,55 @@ void mainscene::UpdatePlayer(double &dt)
 	{
 		if (inAir == false)
 		{
-			P_Player.Velocity.y += 120;
+			P_Player.vel.y += 120;
 			SE_Engine.playSound2D(soundList[ST_STEP]);
 		}
 	}
 
 	//smooth slowing down
-	if (P_Player.Velocity.x != 0)
+	if (P_Player.vel.x != 0)
 	{
-		float SForceX = 0 - P_Player.Velocity.x;
-		P_Player.Velocity.x += SForceX * 0.1f;
+		float SForceX = 0 - P_Player.vel.x;
+		P_Player.vel.x += SForceX * 0.1f;
 	}
 
-	if (P_Player.Velocity.z != 0)
+	if (P_Player.vel.z != 0)
 	{
-		float SForceZ = 0 - P_Player.Velocity.z;
-		P_Player.Velocity.z += SForceZ * 0.1f;
+		float SForceZ = 0 - P_Player.vel.z;
+		P_Player.vel.z += SForceZ * 0.1f;
 	}
 
 
 	//Collision handling
-	if (collide(Vector3(P_Player.getPosition() + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(10.f, 20.f, 0.f))))
+	if (collide(Vector3(P_Player.pos + Vector3(10.f, 10.f, 0.f))) || collide(Vector3(P_Player.pos + Vector3(10.f, 20.f, 0.f))))
 	{
-		if (P_Player.Velocity.x > 0)
+		if (P_Player.vel.x > 0)
 		{
-			P_Player.Velocity.x = 0;
+			P_Player.vel.x = 0;
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 20.f, 10.f))))
+	if (collide(Vector3(P_Player.pos + Vector3(0.f, 10.f, 10.f))) || collide(Vector3(P_Player.pos + Vector3(0.f, 20.f, 10.f))))
 	{
-		if (P_Player.Velocity.z > 0)
+		if (P_Player.vel.z > 0)
 		{
-			P_Player.Velocity.z = 0;
+			P_Player.vel.z = 0;
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.getPosition() + Vector3(-10.f, 20.f, 0.f))))
+	if (collide(Vector3(P_Player.pos + Vector3(-10.f, 10.f, 0.f))) || collide(Vector3(P_Player.pos + Vector3(-10.f, 20.f, 0.f))))
 	{
-		if (P_Player.Velocity.x < 0)
+		if (P_Player.vel.x < 0)
 		{
-			P_Player.Velocity.x = 0;
+			P_Player.vel.x = 0;
 		}
 	}
 
-	if (collide(Vector3(P_Player.getPosition() + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.getPosition() + Vector3(0.f, 20.f, -10.f))))
+	if (collide(Vector3(P_Player.pos + Vector3(0.f, 10.f, -10.f))) || collide(Vector3(P_Player.pos + Vector3(0.f, 20.f, -10.f))))
 	{
-		if (P_Player.Velocity.z < 0)
+		if (P_Player.vel.z < 0)
 		{
-			P_Player.Velocity.z = 0;
+			P_Player.vel.z = 0;
 		}
 	}
 
@@ -1353,7 +1343,7 @@ void mainscene::UpdatePlayer(double &dt)
 					{
 						if (isVisible2(FPC.position, FPC.target, 10, IO->pos))
 						{
-							if ((IO->pos - P_Player.getPosition()).LengthSquared() < 1500)
+							if ((IO->pos - P_Player.pos).LengthSquared() < 1500)
 							{
 								P_Player.HoldObject(IO);
 								break;
@@ -1368,67 +1358,15 @@ void mainscene::UpdatePlayer(double &dt)
 	if (d_dt2 != d_dt)
 	{
 		double tempDT = (d_dt + d_dt2) / 2;
-		FPC = FPC + (P_Player.Velocity * static_cast<float>(tempDT));
+		FPC = FPC + (P_Player.vel * static_cast<float>(tempDT));
 		P_Player.Lookat = FPC.target;
 		P_Player.Update(tempDT);
 	}
 	else
 	{
-		FPC = FPC + (P_Player.Velocity * static_cast<float>(dt));
+		FPC = FPC + (P_Player.vel * static_cast<float>(dt));
 		P_Player.Lookat = FPC.target;
 		P_Player.Update(dt);
-	}
-
-	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
-	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		if (CO->active)
-		{
-			AI *ai = dynamic_cast<AI*>(CO);
-			if (ai != NULL)
-			{
-				ai->Update(dt, P_Player.getPosition(), m_charList, m_goList);
-
-				//Temp collision for AI to weapon
-				for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
-				{
-					GameObject *go = (GameObject *)*it;
-					if (go->active)
-					{
-						if (intersect(ai->getPosition() + Vector3(6, 30, 6), ai->getPosition() + Vector3(-6, 0, -6), go->pos))
-						{
-							if (go->vel.LengthSquared() > 2000)
-							{
-								BulletObject *BO = dynamic_cast<BulletObject*>(go);
-								if (BO != NULL)
-								{
-									for (unsigned i = 0; i < 5; ++i)
-									{
-										generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
-									}
-
-									BO->active = false;
-
-									CO->DropObject();
-									CO->active = false;
-									generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)));
-								}
-								else
-								{
-									CO->DropObject(Vector3(-go->vel.x*0.1f, Math::RandFloatMinMax(20, 120), -go->vel.z*0.1f));
-								}
-							}
-						}
-					}
-				}
-				//Temp collision for AI to weapon^^^^^^^^^^^^^^^^
-			}
-
-			if (CO->holding != NULL)
-			{
-				CO->holding->Update(dt);
-			}
-		}
 	}
 
 	/* Set AI to die
@@ -1529,9 +1467,9 @@ void mainscene::UpdatePlayerPower(double &dt)
 		case mainscene::PT_SLOWMO:
 			dt *= 0.05;
 
-			if (P_Player.Velocity != 0)
+			if (P_Player.vel != 0)
 			{
-				float temp = P_Player.Velocity.LengthSquared() *0.002f;
+				float temp = P_Player.vel.LengthSquared() *0.002f;
 				if (temp > 1)
 				{
 					dt *= temp;
@@ -1572,7 +1510,9 @@ void mainscene::UpdatePlayerPower(double &dt)
 /******************************************************************************/
 /*!
 \brief
-Handles game object physics
+Updates gameobjects
+\param dt
+delta time
 */
 /******************************************************************************/
 void mainscene::UpdateGO(double &dt)
@@ -1585,33 +1525,21 @@ void mainscene::UpdateGO(double &dt)
 			BulletObject *BO = dynamic_cast<BulletObject*>(go);
 			if (BO != NULL)
 			{
-				if (collide(BO->pos))
-				{
-					for (unsigned i = 0; i < 5; ++i)
-					{
-						generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
-					}
-
-					BO->active = false;
-				}
-
-				if (BO->life > 0)
-				{
-					BO->life -= static_cast<float>(dt);
-				}
-				else
-				{
-					BO->active = false;
-				}
-
-				BO->pos += BO->vel * static_cast<float>(dt);
+				UpdateBO(BO, dt);
 				continue;
 			}
 
 			SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
 			if (SC != NULL)
 			{
-				SC->update(dt, P_Player.getPosition(), m_charList);
+				SC->update(dt, P_Player.pos, m_goList);
+				continue;
+			}
+
+			CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
+			if (CO != NULL)
+			{
+				UpdateCO(CO, dt);
 				continue;
 			}
 
@@ -1691,6 +1619,97 @@ void mainscene::UpdateGO(double &dt)
 /******************************************************************************/
 /*!
 \brief
+Updates bulletobject
+\param BO
+Bulletobject to update
+\param dt
+delta time
+*/
+/******************************************************************************/
+void mainscene::UpdateBO(BulletObject *BO, double &dt)
+{
+	if (collide(BO->pos))
+	{
+		for (unsigned i = 0; i < 5; ++i)
+		{
+			generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
+		}
+
+		BO->active = false;
+	}
+
+	if (BO->life > 0)
+	{
+		BO->life -= static_cast<float>(dt);
+	}
+	else
+	{
+		BO->active = false;
+	}
+
+	BO->pos += BO->vel * static_cast<float>(dt);
+}
+
+/******************************************************************************/
+/*!
+\brief
+Updates characterobject
+\param CP
+characterobject to update
+\param dt
+delta time
+*/
+/******************************************************************************/
+void mainscene::UpdateCO(CharacterObject *CO, double &dt)
+{
+	AI *ai = dynamic_cast<AI*>(CO);
+	if (ai != NULL)
+	{
+		ai->Update(dt, P_Player.pos, m_goList);
+
+		//Temp collision for AI to weapon
+		for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+		{
+			GameObject *go = (GameObject *)*it;
+			if (go->active)
+			{
+				if (intersect(ai->pos + Vector3(6, 30, 6), ai->pos + Vector3(-6, 0, -6), go->pos))
+				{
+					if (go->vel.LengthSquared() > 2000)
+					{
+						BulletObject *BO = dynamic_cast<BulletObject*>(go);
+						if (BO != NULL)
+						{
+							for (unsigned i = 0; i < 5; ++i)
+							{
+								generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
+							}
+
+							BO->active = false;
+
+							CO->DropObject();
+							CO->active = false;
+							generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)));
+						}
+						else
+						{
+							CO->DropObject(Vector3(-go->vel.x*0.1f, Math::RandFloatMinMax(20, 120), -go->vel.z*0.1f));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (CO->holding != NULL)
+	{
+		CO->holding->Update(dt);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
 Generates particles at position
 */
 /******************************************************************************/
@@ -1715,28 +1734,28 @@ Generates particles at position
 /******************************************************************************/
 void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel)
 {
-	float CharRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->HeadPos, CO->Scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 1.f, CO->Head);
+	float CharRotation = CalAnglefromPosition(CO->Lookat, CO->pos, true);
+	generateParticle(CO->pos + CO->ModelPos + CO->HeadPos, CO->scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 1.f, CO->Head);
 
 	Mtx44 Rotation;
 	Rotation.SetToRotation(CharRotation, 0, 1, 0);
 	Vector3 tempArm = CO->ArmPos;
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_right);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_right);
 	tempArm = Vector3(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->getPosition() + CO->ModelPos + tempArm, CO->Scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_left);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Arm_left);
 
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_left);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_left);
 
-	generateParticle(CO->getPosition() + CO->ModelPos + CO->LegPos, CO->Scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_right);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 4.f, CO->Leg_right);
 
-	generateParticle(CO->getPosition() + CO->ModelPos, CO->Scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
+	generateParticle(CO->pos + CO->ModelPos, CO->scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
 
 	for (unsigned i = 0; i < 64; ++i)
 	{
 		float bloodsize = Math::RandFloatMinMax(0.1f, .8f);
-		generateParticle(CO->getPosition() + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 4.f);
+		generateParticle(CO->pos + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 4.f);
 	}
 }
 
@@ -2293,53 +2312,55 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.PopMatrix();
 
 		//to be removed
-		SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
-		if (SC != NULL)
+		if (TESTMODE)
 		{
-			static float offset = -0;
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
-			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-			modelStack.Rotate(SC->getCameraRange_Angle(), 0, 1, 0);
-			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
-			RenderMesh(meshList[GEO_REDLINE], false);
-			modelStack.PopMatrix();
+			SecurityCam *SC = dynamic_cast<SecurityCam*>(go);
+			if (SC != NULL)
+			{
+				static float offset = -0;
+				modelStack.PushMatrix();
+				modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+				modelStack.Rotate(static_cast<float>(SC->getCameraRange_Angle()), 0, 1, 0);
+				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
-			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-			modelStack.Rotate(-SC->getCameraRange_Angle(), 0, 1, 0);
-			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
-			RenderMesh(meshList[GEO_REDLINE], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+				modelStack.Rotate(static_cast<float>(-SC->getCameraRange_Angle()), 0, 1, 0);
+				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
-			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-			modelStack.Rotate(-SC->getCameraRange_Angle(), 1, 0, 0);
-			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
-			RenderMesh(meshList[GEO_REDLINE], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+				modelStack.Rotate(static_cast<float>(-SC->getCameraRange_Angle()), 1, 0, 0);
+				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
 
-			modelStack.PushMatrix();
-			modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
-			modelStack.Rotate(SC->rotation.x, 1, 0, 0);
-			modelStack.Rotate(SC->rotation.y, 0, 1, 0);
-			modelStack.Rotate(SC->rotation.z, 0, 0, 1);
-			modelStack.Rotate(SC->getCameraRange_Angle(), 1, 0, 0);
-			modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
-			RenderMesh(meshList[GEO_REDLINE], false);
-			modelStack.PopMatrix();
+				modelStack.PushMatrix();
+				modelStack.Translate(SC->pos.x, SC->pos.y + offset, SC->pos.z);
+				modelStack.Rotate(SC->rotation.x, 1, 0, 0);
+				modelStack.Rotate(SC->rotation.y, 0, 1, 0);
+				modelStack.Rotate(SC->rotation.z, 0, 0, 1);
+				modelStack.Rotate(static_cast<float>(SC->getCameraRange_Angle()), 1, 0, 0);
+				modelStack.Scale(0, 0, static_cast<float>(-sqrt(SC->getCameraRange())));
+				RenderMesh(meshList[GEO_REDLINE], false);
+				modelStack.PopMatrix();
+			}
 		}
 	}
 }
-
 
 /******************************************************************************/
 /*!
@@ -2357,14 +2378,14 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 		{
 			//Detection Range
 			modelStack.PushMatrix();
-			modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
-			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			modelStack.Rotate(static_cast<float>(ai->getDetectionAngle()), 0, 1, 0);
+			modelStack.Scale(0, 0, static_cast<float>(sqrt(ai->getDetectionRange())));
 			RenderMesh(meshList[GEO_REDLINE], false);
 			modelStack.PopMatrix();
 
 			modelStack.PushMatrix();
-			modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
-			modelStack.Scale(0, 0, sqrt(ai->getDetectionRange()));
+			modelStack.Rotate(static_cast<float>(-ai->getDetectionAngle()), 0, 1, 0);
+			modelStack.Scale(0, 0, static_cast<float>(sqrt(ai->getDetectionRange())));
 			RenderMesh(meshList[GEO_REDLINE], false);
 			modelStack.PopMatrix();
 
@@ -2373,15 +2394,15 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 			{
 				modelStack.PushMatrix();
 				modelStack.Translate(0, -1, 0);
-				modelStack.Rotate(ai->getDetectionAngle(), 0, 1, 0);
-				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				modelStack.Rotate(static_cast<float>(ai->getDetectionAngle()), 0, 1, 0);
+				modelStack.Scale(0, 0, static_cast<float>(sqrt(ai->getDetectionRange_Max())));
 				RenderMesh(meshList[GEO_BLUELINE], false);
 				modelStack.PopMatrix();
 
 				modelStack.PushMatrix();
 				modelStack.Translate(0, -1, 0);
-				modelStack.Rotate(-ai->getDetectionAngle(), 0, 1, 0);
-				modelStack.Scale(0, 0, sqrt(ai->getDetectionRange_Max()));
+				modelStack.Rotate(static_cast<float>(-ai->getDetectionAngle()), 0, 1, 0);
+				modelStack.Scale(0, 0, static_cast<float>(sqrt(ai->getDetectionRange_Max())));
 				RenderMesh(meshList[GEO_BLUELINE], false);
 				modelStack.PopMatrix();
 			}
@@ -2390,7 +2411,7 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 			{
 				modelStack.PushMatrix();
 				modelStack.Translate(0, -17, 0);
-				modelStack.Scale(0, 0, (ai->getPosition() - ai->getDestination()).Length());
+				modelStack.Scale(0, 0, (ai->pos - ai->getDestination()).Length());
 				RenderMesh(meshList[GEO_REDLINE], false);
 				modelStack.PopMatrix();
 			}
@@ -2399,7 +2420,7 @@ void mainscene::RenderAIDebugging(CharacterObject * CO)
 		else
 		{
 			modelStack.PushMatrix();
-			modelStack.Scale(0, 0, (P_Player.getPosition() - ai->getPosition()).Length());
+			modelStack.Scale(0, 0, (P_Player.pos - ai->pos).Length());
 			RenderMesh(meshList[GEO_GREENLINE], false);
 			modelStack.PopMatrix();
 		}
@@ -2414,22 +2435,22 @@ Rendering of character objects
 /******************************************************************************/
 void mainscene::RenderCharacter(CharacterObject *CO)
 {
-	float YRotation = CalAnglefromPosition(CO->Lookat, CO->getPosition(), true);;
+	float YRotation = CalAnglefromPosition(CO->Lookat, CO->pos, true);;
 	float Pitch;
 	if (CO == &P_Player)
 	{
-		Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition() + CO->CamOffset, false);
+		Pitch = -CalAnglefromPosition(CO->Lookat, CO->pos + CO->CamOffset, false);
 	}
 	else
 	{
-		Pitch = -CalAnglefromPosition(CO->Lookat, CO->getPosition(), false);
+		Pitch = -CalAnglefromPosition(CO->Lookat, CO->pos, false);
 	}
 
 
 	if (CO->holding != NULL)
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(CO->getPosition());
+		modelStack.Translate(CO->pos);
 		modelStack.PushMatrix();
 		modelStack.Translate(CO->CamOffset);
 		modelStack.Rotate(YRotation, 0, 1, 0);
@@ -2450,46 +2471,49 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	}
 
 	modelStack.PushMatrix();
-	modelStack.Translate(CO->getPosition());
+	modelStack.Translate(CO->pos);
 	modelStack.Translate(CO->ModelPos);
 	modelStack.Rotate(YRotation, 0, 1, 0);
 
-	RenderAIDebugging(CO);
+	if (TESTMODE)
+	{
+		RenderAIDebugging(CO);
+	}
 
 	modelStack.PushMatrix();
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Chest, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->HeadPos);
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Head, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Arm_left, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->ArmPos);
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Arm_right, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
 	modelStack.Rotate(CO->getAnimation().LEFT_LEG, 1, 0, 0);
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Leg_left, true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(CO->LegPos);
 	modelStack.Rotate(CO->getAnimation().RIGHT_LEG, 1, 0, 0);
-	modelStack.Scale(CO->Scale);
+	modelStack.Scale(CO->scale);
 	RenderMesh(CO->Leg_right, true);
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
@@ -2905,31 +2929,23 @@ Renders the entire world with shadow
 /******************************************************************************/
 void mainscene::RenderWorldShadow(void)
 {
-	for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); ++it)
-	{
-		CharacterObject *CO = (CharacterObject *)*it;
-		if (CO->active)
-		{
-			if (isVisible(FPC.position, FPC.target, f_fov, CO->getPosition()) || (Vector3(FPC.position.x - CO->getPosition().x, 0, FPC.position.z - CO->getPosition().z)).LengthSquared() < 4000)
-			{
-				RenderCharacter(CO);
-			}
-		}
-	}
-
 	//Render gameobjects
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
-			if (m_goList.size() < 100)
+			if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 4000)//Dynamic rendering
 			{
-				RenderGO(go);
-			}
-			else if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 4000)//Dynamic rendering
-			{
-				RenderGO(go);
+				CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
+				if (CO != NULL)
+				{
+					RenderCharacter(CO);
+				}
+				else
+				{
+					RenderGO(go);
+				}
 			}
 		}
 	}
@@ -3277,8 +3293,8 @@ void mainscene::Render(void)
 
 	modelStack.LoadIdentity();
 
-	lights[0].position.x = P_Player.getPosition().x;
-	lights[0].position.z = P_Player.getPosition().z;
+	lights[0].position.x = P_Player.pos.x;
+	lights[0].position.z = P_Player.pos.z;
 	if (Graphics < GRA_SHIT)
 	{
 		RenderPassGPass();
@@ -3343,17 +3359,6 @@ void mainscene::Exit(void)
 		}
 
 		m_ParList.pop_back();
-	}
-
-	while (m_charList.size() > 0)
-	{
-		CharacterObject *CO = m_charList.back();
-		if (CO != NULL)
-		{
-			delete CO;
-			CO = NULL;
-		}
-		m_charList.pop_back();
 	}
 
 	for (unsigned i = 0; i < NUM_GEOMETRY; ++i)

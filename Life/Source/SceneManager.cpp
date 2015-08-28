@@ -497,7 +497,7 @@ void SceneManager::PLAYER_ENEMY(Asset* a1, Asset* a2)
 {
 	aPlayer* c1 = (aPlayer*)a1;
 	Enemy* c2 = (Enemy*)a2;
-	float multiplier = 0.2;
+	float multiplier = 0.2f;
 	if (c2->getForce().LengthSquared() == 0)
 	{
 		c1->applyForce(Vector3(50,0,50));

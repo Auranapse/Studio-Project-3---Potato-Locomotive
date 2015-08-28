@@ -33,7 +33,6 @@ f_alert_timer(0.f)
 	this->e_State = e_State;
 	this->e_Type = e_Type;
 	rotating.SetToRotation(90.f, 0, 1, 0);
-	Velocity = Vector3(0, 0, 10);
 	collided = false;
 	prevPosition.SetZero();
 	destination.SetZero();
@@ -95,14 +94,14 @@ void AI::movementFB(double &dt, bool forward)
 
 	if (forward)
 	{
-		Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Lookat = Lookat - Position;
+		Lookat = Lookat - pos;
 		rotation.SetToRotation(720 * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
-		Lookat = Lookat + Position;
+		Lookat = Lookat + pos;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
@@ -120,20 +119,20 @@ void AI::movementLR(double &dt, bool left, float rotation_speed)
 	Mtx44 rotation;
 	if (left == true)
 	{
-		Lookat = Lookat - Position;
+		Lookat = Lookat - pos;
 		rotation.SetToRotation(-rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
-		Lookat = Lookat + Position;
+		Lookat = Lookat + pos;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 
 	}
 
 	else
 	{
-		Lookat = Lookat - Position;
+		Lookat = Lookat - pos;
 		rotation.SetToRotation(rotation_speed * static_cast<float>(dt), 0, 1, 0);
 		Lookat = rotation * Lookat;
-		Lookat = Lookat + Position;
+		Lookat = Lookat + pos;
 		//Velocity += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
@@ -148,12 +147,12 @@ sensors made to see if there is anything in the way of the AI and also move towa
 /******************************************************************************/
 void AI::SensorUpdate2(double &dt, Vector3 &destination, bool left, bool mid, bool right)
 {
-	float rotationDiff = CalAnglefromPosition(destination, Position, true) - CalAnglefromPosition(Lookat, Position, true);
+	float rotationDiff = CalAnglefromPosition(destination, pos, true) - CalAnglefromPosition(Lookat, pos, true);
 	movementLR(dt, false, rotationDiff);
 
 	if(mid || left || right)
 	{
-		destination = Position;
+		destination = pos;
 	}
 
 	//when right has nothing to collide
@@ -352,10 +351,10 @@ void AI::ai_ScanArea(const double &dt)
 	}
 
 	Mtx44 rotation;
-	Lookat = Lookat - Position;
+	Lookat = Lookat - pos;
 	rotation.SetToRotation(static_cast<float>(d_enemyRotation), 0, 1, 0);
 	Lookat = rotation * Lookat;
-	Lookat = Lookat + Position;
+	Lookat = Lookat + pos;
 }
 
 /******************************************************************************/
@@ -485,7 +484,7 @@ Set the AI destination
 		destination
 */
 /******************************************************************************/
-void AI::setDestination(Vector3 destination)
+void AI::setDestination(const Vector3 &destination)
 {
 	this->destination = destination;
 }
@@ -552,7 +551,7 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 
 			if(b_goAttack)
 			{
-				prevPosition = Position;
+				prevPosition = pos;
 				e_State = ATTACK;
 				b_aiCooldown = false;
 				b_goAttack = false;
@@ -560,7 +559,7 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 			else if (b_goAlert)
 			{
 				destination = currentLookat;
-				prevPosition = Position;
+				prevPosition = pos;
 				e_State = ALERT;
 				b_aiCooldown = false;
 				b_goAlert = false;
@@ -583,7 +582,7 @@ Update AI base on its state
 		Enemy state
 */
 /******************************************************************************/
-void AI::aiStateHandling(const double &dt, Vector3 playerPos)
+void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 {
 	switch (e_State)
 	{
@@ -592,15 +591,15 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		//Have the AI partol a certain area
 		//Need Pathfinding i think
 
-		if (isVisible(Position, Lookat, static_cast<float>(d_detectionAngle), playerPos))
+		if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos))
 		{
 			//If player is infront and near player, then ai will switch to attack state
-			if ((playerPos - Position).LengthSquared() < d_detectionRange)
+			if ((playerPos - pos).LengthSquared() < d_detectionRange)
 			{
 				/*prevPosition = Position;
 				e_State = ATTACK;
 				b_aiCooldown = false;*/
-				prevPosition = Position;
+				prevPosition = pos;
 				e_State = ATTACK;
 				b_aiCooldown = false;
 				b_goAttack = false;
@@ -609,7 +608,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 				b_goAttack = true;*/
 			}
 			//if ai saw player but is too far way, the ai will investigate
-			else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax)
+			else if ((playerPos - pos).LengthSquared() > d_detectionRange && (playerPos - pos).LengthSquared() < d_detectionRangeMax)
 			{
 				///*destination.x = playerPos.x;
 				//destination.z = playerPos.z;
@@ -619,7 +618,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 				//destination = currentLookat;
 				destination.x = playerPos.x;
 				destination.z = playerPos.z;
-				prevPosition = Position;
+				prevPosition = pos;
 				e_State = ALERT;
 				b_aiCooldown = false;
 				b_goAlert = false;
@@ -630,7 +629,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		if (b_aiCooldown)
 		{
 			//Ai will move towards prev position
-			if ((Position - prevPosition).LengthSquared() > 2)
+			if ((pos - prevPosition).LengthSquared() > 2)
 			{
 				Lookat = prevPosition;
 			}
@@ -646,7 +645,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 	case ALERT:
 	{
 		//AI will move towards the destination
-		if ((Position - destination).LengthSquared() > 2)
+		if ((pos - destination).LengthSquared() > 2)
 		{
 			//Move the ai towards the destination
 			Lookat = destination;
@@ -658,7 +657,7 @@ void AI::aiStateHandling(const double &dt, Vector3 playerPos)
 		}
 
 		//If player is infront and near player, then ai will switch to attack state
-		if (isVisible(Position, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - Position).LengthSquared() < d_detectionRange)
+		if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
 		{
 			e_State = ATTACK;
 			b_updateAI = true;
@@ -765,14 +764,14 @@ CharacterObject vector list - To check collision
 GameObject vector list - To check collision
 */
 /******************************************************************************/
-void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject*> &m_GOList)
+void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
 	
 	aiStateHandling(dt, playerPos);
 	//UpdateLookat(dt, playerPos);
 
 	Mtx44 rotation;
-	rotation.SetToRotation(CalAnglefromPosition(Lookat, Position, true), 0.f, 1.f, 0.f);
+	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
 	Vector3 L, R, C;
 	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
 	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
@@ -780,29 +779,29 @@ void AI::Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m
 
 	if(e_State == WALKING)
 	{
-		SensorUpdate(dt, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
+		SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 	}
 	else
 	{
-		SensorUpdate2(dt, destination, collisionChecking(Position + L, m_charList, m_GOList), collisionChecking(Position + C, m_charList, m_GOList), collisionChecking(Position + R, m_charList, m_GOList));
+		SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 	}
-	if (Velocity.x != 0)
+	if (vel.x != 0)
 	{
-		float SForceX = 0 - Velocity.x;
-		Velocity.x += SForceX * 0.1f;
+		float SForceX = 0 - vel.x;
+		vel.x += SForceX * 0.1f;
 	}
 
-	if (Velocity.z != 0)
+	if (vel.z != 0)
 	{	
-		float SForceZ = 0 - Velocity.z;
-		Velocity.z += SForceZ * 0.1f;
+		float SForceZ = 0 - vel.z;
+		vel.z += SForceZ * 0.1f;
 	}
 
 	if(b_updateAI)
 	{
-		Animation.Update(dt, Velocity.LengthSquared() * 4);
-		Lookat += Velocity * 10 * static_cast<float>(dt);
-		Position += Velocity * 10 * static_cast<float>(dt);
+		Animation.Update(dt, vel.LengthSquared() * 4);
+		Lookat += vel * 10 * static_cast<float>(dt);
+		pos += vel * 10 * static_cast<float>(dt);
 	}
 }
 
@@ -817,15 +816,12 @@ GameObject vector list - To check collision
 bool checkGO -
 */
 /******************************************************************************/
-bool AI::collisionChecking(Vector3 &pos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO)
+bool AI::collisionChecking(Vector3 &pos, std::vector<GameObject *> &m_GOList)
 {
-	//Check against GameObject
-	if (checkGO)
-	{
 		for (std::vector<GameObject*>::iterator it = m_GOList.begin(); it != m_GOList.end(); it++)
 		{
 			GameObject* go = (GameObject*)*it;
-			if (go->active && go->colEnable && go->pos != Position)
+			if (go->active && go->colEnable && go->pos != pos)
 			{
 				if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, pos))
 				{
@@ -833,22 +829,5 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<CharacterObject *> &m_charL
 				}
 			}
 		}
-	}
-	//Check against Character Object
-	else
-	{
-		for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
-		{
-			CharacterObject * CO = (CharacterObject*)*it;
-			if (CO->getPosition() != Position)
-			{
-				if (intersect(CO->getPosition() + Vector3(5, 5, 5), CO->getPosition() - Vector3(5, 5, 5), Position))
-				{
-					return true;
-				}
-
-			}
-		}
-	}
 	return false;
 }

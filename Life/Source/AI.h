@@ -47,12 +47,12 @@ public:
 
 	void SensorUpdate(double &dt, bool left = false, bool middle = false, bool right = false);
 	void SensorUpdate2(double &dt, Vector3 &destination, bool left = false, bool middle = false, bool right = false);
-	virtual void Update(double &dt, Vector3 playerPos, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList);
-	bool collisionChecking(Vector3 &Position, std::vector<CharacterObject *> &m_charList, std::vector<GameObject *> &m_GOList, bool checkGO = true);
+	virtual void Update(double &dt, const Vector3 &playerPos, std::vector<GameObject *> &m_GOList);
+	bool collisionChecking(Vector3 &Position, std::vector<GameObject *> &m_GOList);
 
 	void ai_ScanArea(const double &dt);
 	void UpdateLookat(const double &dt, const Vector3 &playerPos);
-	void aiStateHandling(const double &dt, Vector3 playerPos);
+	void aiStateHandling(const double &dt, const Vector3 &playerPos);
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
@@ -60,7 +60,7 @@ public:
 	Vector3 getDestination();
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
-	void setDestination(Vector3 destination);
+	void setDestination(const Vector3 &destination);
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;

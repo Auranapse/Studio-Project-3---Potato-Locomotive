@@ -377,9 +377,12 @@ private:
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 
 	Mesh* meshList[NUM_GEOMETRY];
-	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
+
+	void UpdateGO(double &dt);
+	void UpdateBO(BulletObject *BO, double &dt);
+	void UpdateCO(CharacterObject *CO, double &dt);
 
 	WorldObject *Floor, *Celling, *SWALL1, *SWALL2, *SWALL3, *SWALL4;
 
@@ -437,7 +440,6 @@ private:
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
 	void UpdatePlayerPower(double &dt);
-	void UpdateGO(double &dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, Vector3 &Rotation = Vector3(0.f, 0.f, 0.f), int type = Particle::PAR_MESH, float lifetime = 5.f, Mesh *mesh = NULL);
 	void generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel);
 	void UpdateParticles(double &dt);

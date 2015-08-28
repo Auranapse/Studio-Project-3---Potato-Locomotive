@@ -21,7 +21,7 @@ bottom right of box
 the position to check if it's inside the box
 */
 /******************************************************************************/
-bool intersect2D(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
+bool intersect2D(const Vector3 &TopLeft, const Vector3 &BottomRight, const Vector3 &Position)
 {
 	if (Position.x <= TopLeft.x && Position.x >= BottomRight.x)
 	{
@@ -45,7 +45,7 @@ bottom right of box
 the position to check if it's inside the box
 */
 /******************************************************************************/
-bool intersect(Vector3 &TopLeft, Vector3 &BottomRight, Vector3 &Position)
+bool intersect(const Vector3 &TopLeft, const Vector3 &BottomRight, const Vector3 &Position)
 {
 	if (Position.x <= TopLeft.x && Position.x >= BottomRight.x)
 	{
@@ -72,7 +72,7 @@ point in Plane
 another point in Plane
 */
 /******************************************************************************/
-float minDistance(Vector3 &point, Vector3 &pointPlane1, Vector3 &pointPlane2)
+float minDistance(const Vector3 &point, const Vector3 &pointPlane1, const Vector3 &pointPlane2)
 {
 	return point.Dot(pointPlane1.Cross(pointPlane2));
 }
@@ -117,7 +117,7 @@ the target object
 the origin of the angle
 */
 /******************************************************************************/
-float CalAnglefromPosition2D(Vector3 &Target, Vector3 &Origin)
+float CalAnglefromPosition2D(const Vector3 &Target, const Vector3 &Origin)
 {
 	return Math::RadianToDegree(atan2(Target.y - Origin.y, Target.x - Origin.x));
 }
@@ -136,7 +136,7 @@ the field of view of the object
 returns true if object is within the horizontal FOV, if not returns false
 */
 /******************************************************************************/
-bool isVisible(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition)
+bool isVisible(const Vector3 &Position, const Vector3 &Target, float FOV, const Vector3 &ObjectPosition)
 {
 	float lookingOBJ = CalAnglefromPosition(ObjectPosition, Position, true);
 	float cameraRotation = CalAnglefromPosition(Target, Position, true);
@@ -197,7 +197,7 @@ the field of view of the object
 returns true if object is within the horizontal FOV, if not returns false
 */
 /******************************************************************************/
-bool isVisible2(Vector3 &Position, Vector3 &Target, float FOV, Vector3 &ObjectPosition)
+bool isVisible2(const Vector3 &Position, const Vector3 &Target, float FOV, const Vector3 &ObjectPosition)
 {
 	float lookingOBJ = CalAnglefromPosition(ObjectPosition, Position, false);
 	float cameraRotation = CalAnglefromPosition(Target, Position, false);

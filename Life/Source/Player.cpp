@@ -63,11 +63,11 @@ void Player::movementFB(double &dt, bool forward)
 {
 	if (forward)
 	{
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Velocity -= (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -94,6 +94,6 @@ delta time
 /******************************************************************************/
 void Player::Update(double &dt)
 {
-	Animation.Update(dt, Vector3(Velocity.x, 0, Velocity.z).LengthSquared()*0.03f);
-	Position += Velocity * static_cast<float>(dt);
+	Animation.Update(dt, Vector3(vel.x, 0, vel.z).LengthSquared()*0.03f);
+	pos += vel * static_cast<float>(dt);
 }

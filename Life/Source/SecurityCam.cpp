@@ -28,7 +28,7 @@ double SecurityCam::getCameraRange()
 	return d_cameraRange;
 }
 
-void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<CharacterObject*> charList)
+void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList)
 {
 	static double test = 0;
 	if((isVisible(pos, Lookat, static_cast<float>(d_cameraRange_Angle), playerPos)) && (pos - playerPos).LengthSquared() < d_cameraRange)
@@ -54,16 +54,19 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<Chara
 
 	case FOUND:
 		{
-			for (std::vector<CharacterObject*>::iterator it = charList.begin(); it != charList.end(); it++)
+			for (std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
 			{
-				AI * ai = dynamic_cast<AI*>((CharacterObject*)*it);
-				if(ai != NULL && ai->getState() != AI::ATTACK)
+				GameObject *go = (GameObject *)*it;
+				AI *ai = dynamic_cast<AI*>(go);
+				if(ai != NULL)
 				{
-					ai->setState(AI::ALERT);
-
-					Vector3 cameraPos = pos;
-					cameraPos.y = 0;
-					ai->setDestination(cameraPos);
+					if (ai->getState() != AI::ATTACK)
+					{
+						ai->setState(AI::ALERT);
+						Vector3 cameraPos = pos;
+						cameraPos.y = 0;
+						ai->setDestination(cameraPos);
+					}
 				}
 			}
 		}
