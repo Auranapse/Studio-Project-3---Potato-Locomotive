@@ -464,6 +464,7 @@ private:
 	void RenderSkybox(void);
 	void RenderUI(void);
 	void RenderAIDebugging(CharacterObject * CO);
+	void RenderSCDebugging(SecurityCam * SC);
 	bool collide(Vector3 &Position);
 	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;

@@ -44,9 +44,9 @@ f_alert_timer(0.f)
 	b_rotateClockwiseFirst = NULL;
 	currentLookat = NULL;
 	b_goAlert = b_goAttack = false;
-	b_disableDestination = false;
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
+	b_aiScanning = false;
 }
 
 /******************************************************************************/
@@ -317,6 +317,8 @@ use to update the rotation of the ai
 void AI::ai_ScanArea(const double &dt)
 {
 	b_updateAI = false;
+	b_aiScanning = true;
+
 	static double rotationSpeed = 50.f;
 
 	if(b_rotateClockwiseFirst == NULL)
@@ -348,6 +350,7 @@ void AI::ai_ScanArea(const double &dt)
 		b_aiCooldown = true;
 		b_updateAI = true;
 		b_rotateClockwiseFirst = NULL;
+		b_aiScanning = false;
 	}
 
 	Mtx44 rotation;
@@ -777,13 +780,16 @@ void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &
 	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
 	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
 
-	if(e_State == WALKING)
+	if (b_aiScanning == false)
 	{
-		SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-	}
-	else
-	{
-		SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+		if(e_State == WALKING)
+		{
+			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+		}
+		else
+		{
+			SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+		}
 	}
 	if (vel.x != 0)
 	{

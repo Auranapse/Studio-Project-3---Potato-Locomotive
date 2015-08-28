@@ -538,7 +538,7 @@ void SceneManager::PLAYER_ROOM(Asset* a1, Asset* a2)
 
 	float netForce = c1->getForce().Length();
 
-	std::cout<<"\n"<<c1->getForce().x<<", "<<c1->getForce().z<<"\n";
+	//std::cout<<"\n"<<c1->getForce().x<<", "<<c1->getForce().z<<"\n";
 	//Friction 
 	if (netForce != 0)
 	{

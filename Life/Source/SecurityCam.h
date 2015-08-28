@@ -18,17 +18,20 @@ public:
 	SecurityCam(void);
 	~SecurityCam(void);
 
+	void setRotationAngle(float f_rotationAngle);
 	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);
-	float getAngle();
 	CAMERA_STATE getState();
 
 	double getCameraRange_Angle();
 	double getCameraRange();
 	Vector3 Lookat;
-
+	float offsetY;
 private:
 	CAMERA_STATE c_State;
 
+	float d_totalRotation;
+	float d_currentRotation;
+	float f_rotationAngle;
 	static double d_cameraRange_Angle;
 	static double d_cameraRange;
 };
