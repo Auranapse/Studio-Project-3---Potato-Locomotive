@@ -913,7 +913,7 @@ bool mainscene::loadLevel(int level)
 					textOffset = i + 1;
 				}
 
-				for(unsigned a = textOffset + 1; GAME_MAP.map_data[y][x][a] != 'D'; ++a)
+				for (unsigned a = textOffset + 1; GAME_MAP.map_data[y][x][a] != 'D'; ++a)
 				{
 					temp_str_2 += GAME_MAP.map_data[y][x][a];
 				}
@@ -2357,7 +2357,7 @@ void mainscene::RenderGO(GameObject *go)
 		modelStack.Rotate(go->rotation.z, 0, 0, 1);
 
 		SecurityCam * SC = dynamic_cast<SecurityCam*>(go);
-		if(SC != NULL)
+		if (SC != NULL)
 		{
 			float YRotation = CalAnglefromPosition(SC->Lookat, SC->pos, true);
 			modelStack.Rotate(YRotation, 0, 1, 0);
@@ -2367,7 +2367,8 @@ void mainscene::RenderGO(GameObject *go)
 		{
 			RenderMesh(go->mesh, true, true, go->Opacity);
 		}
-		if(TESTMODE && SC != NULL)
+
+		if (TESTMODE && SC != NULL)
 		{
 			RenderSCDebugging(SC);
 		}
@@ -2449,22 +2450,22 @@ Rendering of Security Camera debugging range
 void mainscene::RenderSCDebugging(SecurityCam * SC)
 {
 	modelStack.PushMatrix();
-	modelStack.Translate(0 , -SC->pos.y / 6.1, 0);
+	modelStack.Translate(0, -SC->pos.y / 6.1f, 0);
 	modelStack.Rotate(SC->getCameraFOV(), 0, 1, 0);
-	modelStack.Scale(0 ,0, -sqrt(SC->getCameraRange()));
+	modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0 , -SC->pos.y / 6.1, 0);
+	modelStack.Translate(0, -SC->pos.y / 6.1f, 0);
 	modelStack.Rotate(-SC->getCameraFOV(), 0, 1, 0);
-	modelStack.Scale(0 ,0, -sqrt(SC->getCameraRange()));
+	modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(0, 0, Vector3(0, -SC->pos.y / 6.1, 0).Length());
+	modelStack.Scale(0, 0, Vector3(0, -SC->pos.y / 6.1f, 0).Length());
 	RenderMesh(meshList[GEO_GREENLINE], false);
 	modelStack.PopMatrix();
 }

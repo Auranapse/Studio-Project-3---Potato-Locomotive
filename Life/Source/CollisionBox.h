@@ -9,7 +9,6 @@ public:
 	enum COLLISION_TYPE
 	{
 		CT_AABB,
-		
 		CT_SPHERE,
 		CT_POINT,
 		CT_RAY,
@@ -18,8 +17,35 @@ public:
 
 	COLLISION_TYPE Type;
 	Vector3 Position;
+
+	//For AABB
 	Vector3 ColBox;
 	Vector3 ColOffset;
+
+	//For Sphere
+	float radius;
+
+	//For Ray(Smit's Method)
+	Vector3 Direction;//Normalized
+	Vector3 end;//Another Point on Ray(Preferably the end of the ray)
+	float t1, t2; //Intersection Interval(Length before Ray/AABB can be tested again, t1 = Min, t2 = Max)
+	
+	//For Plane
+	Vector3 planeNormal;//Normalized
+	float offset;//How far it is from the origin in the direction of normal
+
+	/*Finding Normal Example
+	v1,v2,v0 = Any Points of Plane
+		Vector3 vecAB = v1 - v0;
+		Vector3 vecAC = v2 - v0;
+ 
+		// Cross vecAB and vecAC
+		Vector3 normal = vecAB.Cross(vecAC);
+		normal.normalize();
+
+	To Find offset...
+	Vector3 offset = planeNormal.Dot(anyPointOnPlane);
+	*/
 
 	CollisionBox();
 	~CollisionBox();
@@ -31,8 +57,8 @@ private:
 	bool AABB_AABB(CollisionBox &CB1, CollisionBox &CB2);
 	bool AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
 	bool AABB_POINT(CollisionBox &CB1, CollisionBox &CB2);
-	bool AABB_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
-	bool AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
+	bool AABB_RAY(CollisionBox &CB1, CollisionBox &CB2);
+	bool AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2);
 
 	//Sphere Collision(s)
 	bool SPHERE_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
