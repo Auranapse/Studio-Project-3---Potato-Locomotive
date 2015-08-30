@@ -1,8 +1,8 @@
 #include "CollisionBox.h"
 
-CollisionBox::CollisionBox()
+CollisionBox::CollisionBox() : ColOffset(0.f, 0.f, 0.f), Type(CT_POINT)
 {
-
+	
 }
 
 CollisionBox::~CollisionBox()
@@ -27,27 +27,27 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 			default:
 			case 0://AABB to AABB Collision
 				{
-					AABB_AABB(CB1, CB2);
+					return AABB_AABB(CB1, CB2);
 					break;
 				}
 			case 1://AABB to Sphere Collision
 				{
-					AABB_SPHERE(CB1, CB2);
+					return AABB_SPHERE(CB1, CB2);
 					break;
 				}
 			case 2://AABB to Point Collision
 				{
-					AABB_POINT(CB1, CB2);
+					return AABB_POINT(CB1, CB2);
 					break;
 				}
 			case 3://AABB to Ray Collision
 				{
-					AABB_RAY(CB1, CB2);
+					return AABB_RAY(CB1, CB2);
 					break;
 				}
 			case 4://AABB to Plane Collision
 				{
-					AABB_PLANE(CB1, CB2);
+					return AABB_PLANE(CB1, CB2);
 					break;
 				}
 			}
@@ -60,22 +60,22 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 			default:
 			case 1://Sphere To Sphere Collision
 				{
-					SPHERE_SPHERE(CB1, CB2);
+					return SPHERE_SPHERE(CB1, CB2);
 					break;
 				}
 			case 2://Sphere To Point Collision
 				{
-					SPHERE_POINT(CB1, CB2);
+					return SPHERE_POINT(CB1, CB2);
 					break;
 				}
 			case 3://Sphere To Ray Collision
 				{
-					SPHERE_RAY(CB1, CB2);
+					return SPHERE_RAY(CB1, CB2);
 					break;
 				}
 			case 4://Sphere To Plane Collision
 				{
-					SPHERE_PLANE(CB1, CB2);
+					return SPHERE_PLANE(CB1, CB2);
 					break;
 				}
 			}
@@ -88,17 +88,17 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 			default:
 			case 2://Point To Point Collision
 				{
-					POINT_POINT(CB1, CB2);
+					return POINT_POINT(CB1, CB2);
 					break;
 				}
 			case 3://Point To Ray Collision
 				{
-					POINT_RAY(CB1, CB2);
+					return POINT_RAY(CB1, CB2);
 					break;
 				}
 			case 4://Point To Plane Collision
 				{
-					POINT_PLANE(CB1, CB2);
+					return POINT_PLANE(CB1, CB2);
 					break;
 				}
 			}
@@ -111,12 +111,12 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 			default:
 			case 3://Point To Ray Collision
 				{
-					RAY_RAY(CB1, CB2);
+					return RAY_RAY(CB1, CB2);
 					break;
 				}
 			case 4://Point To Plane Collision
 				{
-					RAY_PLANE(CB1, CB2);
+					return RAY_PLANE(CB1, CB2);
 					break;
 				}
 			}
@@ -129,7 +129,7 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 			default:
 			case 4://Point To Plane Collision
 				{
-					PLANE_PLANE(CB1, CB2);
+					return PLANE_PLANE(CB1, CB2);
 					break;
 				}
 			}
@@ -151,6 +151,8 @@ bool CollisionBox::AABB_AABB(CollisionBox &CB1, CollisionBox &CB2)
 	{
 		return true;
 	}
+
+	return false;
 }
 
 bool CollisionBox::AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
@@ -199,10 +201,7 @@ bool CollisionBox::AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
 
 bool CollisionBox::AABB_POINT(CollisionBox &CB1, CollisionBox &CB2)
 {
-	if (intersect((CB1.Position + CB1.ColBox + CB1.ColOffset), (CB1.Position - CB1.ColBox + CB1.ColOffset), CB2.Position))
-	{
-		return true;
-	}
+	return (intersect((CB1.Position + CB1.ColBox + CB1.ColOffset), (CB1.Position - CB1.ColBox + CB1.ColOffset), CB2.Position));
 }
 
 bool CollisionBox::AABB_RAY(CollisionBox &CB1, CollisionBox &CB2)
@@ -262,7 +261,7 @@ bool CollisionBox::AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2)
 {
 	Vector3 topRight = CB1.Position + CB1.ColBox;
 	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
-	Vector3 v1 = (topRight - bottomLeft) / 2;
+	Vector3 v1 = (topRight - bottomLeft) * 0.5f;
 	
 	float rad = abs(CB2.planeNormal.x * v1.x) + abs(CB2.planeNormal.y * v1.y) + abs(CB2.planeNormal.z * v1.z);
 

@@ -50,32 +50,32 @@ public:
 	CollisionBox();
 	~CollisionBox();
 
-	bool checkCollision(CollisionBox &CB1, CollisionBox &CB2);
+	static bool checkCollision(CollisionBox &CB1, CollisionBox &CB2);
 
 private:
 	//AABB Collision(s)
-	bool AABB_AABB(CollisionBox &CB1, CollisionBox &CB2);
-	bool AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
-	bool AABB_POINT(CollisionBox &CB1, CollisionBox &CB2);
-	bool AABB_RAY(CollisionBox &CB1, CollisionBox &CB2);
-	bool AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool AABB_AABB(CollisionBox &CB1, CollisionBox &CB2);
+	static bool AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool AABB_POINT(CollisionBox &CB1, CollisionBox &CB2);
+	static bool AABB_RAY(CollisionBox &CB1, CollisionBox &CB2);
+	static bool AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2);
 
 	//Sphere Collision(s)
-	bool SPHERE_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
-	bool SPHERE_POINT(CollisionBox &CB1, CollisionBox &CB2);
-	bool SPHERE_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
-	bool SPHERE_PLANE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool SPHERE_SPHERE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool SPHERE_POINT(CollisionBox &CB1, CollisionBox &CB2);
+	static bool SPHERE_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
+	static bool SPHERE_PLANE(CollisionBox &CB1, CollisionBox &CB2);
 	
-	bool POINT_POINT(CollisionBox &CB1, CollisionBox &CB2);
-	bool POINT_RAY(CollisionBox &CB1, CollisionBox &CB2);
-	bool POINT_PLANE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool POINT_POINT(CollisionBox &CB1, CollisionBox &CB2);
+	static bool POINT_RAY(CollisionBox &CB1, CollisionBox &CB2);
+	static bool POINT_PLANE(CollisionBox &CB1, CollisionBox &CB2);
 
 	//Ray Collision(s)
-	bool RAY_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
-	bool RAY_PLANE(CollisionBox &CB1, CollisionBox &CB2);
+	static bool RAY_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
+	static bool RAY_PLANE(CollisionBox &CB1, CollisionBox &CB2);
 
 	//Plane Collision(s)
-	bool PLANE_PLANE(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
+	static bool PLANE_PLANE(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
 };
 
 #endif

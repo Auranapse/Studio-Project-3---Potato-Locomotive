@@ -79,7 +79,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 				//Give player 1 sec to prevent detection by the security camera
 				if (alerttimer < 1)
 				{
-					alerttimer += dt;
+					alerttimer += static_cast<float>(dt);
 				}
 				else
 				{

@@ -17,8 +17,6 @@ Default constructor
 /******************************************************************************/
 GameObject::GameObject()
 	: scale(1, 1, 1),
-	ColBox(0, 0, 0),
-	ColBoxOffset(0, 0, 0),
 	pos(0, 0, 0),
 	active(false),
 	enablePhysics(false),
@@ -32,7 +30,8 @@ GameObject::GameObject()
 	mesh(NULL),
 	Opacity(100.f)
 {
-
+	collisionMesh.Type = CollisionBox::CT_AABB;
+	collisionMesh.ColBox.Set(1.f, 1.f, 1.f);
 }
 
 /******************************************************************************/

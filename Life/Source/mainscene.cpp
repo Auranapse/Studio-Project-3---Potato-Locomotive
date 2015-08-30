@@ -881,7 +881,8 @@ bool mainscene::loadLevel(int level)
 				WO->colEnable = true;
 				WO->scale.Set(SizeX, SizeY, SizeZ);
 				WO->pos.Set(x*worldsize*2.f, SizeY, y*worldsize*2.f);
-				WO->ColBox.Set(SizeX, SizeY, SizeZ);
+				WO->collisionMesh.Type = CollisionBox::CT_AABB;
+				WO->collisionMesh.ColBox.Set(SizeX, SizeY, SizeZ);
 				WO->dynamicRendering = true;
 				WO->mesh = meshList[GEO_WORLD_CUBE];
 				m_goList.push_back(WO);
@@ -927,7 +928,8 @@ bool mainscene::loadLevel(int level)
 				SC->active = true;
 				SC->pos.Set(x*worldsize*2.f, worldHeight*2.f, y*worldsize*2.f);
 				SC->colEnable = true;
-				SC->ColBox.Set(3, 3, 3);
+				SC->collisionMesh.Type = CollisionBox::CT_AABB;
+				SC->collisionMesh.ColBox.Set(3.f, 3.f, 3.f);
 				SC->rotation.y = 180.f;
 				SC->scale.Set(6, 6, 6);
 				SC->isHeld = false;
@@ -951,7 +953,8 @@ bool mainscene::loadLevel(int level)
 	WO = new WorldObject();
 	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, 0.f, (GAME_MAP.map_height*0.5f)*worldsize);
 	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, 1, GAME_MAP.map_height * worldsize * 2.f);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -964,7 +967,8 @@ bool mainscene::loadLevel(int level)
 	WO->pos.Set(GAME_MAP.map_width*0.5f*worldsize, worldHeight*2.f, (GAME_MAP.map_height*0.5f)*worldsize);
 	WO->rotation.x = 90.f;
 	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, GAME_MAP.map_height * worldsize * 2.f, 1);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, 5, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -976,7 +980,8 @@ bool mainscene::loadLevel(int level)
 	WO = new WorldObject();
 	WO->pos.Set(worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize * 2.f);
 	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight*1.2f, worldsize);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight*1.2f, worldsize);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight*1.2f, worldsize);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -988,7 +993,8 @@ bool mainscene::loadLevel(int level)
 	WO = new WorldObject();
 	WO->pos.Set(worldsize * 2.f, worldHeight, 0.f);
 	WO->scale.Set(GAME_MAP.map_width * worldsize * 2.2f, worldHeight*1.2f, worldsize);
-	WO->ColBox.Set(GAME_MAP.map_width * worldsize * 2.2f, worldHeight*1.2f, worldsize);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(GAME_MAP.map_width * worldsize * 2.2f, worldHeight*1.2f, worldsize);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -1000,7 +1006,8 @@ bool mainscene::loadLevel(int level)
 	WO = new WorldObject();
 	WO->pos.Set(-worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize);
 	WO->scale.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
-	WO->ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -1012,7 +1019,8 @@ bool mainscene::loadLevel(int level)
 	WO = new WorldObject();
 	WO->pos.Set(GAME_MAP.map_width * worldsize * 2.f, worldHeight, GAME_MAP.map_height * worldsize);
 	WO->scale.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
-	WO->ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
+	WO->collisionMesh.Type = CollisionBox::CT_AABB;
+	WO->collisionMesh.ColBox.Set(worldsize, worldHeight*1.2f, GAME_MAP.map_height * worldsize * 2.f);
 	WO->active = true;
 	WO->enablePhysics = false;
 	WO->colEnable = true;
@@ -1110,8 +1118,9 @@ void mainscene::initWeapons(void)
 	IO_presetList[IO_SYRINGE].pos.Set(-20, 10, 0);
 	IO_presetList[IO_SYRINGE].pos1.Set(-5, -4, 5);
 	IO_presetList[IO_SYRINGE].scale.Set(0.5f, 0.5f, 0.5f);
-	IO_presetList[IO_SYRINGE].ColBox.Set(1, 1, 1);
-	IO_presetList[IO_SYRINGE].ColBoxOffset.Set(0, 1, 0);
+	IO_presetList[IO_SYRINGE].collisionMesh.Type = CollisionBox::CT_AABB;
+	IO_presetList[IO_SYRINGE].collisionMesh.ColBox.Set(1, 1, 1);
+	IO_presetList[IO_SYRINGE].collisionMesh.ColOffset.Set(0, 1, 0);
 	IO_presetList[IO_SYRINGE].enablePhysics = true;
 	IO_presetList[IO_SYRINGE].holdable = true;
 	IO_presetList[IO_SYRINGE].mesh = meshList[GEO_ITEM_SYRINGE];
@@ -1133,7 +1142,8 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_M9].isWeapon = true;
 	WO_presetList[WO_M9].enablePhysics = true;
 	WO_presetList[WO_M9].colEnable = true;
-	WO_presetList[WO_M9].ColBox.Set(3, 3, 3);
+	WO_presetList[WO_M9].collisionMesh.Type = CollisionBox::CT_AABB;
+	WO_presetList[WO_M9].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_M9].AttackSound = ST_WEAPON_M9_SHOOT;
 
 	WO_presetList[WO_KATANA].active = true;
@@ -1150,7 +1160,8 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].isWeapon = true;
 	WO_presetList[WO_KATANA].enablePhysics = true;
 	WO_presetList[WO_KATANA].colEnable = true;
-	WO_presetList[WO_KATANA].ColBox.Set(3, 3, 3);
+	WO_presetList[WO_KATANA].collisionMesh.Type = CollisionBox::CT_AABB;
+	WO_presetList[WO_KATANA].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
 
 	f_curRecoil = 0.f;
@@ -1598,7 +1609,7 @@ void mainscene::UpdateGO(double &dt)
 			if (go->enablePhysics && !go->isHeld)
 			{
 				go->colEnable = false;
-				if (collide(Vector3(go->pos.x, go->pos.y - go->ColBox.y, go->pos.z)))
+				if (collide(Vector3(go->pos.x, go->pos.y - go->collisionMesh.ColBox.y, go->pos.z)))
 				{
 					if (go->vel.y != 0)
 					{
@@ -1625,7 +1636,7 @@ void mainscene::UpdateGO(double &dt)
 					}
 				}
 
-				if (collide(Vector3(go->pos.x + go->ColBox.x, go->pos.y, go->pos.z)))
+				if (collide(Vector3(go->pos.x + go->collisionMesh.ColBox.x, go->pos.y, go->pos.z)))
 				{
 					if (go->vel.x > 0)
 					{
@@ -1633,7 +1644,7 @@ void mainscene::UpdateGO(double &dt)
 					}
 				}
 
-				if (collide(Vector3(go->pos.x - go->ColBox.x, go->pos.y, go->pos.z)))
+				if (collide(Vector3(go->pos.x - go->collisionMesh.ColBox.x, go->pos.y, go->pos.z)))
 				{
 					if (go->vel.x < 0)
 					{
@@ -1641,7 +1652,7 @@ void mainscene::UpdateGO(double &dt)
 					}
 				}
 
-				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z + go->ColBox.z)))
+				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z + go->collisionMesh.ColBox.z)))
 				{
 					if (go->vel.z > 0)
 					{
@@ -1649,7 +1660,7 @@ void mainscene::UpdateGO(double &dt)
 					}
 				}
 
-				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z - go->ColBox.z)))
+				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z - go->collisionMesh.ColBox.z)))
 				{
 					if (go->vel.z < 0)
 					{
@@ -1976,7 +1987,14 @@ bool mainscene::collide(Vector3 &Position)
 		GameObject *go = (GameObject *)*it;
 		if (go->active && go->colEnable && go->pos != Position)
 		{
-			if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, Position))
+			CollisionBox temp;
+			temp.Type = CollisionBox::CT_POINT;
+			temp.Position = Position;
+			/*if (CollisionBox::checkCollision(go->collisionMesh, temp))
+			{
+				return true;
+			}*/
+			if ((intersect((go->pos + go->collisionMesh.ColBox + go->collisionMesh.ColOffset), (go->pos - go->collisionMesh.ColBox + go->collisionMesh.ColOffset), Position)))
 			{
 				return true;
 			}
@@ -2014,7 +2032,7 @@ bool mainscene::collideGO(GameObject *go, GameObject *go2)
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go2 = (GameObject *)*it;
-		if (intersect(go->pos + go->ColBox + go2->ColBox, go->pos - go->ColBox - go2->ColBox, go2->pos))
+		if (CollisionBox::checkCollision(go->collisionMesh, go2->collisionMesh))
 		{
 			return true;
 		}

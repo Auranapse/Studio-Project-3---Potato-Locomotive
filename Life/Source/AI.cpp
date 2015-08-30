@@ -805,10 +805,10 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<GameObject *> &m_GOList)
 		GameObject* go = (GameObject*)*it;
 		if (go->active && go->colEnable && go->pos != pos)
 		{
-			if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, pos))
-			{
-				return true;
-			}
+				if (intersect(go->pos + go->collisionMesh.ColBox, go->pos - go->collisionMesh.ColBox, pos))
+				{
+					return true;
+				}
 		}
 	}
 	return false;
