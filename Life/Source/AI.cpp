@@ -12,7 +12,7 @@ Handles AI position and physics
 
 double AI::d_detectionAngle = 30;
 double AI::d_detectionRange = 6400;
-double AI::d_detectionRangeMax = d_detectionRange * 2;
+double AI::d_detectionRangeMax = 12800;
 double AI::d_playerEscapeRange = 40000;
 
 /******************************************************************************/
@@ -36,8 +36,6 @@ f_alert_timer(0.f)
 	collided = false;
 	prevPosition.SetZero();
 	destination.SetZero();
-	b_aiCooldown = false;
-	f_cooldownTime = 0.f;
 	b_updateAI = true;
 	d_totalRotation = 0.0;
 	d_enemyRotation = 0.0;
@@ -347,7 +345,6 @@ void AI::ai_ScanArea(const double &dt)
 	{
 		e_State = WALKING;
 		d_totalRotation = 0.f;
-		b_aiCooldown = true;
 		b_updateAI = true;
 		b_rotateClockwiseFirst = NULL;
 		b_aiScanning = false;
@@ -556,7 +553,6 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 			{
 				prevPosition = pos;
 				e_State = ATTACK;
-				b_aiCooldown = false;
 				b_goAttack = false;
 			}
 			else if (b_goAlert)
@@ -564,7 +560,6 @@ void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
 				destination = currentLookat;
 				prevPosition = pos;
 				e_State = ALERT;
-				b_aiCooldown = false;
 				b_goAlert = false;
 			}
 			
@@ -599,47 +594,20 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 			//If player is infront and near player, then ai will switch to attack state
 			if ((playerPos - pos).LengthSquared() < d_detectionRange)
 			{
-				/*prevPosition = Position;
-				e_State = ATTACK;
-				b_aiCooldown = false;*/
-				prevPosition = pos;
-				e_State = ATTACK;
-				b_aiCooldown = false;
-				b_goAttack = false;
-				/*currentLookat.x = playerPos.x;
+				currentLookat.x = playerPos.x;
 				currentLookat.z = playerPos.z;
-				b_goAttack = true;*/
+				prevPosition = pos;
+				b_goAttack = true;
 			}
 			//if ai saw player but is too far way, the ai will investigate
-			else if ((playerPos - pos).LengthSquared() > d_detectionRange && (playerPos - pos).LengthSquared() < d_detectionRangeMax)
+			else if ((playerPos - pos).LengthSquared() >= d_detectionRange && (playerPos - pos).LengthSquared() <= d_detectionRangeMax)
 			{
-				///*destination.x = playerPos.x;
-				//destination.z = playerPos.z;
-				//currentLookat = destination;*/
-				//currentLookat.x = playerPos.x;
-				//currentLookat.z = playerPos.z;
-				//destination = currentLookat;
 				destination.x = playerPos.x;
 				destination.z = playerPos.z;
+				currentLookat.x = playerPos.x;
+				currentLookat.z = playerPos.z;
 				prevPosition = pos;
-				e_State = ALERT;
-				b_aiCooldown = false;
-				b_goAlert = false;
-				//b_goAlert = true;
-			}
-		}
-
-		if (b_aiCooldown)
-		{
-			//Ai will move towards prev position
-			if ((pos - prevPosition).LengthSquared() > 2)
-			{
-				Lookat = prevPosition;
-			}
-			//AI is at the destination
-			else
-			{
-				b_aiCooldown = false;
+				b_goAlert = true;
 			}
 		}
 	}
@@ -657,7 +625,7 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 		else
 		{
 			ai_ScanArea(dt);
-		}
+		} 
 
 		//If player is infront and near player, then ai will switch to attack state
 		if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
@@ -665,50 +633,6 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 			e_State = ATTACK;
 			b_updateAI = true;
 			b_rotateClockwiseFirst = NULL;
-		}
-
-		////If ai is at destination
-		//else
-		//{
-		//	static float alertTime = 5.f;
-
-		//	if (f_alert_timer < alertTime)
-		//	{
-		//		f_alert_timer += dt;
-		//	}
-		//	else
-		//	{
-		//		//Alert enemy within a small radius
-		//		for (std::vector<CharacterObject*>::iterator it = m_charList.begin(); it != m_charList.end(); it++)
-		//		{
-		//			AI *ai = dynamic_cast<AI*>((CharacterObject*)*it);
-		//			if (ai->getPosition() != Position)
-		//			{
-		//				if ((Position - ai->getPosition()).LengthSquared() < 100)
-		//				{
-		//					ai->e_State = ATTACK;
-		//				}
-		//			}
-		//		}
-		//		e_State = ATTACK;
-		//		f_alert_timer = 0;
-		//	}
-		//}
-
-		//if player have escaped ai, cooldown first before returning to walking
-		if (b_aiCooldown)
-		{
-			static float cooldownTiming = 2.f;
-
-			if (f_cooldownTime < cooldownTiming)
-			{
-				f_cooldownTime += static_cast<float>(dt);
-			}
-			else
-			{
-				e_State = WALKING;
-				f_cooldownTime = 0.f;
-			}
 		}
 	}
 	break;
@@ -756,6 +680,64 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 	}
 }
 
+void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
+{
+	static float rotationSpeed = 50;
+
+	if (b_goAttack)
+	{
+		rotationSpeed = 100;
+	}
+	else
+	{
+		rotationSpeed = 50;
+	}
+
+	if (Lookat != currentLookat)
+	{
+		if (Lookat.x < currentLookat.x)
+		{
+			Lookat.x += rotationSpeed * dt;
+		}
+		else if (Lookat.x > currentLookat.x)
+		{
+			Lookat.x -= rotationSpeed * dt;
+		}
+
+		if (Lookat.z < currentLookat.z)
+		{
+			Lookat.z += rotationSpeed * dt;
+		}
+		else if (Lookat.z > currentLookat.z)
+		{
+			Lookat.z -= rotationSpeed * dt;
+		}
+
+		if ((Lookat - currentLookat).LengthSquared() < 26)
+		{
+			Lookat = currentLookat;
+		}
+	}
+	else
+	{
+		if (b_goAttack)
+		{
+			prevPosition = pos;
+			e_State = ATTACK;
+			b_goAttack = false;
+		}
+		else if (b_goAlert)
+		{
+			destination = currentLookat;
+			prevPosition = pos;
+			e_State = ALERT;
+			b_goAlert = false;
+		}
+
+		currentLookat = NULL;
+	}
+}
+
 /******************************************************************************/
 /*!
 \brief
@@ -768,46 +750,49 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
-	
-	aiStateHandling(dt, playerPos);
-	//UpdateLookat(dt, playerPos);
-
-	Mtx44 rotation;
-	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
-	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
-	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
-	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
-
-	if (b_aiScanning == false)
+	if (currentLookat == NULL)
 	{
-		if(e_State == WALKING)
+		aiStateHandling(dt, playerPos);
+
+		Mtx44 rotation;
+		rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
+		Vector3 L, R, C;
+		C = rotation * Vector3(0.f, ModelPos.y, 50.f);
+		L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
+		R = rotation * Vector3(15.f, ModelPos.y, 15.f);
+
+		if (b_aiScanning == false)
 		{
-			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+			if (e_State == WALKING)
+			{
+				SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+			}
+			else
+			{
+				SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+			}
 		}
-		else
+		if (vel.x != 0)
 		{
-			SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+			float SForceX = 0 - vel.x;
+			vel.x += SForceX * 0.1f;
+		}
+
+		if (vel.z != 0)
+		{
+			float SForceZ = 0 - vel.z;
+			vel.z += SForceZ * 0.1f;
+		}
+
+		if (b_updateAI)
+		{
+			Animation.Update(dt, vel.LengthSquared() * 4);
+			Lookat += vel * 10 * static_cast<float>(dt);
+			pos += vel * 10 * static_cast<float>(dt);
 		}
 	}
-	if (vel.x != 0)
-	{
-		float SForceX = 0 - vel.x;
-		vel.x += SForceX * 0.1f;
-	}
-
-	if (vel.z != 0)
-	{	
-		float SForceZ = 0 - vel.z;
-		vel.z += SForceZ * 0.1f;
-	}
-
-	if(b_updateAI)
-	{
-		Animation.Update(dt, vel.LengthSquared() * 4);
-		Lookat += vel * 10 * static_cast<float>(dt);
-		pos += vel * 10 * static_cast<float>(dt);
-	}
+	else
+		AiLookatRotation(dt, playerPos);
 }
 
 /******************************************************************************/
@@ -816,23 +801,21 @@ void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &
 To detect collision
 \param dt
 Vector3 pos
-CharacterObject vector list - To check collision
 GameObject vector list - To check collision
-bool checkGO -
 */
 /******************************************************************************/
 bool AI::collisionChecking(Vector3 &pos, std::vector<GameObject *> &m_GOList)
 {
-		for (std::vector<GameObject*>::iterator it = m_GOList.begin(); it != m_GOList.end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_GOList.begin(); it != m_GOList.end(); it++)
+	{
+		GameObject* go = (GameObject*)*it;
+		if (go->active && go->colEnable && go->pos != pos)
 		{
-			GameObject* go = (GameObject*)*it;
-			if (go->active && go->colEnable && go->pos != pos)
+			if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, pos))
 			{
-				if (intersect(go->pos + go->ColBox, go->pos - go->ColBox, pos))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+	}
 	return false;
 }

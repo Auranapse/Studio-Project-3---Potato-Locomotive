@@ -53,6 +53,7 @@ public:
 	void ai_ScanArea(const double &dt);
 	void UpdateLookat(const double &dt, const Vector3 &playerPos);
 	void aiStateHandling(const double &dt, const Vector3 &playerPos);
+	void AiLookatRotation(const double &dt, const Vector3 &playerPos);
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
@@ -67,8 +68,6 @@ private:
 	E_TYPE e_Type;
 	Mtx44 rotating;
 	float f_alert_timer;
-	float f_cooldownTime;
-	bool b_aiCooldown;
 	bool collided;
 
 	Vector3 prevPosition;

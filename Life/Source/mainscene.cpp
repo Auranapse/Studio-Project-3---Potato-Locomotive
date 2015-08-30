@@ -940,6 +940,7 @@ bool mainscene::loadLevel(int level)
 				SC->Lookat = (rotationMtx * templookat) + SC->pos;
 				SC->dynamicRendering = true;
 				SC->mesh = meshList[GEO_SECURITYCAMERA];
+
 				m_goList.push_back(SC);
 			}
 		}
@@ -2076,6 +2077,7 @@ Animations, controls
 /******************************************************************************/
 void mainscene::Update(double dt)
 {
+	//std::cout << this->m_<< std::endl;
 	d_dt = dt;
 	FPScounter = static_cast<float>(1 / dt);
 
@@ -2361,16 +2363,16 @@ void mainscene::RenderGO(GameObject *go)
 		{
 			float YRotation = CalAnglefromPosition(SC->Lookat, SC->pos, true);
 			modelStack.Rotate(YRotation, 0, 1, 0);
+
+			if (TESTMODE)
+			{
+				RenderSCDebugging(SC);
+			}
 		}
 		modelStack.Scale(go->scale);
 		if (go->mesh)
 		{
 			RenderMesh(go->mesh, true, true, go->Opacity);
-		}
-
-		if (TESTMODE && SC != NULL)
-		{
-			RenderSCDebugging(SC);
 		}
 		modelStack.PopMatrix();
 	}
@@ -2450,22 +2452,24 @@ Rendering of Security Camera debugging range
 void mainscene::RenderSCDebugging(SecurityCam * SC)
 {
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -SC->pos.y / 6.1f, 0);
+	modelStack.Translate(0, -GAME_MAP.worldHeight * 2 + 2.f, 0);
 	modelStack.Rotate(SC->getCameraFOV(), 0, 1, 0);
-	modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Scale(0, 0, sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -SC->pos.y / 6.1f, 0);
+	modelStack.Translate(0, -GAME_MAP.worldHeight * 2 + 2.f, 0);
 	modelStack.Rotate(-SC->getCameraFOV(), 0, 1, 0);
-	modelStack.Scale(0, 0, -sqrt(SC->getCameraRange()));
+	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Scale(0, 0, sqrt(SC->getCameraRange()));
 	RenderMesh(meshList[GEO_REDLINE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(0, 0, Vector3(0, -SC->pos.y / 6.1f, 0).Length());
+	modelStack.Scale(0, 0, Vector3(0, -GAME_MAP.worldHeight * 2 + 2.f, 0).Length());
 	RenderMesh(meshList[GEO_GREENLINE], false);
 	modelStack.PopMatrix();
 }
@@ -2488,7 +2492,6 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	{
 		Pitch = -CalAnglefromPosition(CO->Lookat, CO->pos, false);
 	}
-
 
 	if (CO->holding != NULL)
 	{
@@ -2517,7 +2520,6 @@ void mainscene::RenderCharacter(CharacterObject *CO)
 	modelStack.Translate(CO->pos);
 	modelStack.Translate(CO->ModelPos);
 	modelStack.Rotate(YRotation, 0, 1, 0);
-
 	if (TESTMODE)
 	{
 		RenderAIDebugging(CO);

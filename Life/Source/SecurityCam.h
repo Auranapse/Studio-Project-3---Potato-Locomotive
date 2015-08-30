@@ -20,8 +20,9 @@ public:
 
 	void setRotationAngle(float f_rotationAngle);
 	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);
-	CAMERA_STATE getState();
+	void CollisionChecking(std::vector<GameObject *> &m_goList);
 
+	CAMERA_STATE getState();
 	float getCameraFOV();
 	float getCameraRange();
 	Vector3 Lookat;
@@ -33,6 +34,7 @@ private:
 	bool rotationState;
 	float f_rotationLimiter;
 	float f_rotationAngle;
+	bool b_alertAI;
 	static float f_cameraFOV;
 	static float f_cameraRange;
 };
