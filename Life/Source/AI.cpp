@@ -683,17 +683,8 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 {
 	static float rotationSpeed = 50;
-
-	if (b_goAttack)
-	{
-		rotationSpeed = 100;
-	}
-	else
-	{
-		rotationSpeed = 50;
-	}
-
-	if (Lookat != currentLookat)
+	static bool test = false;
+	if (test == false)
 	{
 		if (Lookat.x < currentLookat.x)
 		{
@@ -715,7 +706,7 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 
 		if ((Lookat - currentLookat).LengthSquared() < 26)
 		{
-			Lookat = currentLookat;
+			test = true;
 		}
 	}
 	else
@@ -734,6 +725,9 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 			b_goAlert = false;
 		}
 
+		Lookat = currentLookat;
+		currentLookat = NULL;
+		test = false;
 		currentLookat = NULL;
 	}
 }
