@@ -279,7 +279,8 @@ class mainscene : public Scene
 	enum SOUND_TYPE
 	{
 		ST_STEP,
-		ST_STEP_2,
+		ST_JUMP,
+		ST_LAND,
 		ST_BUZZER,
 		ST_ALERT,
 		ST_BACKGROUND,

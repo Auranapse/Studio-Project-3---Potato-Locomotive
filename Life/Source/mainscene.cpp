@@ -667,7 +667,8 @@ void mainscene::Init()
 	soundList[ST_WALL_POWER_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_exit.mp3");
 
 	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
-	soundList[ST_STEP_2] = SE_Engine.preloadSound("GameData//sounds//other//step2.wav");
+	soundList[ST_JUMP] = SE_Engine.preloadSound("GameData//sounds//other//jump.wav");
+	soundList[ST_LAND] = SE_Engine.preloadSound("GameData//sounds//other//land.wav");
 	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
 	soundList[ST_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//alert.wav");
 
@@ -1195,6 +1196,17 @@ void mainscene::UpdatePlayer(double &dt)
 	float walkSoundDelay = 0.7f;
 	bool inAir = false;
 
+	double tempDT;
+
+	if (d_dt != d_dt2)
+	{
+		tempDT = (d_dt + d_dt2) / 2;
+	}
+	else
+	{
+		tempDT = d_dt;
+	}
+
 	//Y axis collision handling
 	if (!collide(Vector3(P_Player.pos)))
 	{
@@ -1206,67 +1218,45 @@ void mainscene::UpdatePlayer(double &dt)
 			}
 		}
 
-		if (d_dt != d_dt2)
-		{
-			double tempDT = (d_dt + d_dt2) / 2;
-			P_Player.vel += gravity_force * static_cast<float>(tempDT);
-		}
-		else
-		{
-			P_Player.vel += gravity_force * static_cast<float>(dt);
-		}
-
+		P_Player.vel += gravity_force * static_cast<float>(tempDT);
 
 		inAir = true;
 	}
 	else
 	{
-		if (P_Player.vel.y != 0)
-		{
-			P_Player.vel.y = 0.f;
-		}
-
 		if (collide(Vector3(P_Player.pos + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 		{
-			P_Player.vel.y = 50 * static_cast<float>(dt);
+			P_Player.vel.y = 50 * static_cast<float>(tempDT);
 		}
 
 		else if (collide(Vector3(P_Player.pos + Vector3(0.f, 2.f, 0.f))))
 		{
-			P_Player.vel.y = 20 * static_cast<float>(dt);
+			P_Player.vel.y = 20 * static_cast<float>(tempDT);
+		}
+		else if (P_Player.vel.y != 0)
+		{
+			P_Player.vel.y = 0.f;
+			SE_Engine.playSound2D(soundList[ST_LAND]);
 		}
 	}
 
-	//PLAYER MOVEMENT
-	Vector3 LookDir = FPC.target - FPC.position;
-	LookDir.y = 0.f;
-	Vector3 RightDir = LookDir.Cross(Vector3(0, 1, 0));
-	LookDir.Normalize();
-	RightDir.Normalize();
-
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_SPRINT]))
 	{
-		LookDir *= 25;
-		RightDir *= 25;
-		walkSoundDelay *= 0.5f;
+		P_Player.f_movementSpeed = P_Player.f_move_run;
 	}
 	else if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_WALK]))
 	{
-		LookDir *= 4.5f;
-		RightDir *= 4.5f;
-		walkSoundDelay *= 2;
+		P_Player.f_movementSpeed = P_Player.f_move_crawl;
 	}
 	else
 	{
-		LookDir *= 15;
-		RightDir *= 15;
+		P_Player.f_movementSpeed = P_Player.f_move_walk;
 	}
 
 	//Player movement
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 	{
-		P_Player.vel.x += LookDir.x;
-		P_Player.vel.z += LookDir.z;
+		P_Player.movementFB(tempDT);
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1277,8 +1267,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 	{
-		P_Player.vel.x -= LookDir.x;
-		P_Player.vel.z -= LookDir.z;
+		P_Player.movementFB(tempDT, false);
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1289,7 +1278,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
 	{
-		P_Player.vel -= RightDir;
+		P_Player.movementLR(tempDT);
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1300,7 +1289,7 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
 	{
-		P_Player.vel += RightDir;
+		P_Player.movementLR(tempDT, false);
 
 		if (walkSoundDelay + f_step < timer && !inAir)
 		{
@@ -1314,7 +1303,7 @@ void mainscene::UpdatePlayer(double &dt)
 		if (inAir == false)
 		{
 			P_Player.vel.y += 120;
-			SE_Engine.playSound2D(soundList[ST_STEP]);
+			SE_Engine.playSound2D(soundList[ST_JUMP]);
 		}
 	}
 
@@ -1322,13 +1311,13 @@ void mainscene::UpdatePlayer(double &dt)
 	if (P_Player.vel.x != 0)
 	{
 		float SForceX = 0 - P_Player.vel.x;
-		P_Player.vel.x += SForceX * 0.1f;
+		P_Player.vel.x += SForceX * static_cast<float>(tempDT) * 6.f;
 	}
 
 	if (P_Player.vel.z != 0)
 	{
 		float SForceZ = 0 - P_Player.vel.z;
-		P_Player.vel.z += SForceZ * 0.1f;
+		P_Player.vel.z += SForceZ * static_cast<float>(tempDT) * 6.f;
 	}
 
 
@@ -1390,19 +1379,9 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (d_dt2 != d_dt)
-	{
-		double tempDT = (d_dt + d_dt2) / 2;
-		FPC = FPC + (P_Player.vel * static_cast<float>(tempDT));
-		P_Player.Lookat = FPC.target;
-		P_Player.Update(tempDT);
-	}
-	else
-	{
-		FPC = FPC + (P_Player.vel * static_cast<float>(dt));
-		P_Player.Lookat = FPC.target;
-		P_Player.Update(dt);
-	}
+	FPC = FPC + (P_Player.vel * static_cast<float>(tempDT));
+	P_Player.Lookat = FPC.target;
+	P_Player.Update(tempDT);
 }
 
 /******************************************************************************/
@@ -1585,6 +1564,8 @@ void mainscene::UpdateGO(double &dt)
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
+			go->collisionMesh.Position = go->pos;
+
 			BulletObject *BO = dynamic_cast<BulletObject*>(go);
 			if (BO != NULL)
 			{
@@ -1990,11 +1971,7 @@ bool mainscene::collide(Vector3 &Position)
 			CollisionBox temp;
 			temp.Type = CollisionBox::CT_POINT;
 			temp.Position = Position;
-			/*if (CollisionBox::checkCollision(go->collisionMesh, temp))
-			{
-				return true;
-			}*/
-			if ((intersect((go->pos + go->collisionMesh.ColBox + go->collisionMesh.ColOffset), (go->pos - go->collisionMesh.ColBox + go->collisionMesh.ColOffset), Position)))
+			if (CollisionBox::checkCollision(go->collisionMesh, temp))
 			{
 				return true;
 			}

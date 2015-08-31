@@ -18,6 +18,11 @@ Default constructor
 Player::Player()
 {
 	CamOffset.Set(0, 25, 0);
+	//f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
+	f_move_crawl = 150.f;
+	f_move_walk = 700.f;
+	f_move_run = 1200.f;
+	f_movementSpeed = f_move_walk;
 }
 
 /******************************************************************************/
@@ -29,26 +34,6 @@ Default destructor
 Player::~Player()
 {
 
-}
-
-/******************************************************************************/
-/*!
-\brief
-makes player run/walk
-\param forward
-if true will run, else walk
-*/
-/******************************************************************************/
-void Player::movementRW(bool run)
-{
-	if (run)
-	{
-		f_movementSpeed = f_move_run;
-	}
-	else
-	{
-		f_movementSpeed = f_move_walk;
-	}
 }
 
 /******************************************************************************/
@@ -81,7 +66,14 @@ if true will move left, else right
 /******************************************************************************/
 void Player::movementLR(double &dt, bool left)
 {
-	
+	if (left)
+	{
+		vel -= (getDirection(true).Cross(Vector3(0, 1, 0)).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
+	else
+	{
+		vel += (getDirection(true).Cross(Vector3(0, 1, 0)).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
 }
 
 /******************************************************************************/

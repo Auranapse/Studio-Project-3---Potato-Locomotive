@@ -20,7 +20,6 @@ public:
 	Player();
 	virtual ~Player();
 	
-	void movementRW(bool run = true);
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true);
 
