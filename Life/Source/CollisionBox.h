@@ -51,6 +51,8 @@ public:
 	~CollisionBox();
 
 	static bool checkCollision(CollisionBox &CB1, CollisionBox &CB2);
+	void setPos(Vector3);
+	Vector3 getPos(void)const;
 
 private:
 	//AABB Collision(s)

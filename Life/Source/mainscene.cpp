@@ -687,19 +687,10 @@ void mainscene::Init()
 	currentLevel = 1;
 	loadLevel(currentLevel);
 
-	Shape *sTest = new Sphere(Vector3(0, 0, 0), 100000);
-	Asset *Test = new Room(meshList[GEO_OBJCAKE], sTest, 100, true, false, 0.6f, 0.55f);
-	MainManager.Add(Test);
 
+	PlayerSound = new SoundDetect(P_Player.pos, 100);
+	std::cout<<PlayerSound->getSoundRadius();
 
-	Shape *aTest = new Sphere(Vector3(0, 0, 0), 5);
-	Asset *Test2 = new Enemy(meshList[GEO_OBJCAKE], aTest, 5, 1, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 1, 20, 0);
-
-	MainManager.Add(Test2);
-
-	Shape *wTest = new AABB(Vector3(20, 0, 20), 10);
-	Asset *Test3 = new aPlayer(meshList[GEO_SECURITYCAMERA], wTest, 5, 5, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 1, 50, 100, 100);
-	MainManager.Add(Test3);
 }
 
 /******************************************************************************/
@@ -895,6 +886,11 @@ bool mainscene::loadLevel(int level)
 				ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
 				ai->Lookat = ai->pos + Vector3(0, 0, 10);
 				ai->scale.Set(10, 10, 10);
+				ai->collisionMesh.Type = CollisionBox::CT_AABB;
+				ai->collisionMesh.Position = ai->pos;
+				ai->collisionMesh.ColBox.Set(6, 15, 6);
+				ai->collisionMesh.ColOffset.Set(0, 15, 0);
+
 
 				WeaponsObject *WO;
 				WO = new WeaponsObject(WO_presetList[WO_M9]);
@@ -1553,6 +1549,8 @@ void mainscene::UpdatePlayerPower(double &dt)
 			f_powerTint += diff * static_cast<float>(d_dt) * 10.f;
 		}
 	}
+
+	PlayerSound->setSource(P_Player.pos);
 }
 
 /******************************************************************************/
@@ -1999,18 +1997,18 @@ bool mainscene::collide(Vector3 &Position)
 	//collision with terrainmap
 	/*if(monalisa.ColEnable)
 	{
-		Vector3 tempPos;
-		tempPos = Position - monalisa.position;
-		tempPos.x /= monalisa.scale.x;
-		tempPos.z /= monalisa.scale.z;
+	Vector3 tempPos;
+	tempPos = Position - monalisa.position;
+	tempPos.x /= monalisa.scale.x;
+	tempPos.z /= monalisa.scale.z;
 
-		if(tempPos.x < 0.5 && tempPos.x > -0.5 && tempPos.z < 0.5 && tempPos.z > -0.5)
-		{
-			if(Position.y < (ReadHeightMap(monalisa.uc_heightmap, tempPos.x, tempPos.z)*monalisa.scale.y)+monalisa.position.y && Position.y > monalisa.position.y - 3)
-			{
-				return true;
-			}
-		}
+	if(tempPos.x < 0.5 && tempPos.x > -0.5 && tempPos.z < 0.5 && tempPos.z > -0.5)
+	{
+	if(Position.y < (ReadHeightMap(monalisa.uc_heightmap, tempPos.x, tempPos.z)*monalisa.scale.y)+monalisa.position.y && Position.y > monalisa.position.y - 3)
+	{
+	return true;
+	}
+	}
 	}*/
 
 	return false;
@@ -2324,35 +2322,7 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-
-
-	MainManager.Update(dt, 1);
-
-	//std::cout<<"Pos: "<<MainManager.SceneAssets[1]->getBound()->getOrigin().x<<std::endl;
-	Living* Whatever = (Living*)MainManager.SceneAssets[1];
-	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
-	//std::cout<<"Velo: "<<Whatever->getVelo().x<<std::endl<<"Acc: "<<Whatever->getAcc().x<<std::endl<<"Force: "<<Whatever->getForce().Length()<<std::endl;
-	if (Application::IsKeyPressed('P'))
-	{
-		//std::cout<<"50 Force Added!\n";
-		Whatever->applyForce(Vector3(50, 0, 50));
-	}
-	if (Application::IsKeyPressed('I'))
-		Whatever1->applyForce(Vector3(0, 0, -50));
-	if (Application::IsKeyPressed('K'))
-		Whatever1->applyForce(Vector3(0, 0, 50));
-	if (Application::IsKeyPressed('L'))
-		Whatever1->applyForce(Vector3(50, 0, 0));
-	if (Application::IsKeyPressed('J'))
-		Whatever1->applyForce(Vector3(-50, 0, 0));
-
-	//std::cout << "Pos: " << MainManager.SceneAssets[1]->getBound()->getOrigin().x << std::endl;
-	//std::cout << "Velo: " << Whatever->getVelo().x << std::endl << "Acc: " << Whatever->getAcc().x << std::endl << "Force: " << Whatever->getForce().Length() << std::endl;
-	if (Application::IsKeyPressed('P'))
-	{
-		std::cout << "5 Force Added!\n";
-		Whatever->applyForce(Vector3(50, 0, 0));
-	}
+	CheckPlayerSound();
 }
 
 /******************************************************************************/
@@ -2593,32 +2563,6 @@ void mainscene::RenderParticles(void)
 			switch (Par->ParticleType)
 			{
 			case Particle::PAR_SPARKS:
-			{
-				modelStack.PushMatrix();
-				modelStack.Translate(Par->Pos);
-				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
-				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
-				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
-				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
-				modelStack.PopMatrix();
-				break;
-			}
-			case Particle::PAR_BLOOD:
-			{
-				modelStack.PushMatrix();
-				modelStack.Translate(Par->Pos);
-				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
-				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
-				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
-				modelStack.Scale(Par->Scale);
-				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
-				modelStack.PopMatrix();
-				break;
-			}
-			case Particle::PAR_MESH:
-			{
-				if (Par->mesh != NULL)
 				{
 					modelStack.PushMatrix();
 					modelStack.Translate(Par->Pos);
@@ -2626,10 +2570,36 @@ void mainscene::RenderParticles(void)
 					modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 					modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 					modelStack.Scale(Par->Scale);
-					RenderMesh(Par->mesh, true);
+					RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
 					modelStack.PopMatrix();
+					break;
 				}
-			}
+			case Particle::PAR_BLOOD:
+				{
+					modelStack.PushMatrix();
+					modelStack.Translate(Par->Pos);
+					modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+					modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+					modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+					modelStack.Scale(Par->Scale);
+					RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
+					modelStack.PopMatrix();
+					break;
+				}
+			case Particle::PAR_MESH:
+				{
+					if (Par->mesh != NULL)
+					{
+						modelStack.PushMatrix();
+						modelStack.Translate(Par->Pos);
+						modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+						modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+						modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+						modelStack.Scale(Par->Scale);
+						RenderMesh(Par->mesh, true);
+						modelStack.PopMatrix();
+					}
+				}
 			default:
 				break;
 			}
@@ -2649,7 +2619,6 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, f
 	{
 		return;
 	}
-
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
@@ -2702,7 +2671,6 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 	{
 		return;
 	}
-
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
@@ -2716,124 +2684,124 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 	switch (m_renderPass)
 	{
 	case RENDER_PASS_PRE:
-	{
-		Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
-		mesh->Render();
-		break;
-	}
+		{
+			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
+			mesh->Render();
+			break;
+		}
 	case RENDER_PASS_MAIN:
-	{
-		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
-
-		modelView = viewStack.Top() * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
-
-		if (enableLight)
 		{
-			glUniform1i(m_parameters[U_LIGHTENABLED], 1);
+			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 
-			modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
-			glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
-			//
-			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
-			//
-			//load material
-			glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
-			glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
-			glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
-			glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
-		}
-		else
-		{
-			glUniform1i(m_parameters[U_LIGHTENABLED], 0);
-		}
+			modelView = viewStack.Top() * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
 
-		for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
-		{
-			if (mesh->textureID[i] > 0)
+			if (enableLight)
 			{
-				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
+				glUniform1i(m_parameters[U_LIGHTENABLED], 1);
+
+				modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
+				glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
+				//
+				Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+				glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
+				//
+				//load material
+				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
+				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
+				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
+				glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
 			}
 			else
 			{
-				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
+				glUniform1i(m_parameters[U_LIGHTENABLED], 0);
 			}
 
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
-			glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
-		}
-		mesh->Render(); //this line should only be called once
-		break;
-	}
-	case RENDER_PASS_LIGHT:
-	{
-		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
-		mesh->Render();
-		break;
-	}
-	case RENDER_PASS_GBUFFER:
-	{
-		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_MVP_GBUFFER], 1, GL_FALSE, &MVP.a[0]);
-
-		modelView = viewStack.Top() * modelStack.Top();
-		glUniformMatrix4fv(m_parameters[U_MODELVIEW_GBUFFER], 1, GL_FALSE, &modelView.a[0]);
-
-		if (enableLight)
-		{
-			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 1);
-
-			modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
-			glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
-
-			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GBUFFER], 1, GL_FALSE, &lightDepthMVP.a[0]);
-
-			//load material
-			if (material == NULL)
+			for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
 			{
-				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &mesh->material.kAmbient.r);
-				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &mesh->material.kDiffuse.r);
-				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &mesh->material.kSpecular.r);
-				glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &mesh->material.kEmissive.r);
-				glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], mesh->material.kShininess);
-			}
-			else
-			{
-				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &material->kAmbient.r);
-				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &material->kDiffuse.r);
-				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &material->kSpecular.r);
-				glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &material->kEmissive.r);
-				glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], material->kShininess);
-			}
-		}
-		else
-		{
-			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 0);
-		}
-		for (int i = 0; i < 1; ++i)
-		{
-			if (mesh->textureID[i] > 0)
-			{
-				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 1);
+				if (mesh->textureID[i] > 0)
+				{
+					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
+				}
+				else
+				{
+					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
+				}
 
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
-				glUniform1i(m_parameters[U_COLOR_TEXTURE_GBUFFER + i], i);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
+			}
+			mesh->Render(); //this line should only be called once
+			break;
+		}
+	case RENDER_PASS_LIGHT:
+		{
+			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
+			mesh->Render();
+			break;
+		}
+	case RENDER_PASS_GBUFFER:
+		{
+			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_MVP_GBUFFER], 1, GL_FALSE, &MVP.a[0]);
+
+			modelView = viewStack.Top() * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_MODELVIEW_GBUFFER], 1, GL_FALSE, &modelView.a[0]);
+
+			if (enableLight)
+			{
+				glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 1);
+
+				modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
+				glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
+
+				Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+				glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GBUFFER], 1, GL_FALSE, &lightDepthMVP.a[0]);
+
+				//load material
+				if (material == NULL)
+				{
+					glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &mesh->material.kAmbient.r);
+					glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &mesh->material.kDiffuse.r);
+					glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &mesh->material.kSpecular.r);
+					glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &mesh->material.kEmissive.r);
+					glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], mesh->material.kShininess);
+				}
+				else
+				{
+					glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &material->kAmbient.r);
+					glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &material->kDiffuse.r);
+					glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &material->kSpecular.r);
+					glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &material->kEmissive.r);
+					glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], material->kShininess);
+				}
 			}
 			else
 			{
-				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 0);
+				glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 0);
 			}
+			for (int i = 0; i < 1; ++i)
+			{
+				if (mesh->textureID[i] > 0)
+				{
+					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 1);
+
+					glActiveTexture(GL_TEXTURE0 + i);
+					glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
+					glUniform1i(m_parameters[U_COLOR_TEXTURE_GBUFFER + i], i);
+				}
+				else
+				{
+					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 0);
+				}
+			}
+			mesh->Render();
+			break;
 		}
-		mesh->Render();
-		break;
-	}
 	}
 }
 
@@ -3027,20 +2995,6 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&P_Player);
 	RenderParticles();
-
-	Living* Whatever = (Living*)MainManager.SceneAssets[1];
-	modelStack.PushMatrix();
-	modelStack.Translate(Whatever->getBound()->getOrigin().x, Whatever->getBound()->getOrigin().y, Whatever->getBound()->getOrigin().z);
-	modelStack.Scale(10, 10, 10);
-	RenderMesh(meshList[GEO_OBJCAKE], true);
-	modelStack.PopMatrix();
-
-	Living* Whatever1 = (Living*)MainManager.SceneAssets[2];
-	modelStack.PushMatrix();
-	modelStack.Translate(Whatever1->getBound()->getOrigin().x, Whatever1->getBound()->getOrigin().y, Whatever1->getBound()->getOrigin().z);
-	modelStack.Scale(15, 15, 15);
-	RenderMesh(meshList[GEO_OBJCAKE], true);
-	modelStack.PopMatrix();
 }
 
 /******************************************************************************/
@@ -3298,19 +3252,19 @@ void mainscene::RenderPassLight(void)
 	//Point light - local light without shadow
 	/*for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
-		GameObject *go = static_cast<GameObject *>(*it);
-		Position pos(go->pos.x, go->pos.y, go->pos.z);
-		Position lightPosition_cameraspace = viewStack.Top() * pos;
-		glUniform1i(m_parameters[U_LIGHT_TYPE_LIGHTPASS], LIGHT_POINT);
-		glUniform3fv(m_parameters[U_LIGHT_POSITION_LIGHTPASS], 1, &lightPosition_cameraspace.x);
-		glUniform3fv(m_parameters[U_LIGHT_COLOR_LIGHTPASS], 1, &go->material.kDiffuse.r);
-		glUniform1f(m_parameters[U_LIGHT_POWER_LIGHTPASS], go->lightPower);
-		glUniform1f(m_parameters[U_LIGHT_RADIUS_LIGHTPASS], go->lightRadius);
-		modelStack.PushMatrix();
-		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
-		modelStack.Scale(go->lightRadius, go->lightRadius, go->lightRadius);
-		RenderMesh(meshList[GEO_RENDERING_SPHERE], false);
-		modelStack.PopMatrix();
+	GameObject *go = static_cast<GameObject *>(*it);
+	Position pos(go->pos.x, go->pos.y, go->pos.z);
+	Position lightPosition_cameraspace = viewStack.Top() * pos;
+	glUniform1i(m_parameters[U_LIGHT_TYPE_LIGHTPASS], LIGHT_POINT);
+	glUniform3fv(m_parameters[U_LIGHT_POSITION_LIGHTPASS], 1, &lightPosition_cameraspace.x);
+	glUniform3fv(m_parameters[U_LIGHT_COLOR_LIGHTPASS], 1, &go->material.kDiffuse.r);
+	glUniform1f(m_parameters[U_LIGHT_POWER_LIGHTPASS], go->lightPower);
+	glUniform1f(m_parameters[U_LIGHT_RADIUS_LIGHTPASS], go->lightRadius);
+	modelStack.PushMatrix();
+	modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+	modelStack.Scale(go->lightRadius, go->lightRadius, go->lightRadius);
+	RenderMesh(meshList[GEO_RENDERING_SPHERE], false);
+	modelStack.PopMatrix();
 	}*/
 
 	glEnable(GL_CULL_FACE);
@@ -3488,4 +3442,51 @@ void mainscene::Exit(void)
 	glDeleteVertexArrays(1, &m_vertexArrayID);
 	glDeleteProgram(m_programID);
 	glDeleteProgram(m_gPassShaderID);
+}
+
+
+bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
+{
+	CollisionBox Ray;
+	Ray.Type = CollisionBox::CT_RAY;
+	Ray.end = end;
+	Ray.Position = start;
+	Ray.t1 = 0;
+	Ray.t2 = 1;
+
+	Ray.Direction = (end-start).Normalized();
+
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->collisionMesh.Position != NULL)
+		{
+			if (go->active)
+			{
+				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
+void mainscene::CheckPlayerSound(void)
+{
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{	
+			AI *ai = dynamic_cast<AI*>(go);
+			if(ai != NULL)
+			{
+				if (PlayerSound->heard(go->pos))
+				{
+					std::cout<<"Player has been heard!";
+					//You put whatever functions want in 
+				}	
+			}
+		}
+	}
 }

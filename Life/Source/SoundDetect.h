@@ -25,7 +25,7 @@ public:
 	SoundDetect();
 	~SoundDetect();
 
-	bool heard(CollisionBox &target);
+	bool heard(Vector3 &target);
 
 	//Accessors
 	float getSoundRadius(void)const;
@@ -35,6 +35,7 @@ public:
 	//Mutators
 	void setSoundRadius(float);
 	void setSoundMultiplier(float);
+	void setSource(Vector3);
 private:
 	float soundMultiplier;
 	float soundRadius;

@@ -42,6 +42,7 @@ Main scene
 
 
 #include "SceneManager.h"
+#include "SoundDetect.h"
 
 
 /******************************************************************************/
@@ -391,7 +392,7 @@ private:
 	WeaponsObject WO_presetList[WO_TOTAL];
 
 	Player P_Player;
-
+	SoundDetect *PlayerSound;
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 
@@ -473,8 +474,9 @@ private:
 	SoundEngine SE_Engine;
 
 
-	//SCENE MANAGER!!!
-	SceneManager MainManager;
+	//Ray Collision
+	bool CollisionBetween(Vector3 &start, Vector3 &end);
+	void CheckPlayerSound(void);
 };
 
 #endif

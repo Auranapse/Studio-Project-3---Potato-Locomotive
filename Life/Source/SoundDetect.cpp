@@ -53,9 +53,12 @@ Returns bool if Enemy Hears sound
 TRUE = Target hears sound
 */
 /******************************************************************************/
-bool SoundDetect::heard(CollisionBox &target)
+bool SoundDetect::heard(Vector3 &target)
 {
-	return soundBound.checkCollision(target);
+	CollisionBox TargetPos;
+	TargetPos.Type = CollisionBox::CT_POINT;
+	TargetPos.Position = target;
+	return CollisionBox::checkCollision(soundBound, TargetPos);
 }
 
 //Accessors
@@ -123,4 +126,16 @@ void SoundDetect::setSoundMultiplier(float soundMultiplier)
 {
 	this->soundMultiplier = soundMultiplier;
 	this->soundBound.radius = soundRadius * soundMultiplier;
+}
+/******************************************************************************/
+/*!
+\brief
+Sets the source of sound
+\soundMultiplier
+sound's source
+*/
+/******************************************************************************/
+void SoundDetect::setSource(Vector3 source)
+{
+	this->soundBound.Position = source;
 }

@@ -17,10 +17,17 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	c1 = (CB1.Type < CB2.Type) ? (c1 = CB1.Type) : (c1 = CB2.Type);
 	c2 = (CB2.Type > CB1.Type) ? (c2 = CB2.Type) : (c2 = CB1.Type);
 
+	if (CB2.Type < CB1.Type)
+	{
+		COLLISION_TYPE Temp = CB1.Type;
+		CB1.Type = CB2.Type;
+		CB2.Type = Temp;
+	}
+	//std::cout<<"CHECK!"<<c1<<c2;
 	switch (c1)
 	{
 	default:
-	case 1:
+	case 0:
 	{
 		switch (c2)
 		{
@@ -53,7 +60,7 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 		}
 		break;
 	}
-	case 2:
+	case 1:
 	{
 		switch (c2)
 		{
@@ -81,7 +88,7 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 		}
 		break;
 	}
-	case 3:
+	case 2:
 	{
 		switch (c2)
 		{
@@ -104,7 +111,7 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 		}
 		break;
 	}
-	case 4:
+	case 3:
 	{
 		switch (c2)
 		{
@@ -122,7 +129,7 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 		}
 		break;
 	}
-	case 5:
+	case 4:
 	{
 		switch (c2)
 		{
@@ -137,6 +144,15 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	}
 	}
 	return false;
+}
+
+void CollisionBox::setPos(Vector3 pos)
+{
+	this->Position = pos;
+}
+Vector3 CollisionBox::getPos(void)const
+{
+	return this->Position;
 }
 
 /*******************************************************************************
@@ -273,8 +289,8 @@ bool CollisionBox::AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2)
 ********************************************************************************/
 bool CollisionBox::SPHERE_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
 {
-	float radius1 = CB1.ColBox.x;
-	float radius2 = CB2.ColBox.x;
+	float radius1 = CB1.radius;
+	float radius2 = CB2.radius;
 
 	//Distance Between Their Centres
 	float d = pow((CB1.Position.x - CB2.Position.x), 2)
@@ -292,16 +308,17 @@ bool CollisionBox::SPHERE_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
 
 bool CollisionBox::SPHERE_POINT(CollisionBox &CB1, CollisionBox &CB2)
 {
-	float radius1 = CB1.ColBox.x;
-
+	//std::cout<<"COLT: ";
+	float radius1 = CB1.radius;
 	//Distance Between Their Centres
 	float d = pow((CB1.Position.x - CB2.Position.x), 2)
 		+ pow((CB1.Position.y - CB2.Position.y), 2)
 		+ pow((CB1.Position.z - CB2.Position.z), 2);
+	//std::cout<<d<<"                                         ";
 
 	//Combined Radius of Two Bounding Spheres
 	float tR = pow(radius1, 2);
-
+	//std::cout<<tR<<"\n";
 	if (d <= tR)
 		return true;
 	else
