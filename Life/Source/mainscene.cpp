@@ -1399,7 +1399,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		abilityPressed_1 = true;
 
-		if (!PowerActive && f_poweramount > 50)
+		if (!PowerActive && f_poweramount > 20)
 		{
 			PowerActive = true;
 			CurrentPower = PT_SLOWMO;
@@ -1423,7 +1423,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	if (Application::IsKeyPressed(us_control[E_CTRL_ABILITY_2]) && !abilityPressed_2)
 	{
 		abilityPressed_2 = true;
-		if (!PowerActive && f_poweramount > 50)
+		if (!PowerActive && f_poweramount > 20)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 			{
@@ -1528,7 +1528,11 @@ void mainscene::UpdatePlayerPower(double &dt)
 	}
 	else
 	{
-		if (f_poweramount < 100)
+		if (f_poweramount < 20)
+		{
+			f_poweramount += static_cast<float>(d_dt);
+		}
+		else if (f_poweramount < 100)
 		{
 			f_poweramount += static_cast<float>(d_dt) * 2.f;
 		}
@@ -3130,7 +3134,7 @@ void mainscene::RenderUI(void)
 			modelStack.PushMatrix();
 			modelStack.Translate(0, 0, 0.2f);
 			modelStack.Scale(1, f_poweramount*0.1f, 0.f);
-			if (f_poweramount < 50)
+			if (f_poweramount < 20)
 			{
 				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.5f, 0.f, 0.f));
 			}
