@@ -213,7 +213,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 					{
 						b_cameraRotating = false;
 					}*/
-					float angle = CalAnglefromPosition(Vector3(defaultLookat.x, 0, defaultLookat.z), Vector3(Lookat.x, 0, Lookat.z), true);
+					/*float angle = CalAnglefromPosition(Vector3(defaultLookat.x, 0, defaultLookat.z), Vector3(Lookat.x, 0, Lookat.z), true);
 					std::cout << angle << std::endl;
 					
 					if(angle < offsetY + 10)
@@ -238,7 +238,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 					{
 						std::cout << "Senpai no notice me" << std::endl;
 						b_cameraRotating = false;
-					}
+					}*/
 				}
 				else
 				{
