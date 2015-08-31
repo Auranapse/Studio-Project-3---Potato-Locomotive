@@ -11,6 +11,7 @@ Custom made camera
 #define CUSTOMCAM1_H
 
 #include "Camera.h"
+#include "GabrielDLC.h"
 
 class CustomCam1 : public Camera
 {
@@ -19,6 +20,8 @@ public:
 	//Vector3 target;
 	//Vector3 up;
 	float mouseSensitivity;
+	float f_currentPitch;
+	float f_pitchLimit;
 
 	Vector3 defaultPosition;
 	Vector3 defaultTarget;
@@ -28,7 +31,6 @@ public:
 	~CustomCam1();
 	virtual void Init(const Vector3& pos, const Vector3& target, const Vector3& up, const float mouseSensitivity);
 	virtual void Update(double dt);
-	virtual void Reset();
 	void rotateCamVertical(float degrees);
 private:
 	double mouseX, mouseY;

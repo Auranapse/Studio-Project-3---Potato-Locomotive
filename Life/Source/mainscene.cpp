@@ -503,8 +503,6 @@ void mainscene::Init()
 	meshList[GEO_GREENLINE] = MeshBuilder::GenerateLine("Green Line", Color(0, 1, 0), 0.f, 0.f, 1.f);
 	meshList[GEO_BLUELINE] = MeshBuilder::GenerateLine("Blue Line", Color(0, 0, 1), 0.f, 0.f, 1.f);
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", Color(0.f, 1.f, 1.f), 0.1f, 0.5f, 1.f);
-	meshList[GEO_FLOOR_TILE] = MeshBuilder::GenerateQuad("Room floor", Color(1.f, 1.f, 1.f), 10.f, 10.f, 400.f);
-	meshList[GEO_FLOOR_TILE]->textureID[0] = LoadTGA("GameData//Image//floortexture.tga", false);
 
 	meshList[GEO_WORLD_CUBE] = MeshBuilder::GenerateCubeT2("World Cube", Color(1.f, 1.f, 1.f), 1, 1, 1);
 	meshList[GEO_WORLD_CUBE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
@@ -518,11 +516,15 @@ void mainscene::Init()
 	meshList[GEO_WORLD_QUAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_WORLD_QUAD]->material.kShininess = 1.0f;
 
-	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THELIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
+	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("THE MYSTERIOUS MAGIC AMAZING LIGHT", Color(1.0, 1.0, 1.0), 9, 18, 1);
 
 	//Load OBJ Models
 	meshList[GEO_OBJCAKE] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//CAKE.obj");
 	meshList[GEO_OBJCAKE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Cake_UV.tga", true);
+	meshList[GEO_OBJCAKE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
+	meshList[GEO_OBJCAKE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
+	meshList[GEO_OBJCAKE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
 
 	meshList[GEO_SECURITYCAMERA] = MeshBuilder::GenerateOBJ("CAKE", "GameData//OBJ//other//SecurityCamera.obj");
 	meshList[GEO_SECURITYCAMERA]->textureID[0] = LoadTGA("GameData//Image//OBJ//SecurityCamera_UV.tga", true);
@@ -609,19 +611,7 @@ void mainscene::Init()
 	meshList[GEO_EMISSIVE_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_EMISSIVE);
 
 	meshList[GEO_SCREEN_OVERLAY] = MeshBuilder::GenerateQuad("Screen tint", Color(1, 1, 1), 1.f, 1.f, 1.f);
-
-
-	//Lighting-------------------------------------------------------------------------------
-
-	meshList[GEO_FLOOR_TILE]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
-	meshList[GEO_FLOOR_TILE]->material.kDiffuse.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_FLOOR_TILE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_FLOOR_TILE]->material.kShininess = 1.0f;
-
-	meshList[GEO_OBJCAKE]->material.kAmbient.Set(0.15f, 0.15f, 0.15f);
-	meshList[GEO_OBJCAKE]->material.kDiffuse.Set(0.7f, 0.7f, 0.7f);
-	meshList[GEO_OBJCAKE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_OBJCAKE]->material.kShininess = 1.0f;
+	
 
 	renderAxis = false;
 
@@ -966,13 +956,13 @@ bool mainscene::loadLevel(int level)
 				WO = new WorldObject();
 				WO->active = true;
 				WO->colEnable = false;
-				WO->scale.Set(1, 1, 1);
+				WO->scale.Set(3.f, 3.f, 3.f);
 				WO->pos.Set(x*worldsize*2.f, 1, y*worldsize*2.f);
 				WO->collisionMesh.Type = CollisionBox::CT_SPHERE;
 				WO->collisionMesh.radius = 10.f;
 				WO->collisionMesh.Position = WO->pos;
 				WO->dynamicRendering = true;
-				WO->mesh = meshList[GEO_MP5K];
+				WO->mesh = meshList[GEO_OBJCAKE];
 				WO_END = WO;
 				m_goList.push_back(WO);
 			}

@@ -72,7 +72,6 @@ class mainscene : public Scene
 		GEO_BLUELINE,
 		GEO_CROSSHAIR,
 		GEO_SKYPLANE,
-		GEO_FLOOR_TILE,
 		GEO_WORLD_CUBE,
 		GEO_WORLD_QUAD,
 
