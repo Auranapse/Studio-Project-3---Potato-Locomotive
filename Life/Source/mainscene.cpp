@@ -638,6 +638,10 @@ void mainscene::Init()
 
 	P_Player.Init(Vector3(0, 100.f, 0), Vector3(0, 10, -1), "GameData//Image//player//PlayerSkin.tga");
 	P_Player.scale.Set(10, 10, 10);
+	P_Player.collisionMesh.Type = CollisionBox::CT_AABB;
+	P_Player.collisionMesh.Position = P_Player.pos;
+	P_Player.collisionMesh.ColBox.Set(6, 15, 6);
+	P_Player.collisionMesh.ColOffset.Set(0, 15, 0);
 
 	f_step = 0.f;
 
@@ -678,6 +682,8 @@ void mainscene::Init()
 	soundList[ST_WEAPON_KATANA] = SE_Engine.preloadSound("GameData//sounds//weapons//Katana.mp3");
 
 	soundList[ST_WEAPON_CLICK] = SE_Engine.preloadSound("GameData//sounds//weapons//empty.wav");
+
+	soundList[ST_AI_DEATH] = SE_Engine.preloadSound("GameData//sounds//other//ai_hit.mp3");
 
 	soundList[ST_CAMERA_SPOTTED] = SE_Engine.preloadSound("GameData//sounds//other//EnemySpotted.mp3");
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
@@ -759,6 +765,8 @@ bool mainscene::loadLevel(int level)
 		}
 		m_ParList.pop_back();
 	}
+
+	WO_END = NULL;
 
 	float worldsize = static_cast<float>(GAME_MAP.worldSize);
 	float worldHeight = static_cast<float>(GAME_MAP.worldHeight);
@@ -940,6 +948,20 @@ bool mainscene::loadLevel(int level)
 
 				m_goList.push_back(SC);
 			}
+			else if (GAME_MAP.map_data[y][x] == "EXIT")
+			{
+				WorldObject *WO;
+				WO = new WorldObject();
+				WO->active = true;
+				WO->colEnable = false;
+				WO->scale.Set(1, 1, 1);
+				WO->pos.Set(x*worldsize*2.f, 1, y*worldsize*2.f);
+				WO->collisionMesh.Type = CollisionBox::CT_SPHERE;
+				WO->collisionMesh.radius = 100.f;
+				WO->dynamicRendering = true;
+				WO->mesh = meshList[GEO_MP5K];
+				m_goList.push_back(WO);
+			}
 		}
 	}
 
@@ -1025,7 +1047,7 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	lights[0].position.y = worldHeight * 2.5f;
-
+	//Warning for end not defined
 	FPC.Init(P_Player.pos + P_Player.CamOffset, P_Player.pos + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
@@ -1159,7 +1181,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_KATANA].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
-	WO_presetList[WO_KATANA].range = 0.2f;
+	WO_presetList[WO_KATANA].range = 0.1f;
 
 	f_curRecoil = 0.f;
 }
@@ -1378,6 +1400,7 @@ void mainscene::UpdatePlayer(double &dt)
 	FPC = FPC + (P_Player.vel * static_cast<float>(tempDT));
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(tempDT);
+	P_Player.collisionMesh.Position = P_Player.pos;
 }
 
 /******************************************************************************/
@@ -1721,7 +1744,8 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 					if(ai->attackrate + WO->attackRate < timer)
 					{
 						ai->attackrate = timer;
-						Shoot(ai->pos + ai->CamOffset + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+						SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
+						Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
 					}
 				}
 			}
@@ -1735,20 +1759,16 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 			GameObject *go = (GameObject *)*it;
 			if (go->active)
 			{
-				if (intersect(ai->pos + Vector3(6, 30, 6), ai->pos + Vector3(-6, 0, -6), go->pos))
+				if (CollisionBox::checkCollision(ai->collisionMesh, go->collisionMesh))
 				{
 					if (go->vel.LengthSquared() > 2000)
 					{
 						BulletObject *BO = dynamic_cast<BulletObject*>(go);
 						if (BO != NULL)
 						{
-							for (unsigned i = 0; i < 5; ++i)
-							{
-								generateParticle(BO->pos, Vector3(0.2f, 0.2f, 0.2f), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) - BO->vel*0.01f, Vector3(0.f, 0.f, 0.f), Particle::PAR_SPARKS, 1.0f);
-							}
-
+							//AI DIES
+							SE_Engine.playSound2D(soundList[ST_AI_DEATH]);
 							BO->active = false;
-
 							CO->DropObject();
 							CO->active = false;
 							generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)));
@@ -1861,9 +1881,9 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 	BO->pos = Pos;
 	BO->vel = Dir * Speed;
 	BO->life = Longevity;
-	BO->collisionMesh.Type == CollisionBox::CT_AABB;
+	BO->collisionMesh.Type = CollisionBox::CT_SPHERE;
 	BO->colEnable = true;
-	BO->collisionMesh.ColBox.Set(0.5f, 0.5f, 0.5f);
+	BO->collisionMesh.radius = 1.f;
 	BO->scale.Set(0.5f, 0.5f, 0.5f);
 	if (!melee)
 	{
@@ -1871,6 +1891,7 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 	}
 	else
 	{
+		BO->collisionMesh.radius = 5.f;
 		BO->mesh = NULL;
 	}
 }
@@ -2129,13 +2150,7 @@ void mainscene::Update(double dt)
 
 		editFOV(f_fov);
 	}
-
-	if (Application::IsKeyPressed('1'))
-	{
-		GAMESTATE = GS_DEATH;
-		Application::SetCursor(true);
-	}
-
+	
 	if (Application::IsKeyPressed('2'))
 	{
 		if (!Application::IsKeyPressed(VK_SHIFT))
@@ -2156,6 +2171,7 @@ void mainscene::Update(double dt)
 	switch (GAMESTATE)
 	{
 	case mainscene::GS_PLAY:
+	{
 		UpdatePlayerPower(dt);
 		d_dt2 = dt;
 		timer += static_cast<float>(dt);
@@ -2177,7 +2193,18 @@ void mainscene::Update(double dt)
 			Application::SetCursor(true);
 			GAMESTATE = GS_PAUSED;
 		}
+
+		if (WO_END != NULL)
+		{
+			if (CollisionBox::checkCollision(WO_END->collisionMesh, P_Player.collisionMesh))
+			{
+				Application::SetCursor(true);
+				GAMESTATE = GS_END;
+			}
+		}
+
 		break;
+	}
 	case mainscene::GS_PAUSED:
 		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
 		{
@@ -2998,7 +3025,7 @@ void mainscene::RenderWorldShadow(void)
 			}
 			else
 			{
-				if (isVisible(FPC.position, FPC.target, f_fov, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 5000)//Dynamic rendering
+				if (isVisible(FPC.position, FPC.target, f_defaultfov, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 12000)//Dynamic rendering
 				{
 					CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
 					if (CO != NULL)

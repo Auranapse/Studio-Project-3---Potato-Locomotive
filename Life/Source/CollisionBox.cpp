@@ -174,9 +174,9 @@ bool CollisionBox::AABB_AABB(CollisionBox &CB1, CollisionBox &CB2)
 
 bool CollisionBox::AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
 {
-	float radius = CB2.ColBox.x;
-	Vector3 topRight = CB1.Position + CB1.ColBox;
-	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
+	float radius = CB2.radius;
+	Vector3 topRight = CB1.Position + CB1.ColBox + CB1.ColOffset;
+	Vector3 bottomLeft = CB1.Position - CB1.ColBox + CB1.ColOffset;
 	float DistanceBetween = 0;
 	float Temp;
 
@@ -224,8 +224,8 @@ bool CollisionBox::AABB_POINT(CollisionBox &CB1, CollisionBox &CB2)
 bool CollisionBox::AABB_RAY(CollisionBox &CB1, CollisionBox &CB2)
 {
 	//std::cout<<"RANAR!";
-	Vector3 topRight = CB1.Position + CB1.ColBox;
-	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
+	Vector3 topRight = CB1.Position + CB1.ColBox + CB1.ColOffset;;
+	Vector3 bottomLeft = CB1.Position - CB1.ColBox + CB1.ColOffset;;
 	float xmin, xmax, ymin, ymax, zmin, zmax;
 	if (CB2.Direction.x >= 0)
 	{
@@ -277,8 +277,8 @@ bool CollisionBox::AABB_RAY(CollisionBox &CB1, CollisionBox &CB2)
 
 bool CollisionBox::AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2)
 {
-	Vector3 topRight = CB1.Position + CB1.ColBox;
-	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
+	Vector3 topRight = CB1.Position + CB1.ColBox + CB1.ColOffset;;
+	Vector3 bottomLeft = CB1.Position - CB1.ColBox + CB1.ColOffset;;
 	Vector3 v1 = (topRight - bottomLeft) * 0.5f;
 
 	float rad = abs(CB2.planeNormal.x * v1.x) + abs(CB2.planeNormal.y * v1.y) + abs(CB2.planeNormal.z * v1.z);

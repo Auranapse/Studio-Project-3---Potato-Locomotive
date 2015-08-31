@@ -297,6 +297,8 @@ class mainscene : public Scene
 		ST_WEAPON_M9_SHOOT,
 		ST_WEAPON_KATANA,
 
+		ST_AI_DEATH,
+
 		ST_CAMERA_SPOTTED,
 		ST_CAMERA_FOUND,
 
@@ -387,6 +389,7 @@ private:
 	void UpdateCO(CharacterObject *CO, double &dt);
 
 	WorldObject *Floor, *Celling, *SWALL1, *SWALL2, *SWALL3, *SWALL4;
+	WorldObject *WO_END;
 
 	ItemObject IO_presetList[IO_TOTAL];
 	WeaponsObject WO_presetList[WO_TOTAL];
