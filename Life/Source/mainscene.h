@@ -446,7 +446,7 @@ private:
 	void generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel);
 	void UpdateParticles(double &dt);
 
-	void Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity = 10);
+	void Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity = 10, bool melee = false);
 	void weaponsUpdate(double &dt);
 
 	const int NUM_LIGHT_PARAM;

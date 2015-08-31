@@ -33,6 +33,7 @@ WeaponsObject::WeaponsObject()
 	AnimSpeed = 10.f;
 	animComplete = false;
 	timer = 0.f;
+	range = 5.f;
 }
 
 /******************************************************************************/

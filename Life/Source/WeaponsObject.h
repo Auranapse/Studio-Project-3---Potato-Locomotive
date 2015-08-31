@@ -31,6 +31,7 @@ public:
 	float adsZoom;
 	float bulletSpread;
 	float AnimSpeed;
+	float range;
 	int numBullet;
 	int CurrentClip;
 	

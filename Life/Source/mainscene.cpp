@@ -1146,6 +1146,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_M9].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_M9].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_M9].AttackSound = ST_WEAPON_M9_SHOOT;
+	WO_presetList[WO_M9].range = 5.f;
 
 	WO_presetList[WO_KATANA].active = true;
 	WO_presetList[WO_KATANA].mesh = meshList[GEO_KATANA];
@@ -1164,6 +1165,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_KATANA].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
+	WO_presetList[WO_KATANA].range = 0.2f;
 
 	f_curRecoil = 0.f;
 }
@@ -1839,7 +1841,7 @@ void mainscene::UpdateParticles(double &dt)
 Fires bullet
 */
 /******************************************************************************/
-void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity)
+void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float Longevity, bool melee)
 {
 	BulletObject *BO;
 	BO = FetchBullet();
@@ -1848,7 +1850,14 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 	BO->vel = Dir * Speed;
 	BO->life = Longevity;
 	BO->scale.Set(0.5f, 0.5f, 0.5f);
-	BO->mesh = meshList[GEO_BULLET];
+	if (!melee)
+	{
+		BO->mesh = meshList[GEO_BULLET];
+	}
+	else
+	{
+		BO->mesh = NULL;
+	}
 }
 
 /******************************************************************************/
@@ -1895,7 +1904,7 @@ void mainscene::weaponsUpdate(double &dt)
 							firerate = timer;
 							Vector3 ShootVector = FPC.target - FPC.position;
 							FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
-							Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, 6);
+							Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, WO->range);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
@@ -1915,6 +1924,10 @@ void mainscene::weaponsUpdate(double &dt)
 							isAttackPressed = true;
 							firerate = timer;
 							WO->toggleAnimation();
+
+							Vector3 ShootVector = FPC.target - FPC.position;
+							Shoot(FPC.position, ShootVector.Normalize(), 300.f, WO->range, true);
+
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 						}
 					}
@@ -2636,6 +2649,7 @@ void mainscene::RenderMeshin2D(Mesh *mesh, bool enableLight, float visibility, f
 	{
 		return;
 	}
+
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
@@ -2688,6 +2702,7 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 	{
 		return;
 	}
+
 	glUniform1i(m_parameters[U_GLOW], static_cast<GLint>(glow));
 	glUniform3fv(m_parameters[U_GLOW_COLOR], 1, &glowColor.r);
 	glUniform1i(m_parameters[U_TRANSPARENCY], static_cast<GLint>(visibility));
