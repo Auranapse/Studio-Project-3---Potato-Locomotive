@@ -670,7 +670,9 @@ void mainscene::Init()
 	soundList[ST_DEATH] = SE_Engine.preloadSound("GameData//sounds//effects//death.mp3");
 
 	soundList[ST_WALL_POWER_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_enter.mp3");
+	soundList[ST_WALL_POWER_ENTER]->setDefaultVolume(0.5f);
 	soundList[ST_WALL_POWER_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_exit.mp3");
+	soundList[ST_WALL_POWER_EXIT]->setDefaultVolume(0.5f);
 
 	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
 	soundList[ST_JUMP] = SE_Engine.preloadSound("GameData//sounds//other//jump.wav");
@@ -687,7 +689,7 @@ void mainscene::Init()
 	soundList[ST_WEAPON_CLICK] = SE_Engine.preloadSound("GameData//sounds//weapons//empty.wav");
 
 	soundList[ST_AI_DEATH] = SE_Engine.preloadSound("GameData//sounds//other//ai_hit.mp3");
-	soundList[ST_AI_DEATH]->setDefaultVolume(0.5f);
+	soundList[ST_AI_DEATH]->setDefaultMinDistance(100.f);
 
 	soundList[ST_AI_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//ai_alert.mp3");
 
@@ -750,6 +752,7 @@ bool mainscene::loadLevel(int level)
 	PowerActive = false;
 	f_powerTintSet = 0.f;
 	f_poweramount = 60.f;
+	f_playerHealthTint = 0.f;
 
 	while (m_goList.size() > 0)
 	{
@@ -1292,6 +1295,11 @@ void mainscene::UpdatePlayer(double &dt)
 		P_Player.f_movementSpeed = P_Player.f_move_walk;
 	}
 
+	if (f_poweramount < 20)
+	{
+		P_Player.f_movementSpeed *= 0.5f;
+	}
+
 	//Player movement
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 	{
@@ -1402,9 +1410,9 @@ void mainscene::UpdatePlayer(double &dt)
 				ItemObject *IO = (ItemObject *)*it;
 				if (IO->active && IO->holdable)
 				{
-					if (isVisible(FPC.position, FPC.target, 10, IO->pos))
+					if (isVisible(FPC.position, FPC.target, 15, IO->pos))
 					{
-						if (isVisible2(FPC.position, FPC.target, 10, IO->pos))
+						if (isVisible2(FPC.position, FPC.target, 15, IO->pos))
 						{
 							if ((IO->pos - P_Player.pos).LengthSquared() < 1500)
 							{
@@ -1580,11 +1588,11 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		if (f_poweramount < 20)
 		{
-			f_poweramount += static_cast<float>(d_dt) * 2.f;
+			f_poweramount += static_cast<float>(d_dt) * 1.2f;
 		}
 		else if (f_poweramount < 100)
 		{
-			f_poweramount += static_cast<float>(d_dt) * 4.f;
+			f_poweramount += static_cast<float>(d_dt) * 3.f;
 		}
 	}
 
@@ -1592,8 +1600,10 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		if (!SE_Engine.isSoundPlaying(soundList[ST_HEARTBEAT]))
 		{
-			SE_Engine.playSound2D(soundList[ST_HEARTBEAT]);
+			SE_Engine.playSound2D(soundList[ST_HEARTBEAT], false, true, true);
 		}
+
+		f_playerHealthTint = 100.f - (f_poweramount * 5.f);
 	}
 
 	if (f_powerTint != f_powerTintSet)
@@ -1806,7 +1816,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 						if (BO != NULL)
 						{
 							//AI DIES
-							SE_Engine.playSound2D(soundList[ST_AI_DEATH]);
+							SE_Engine.playSound3D(soundList[ST_AI_DEATH], CO->pos);
 							BO->active = false;
 							CO->DropObject();
 							CO->active = false;
@@ -2352,8 +2362,6 @@ void mainscene::Update(double dt)
 		}
 		break;
 	case GS_DEATH:
-		f_powerTintSet = 100.f;
-		c_powerColor.Set(0.5f, 0.f, 0.f);
 		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
 		{
 			isEscPressed = true;
@@ -2377,8 +2385,6 @@ void mainscene::Update(double dt)
 			}
 			else if (FetchBUTTON("Try again")->active)
 			{
-				f_powerTint = 0.f;
-				f_powerTintSet = 0.f;
 				loadLevel(currentLevel);
 				Application::SetCursor(false);
 				Application::SetMouseinput(Application::GetWindowWidth()*0.5, Application::GetWindowHeight()*0.5);
@@ -2387,21 +2393,6 @@ void mainscene::Update(double dt)
 			else if (FetchBUTTON("Quit")->active)
 			{
 				e_nextScene = Application::E_SCENE_QUIT;
-			}
-		}
-
-		//SCREEN COLOUR
-		if (f_powerTint != f_powerTintSet)
-		{
-			float diff = f_powerTintSet - f_powerTint;
-
-			if (diff < 0.01 && diff > -0.01)
-			{
-				f_powerTint = f_powerTintSet;
-			}
-			else
-			{
-				f_powerTint += diff * static_cast<float>(d_dt) * 10.f;
 			}
 		}
 		break;
@@ -3117,9 +3108,9 @@ void mainscene::RenderUI(void)
 	{
 	case mainscene::GS_DEATH:
 		modelStack.PushMatrix();
-		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
 		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
 		modelStack.PopMatrix();
 		break;
 	case mainscene::GS_PLAY:
@@ -3131,6 +3122,12 @@ void mainscene::RenderUI(void)
 		modelStack.PopMatrix();
 		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
 
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
+		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
+		modelStack.PopMatrix();
+				
 		if (P_Player.holding != NULL)
 		{
 			if (P_Player.holding->isGun)

@@ -40,8 +40,8 @@ Initialise the sound engine
 void SoundEngine::Init(void)
 {
 	engine = createIrrKlangDevice(ESOD_AUTO_DETECT, ESEO_MULTI_THREADED | ESEO_LOAD_PLUGINS | ESEO_USE_3D_BUFFERS);
+	f_distortionEffect = -30.f;
 	distortionEnabled = false;
-	f_distortionEffect = 0.f;
 }
 
 /******************************************************************************/
@@ -102,10 +102,10 @@ the sound source to play
 if true, will loop the sound
 */
 /******************************************************************************/
-void SoundEngine::playSound2D(ISoundSource* sound, bool loop, bool effects)
+void SoundEngine::playSound2D(ISoundSource* sound, bool loop, bool effects, bool distortionOverwrite)
 {
 	ISound *snd = engine->play2D(sound, loop, false, false, effects);
-	if (distortionEnabled)
+	if (distortionEnabled || distortionOverwrite)
 	{
 		if (snd)
 		{
@@ -130,11 +130,11 @@ the sound source to play
 if true, will loop the sound
 */
 /******************************************************************************/
-void SoundEngine::playSound3D(ISoundSource* sound, Vector3 &pos, bool loop, bool effects)
+void SoundEngine::playSound3D(ISoundSource* sound, Vector3 &pos, bool loop, bool effects, bool distortionOverwrite)
 {
 	ISound *snd = engine->play3D(sound, vec3df(pos.x, pos.y, pos.z), loop, false, false, effects);
 
-	if (distortionEnabled)
+	if (distortionEnabled || distortionOverwrite)
 	{
 		if (snd)
 		{
