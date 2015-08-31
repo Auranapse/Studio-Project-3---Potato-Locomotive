@@ -10,6 +10,7 @@ Game Object base class
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#include "CollisionBox.h"
 #include "Vector3.h"
 #include "Mesh.h"
 
@@ -20,8 +21,8 @@ public:
 	Vector3 vel;
 	Vector3 scale;
 	Vector3 rotation;
-	Vector3 ColBox;
-	Vector3 ColBoxOffset;
+	CollisionBox collisionMesh;
+
 	bool active;
 	bool enablePhysics;
 	bool colEnable;

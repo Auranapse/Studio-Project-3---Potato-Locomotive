@@ -18,6 +18,11 @@ Default constructor
 Player::Player()
 {
 	CamOffset.Set(0, 25, 0);
+	//f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
+	f_move_crawl = 150.f;
+	f_move_walk = 700.f;
+	f_move_run = 1200.f;
+	f_movementSpeed = f_move_walk;
 }
 
 /******************************************************************************/
@@ -34,26 +39,6 @@ Player::~Player()
 /******************************************************************************/
 /*!
 \brief
-makes player run/walk
-\param forward
-if true will run, else walk
-*/
-/******************************************************************************/
-void Player::movementRW(bool run)
-{
-	if (run)
-	{
-		f_movementSpeed = f_move_run;
-	}
-	else
-	{
-		f_movementSpeed = f_move_walk;
-	}
-}
-
-/******************************************************************************/
-/*!
-\brief
 moves player forward/back
 \param forward
 if true will move forward, else back
@@ -63,11 +48,11 @@ void Player::movementFB(double &dt, bool forward)
 {
 	if (forward)
 	{
-		Velocity += (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 	else
 	{
-		Velocity -= (getDirection().Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel -= (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
 	}
 }
 
@@ -81,7 +66,14 @@ if true will move left, else right
 /******************************************************************************/
 void Player::movementLR(double &dt, bool left)
 {
-	
+	if (left)
+	{
+		vel -= (getDirection(true).Cross(Vector3(0, 1, 0)).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
+	else
+	{
+		vel += (getDirection(true).Cross(Vector3(0, 1, 0)).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+	}
 }
 
 /******************************************************************************/
@@ -94,6 +86,6 @@ delta time
 /******************************************************************************/
 void Player::Update(double &dt)
 {
-	Animation.Update(dt, Vector3(Velocity.x, 0, Velocity.z).LengthSquared()*0.03f);
-	Position += Velocity * static_cast<float>(dt);
+	Animation.Update(dt, Vector3(vel.x, 0, vel.z).LengthSquared()*0.03f);
+	pos += vel * static_cast<float>(dt);
 }

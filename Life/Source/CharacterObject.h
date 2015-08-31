@@ -10,6 +10,7 @@ Character Object used by AI and player
 #ifndef CHARACTEROBJECT_H
 #define CHARACTEROBJECT_H
 
+#include "GameObject.h"
 #include "Mesh.h"
 #include "MeshBuilder.h"
 #include "LoadOBJ.h"
@@ -20,7 +21,7 @@ Character Object used by AI and player
 #include "Mtx44.h"
 #include "GabrielDLC.h"
 
-class CharacterObject
+class CharacterObject : public GameObject
 {
 protected:
 	/******************************************************************************/
@@ -30,15 +31,7 @@ protected:
 	*/
 	/******************************************************************************/
 	Anim4 Animation;
-
-	/******************************************************************************/
-	/*!
-	\brief
-	Position of the character
-	*/
-	/******************************************************************************/
-	Vector3 Position;
-
+	
 	/******************************************************************************/
 	/*!
 	\brief
@@ -63,23 +56,7 @@ public:
 	*/
 	/******************************************************************************/
 	Vector3 defaultLookat;
-
-	/******************************************************************************/
-	/*!
-	\brief
-	Character velocity
-	*/
-	/******************************************************************************/
-	Vector3 Velocity;
-
-	/******************************************************************************/
-	/*!
-	\brief
-	Scale of the character
-	*/
-	/******************************************************************************/
-	Vector3 Scale;
-
+	
 	/******************************************************************************/
 	/*!
 	\brief
@@ -127,8 +104,6 @@ public:
 	float f_movementSpeed;
 
 	Anim4 getAnimation(void);
-	void setPosition(Vector3 &newpos);
-	Vector3 getPosition(void);
 	Vector3 getDirection(bool XZ = false);
 
 	ItemObject *holding;
@@ -137,7 +112,6 @@ public:
 	void HoldObject(ItemObject *obj);
 	void DropObject(const Vector3 &ThrowVel = Vector3(0, 0, 0));
 	virtual void Update(const double &dt);
-	bool active;
 
 	CharacterObject();
 	~CharacterObject();

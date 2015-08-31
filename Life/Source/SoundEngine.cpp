@@ -17,7 +17,7 @@ Default constructor
 /******************************************************************************/
 SoundEngine::SoundEngine()
 {
-	
+
 }
 
 /******************************************************************************/
@@ -28,7 +28,7 @@ Default destructor
 /******************************************************************************/
 SoundEngine::~SoundEngine()
 {
-	
+
 }
 
 /******************************************************************************/
@@ -64,6 +64,21 @@ ISoundSource* SoundEngine::preloadSound(const char* dir)
 /******************************************************************************/
 /*!
 \brief
+Checks if a sound is currently playing in runtime
+\param sound
+the pointer to the sound source
+\return
+returns true if it is still playing
+*/
+/******************************************************************************/
+bool SoundEngine::isSoundPlaying(ISoundSource *sound)
+{
+	return engine->isCurrentlyPlaying(sound);
+}
+
+/******************************************************************************/
+/*!
+\brief
 Enables or disables distortion effect
 \param enable
 if true will enable effect
@@ -87,9 +102,9 @@ the sound source to play
 if true, will loop the sound
 */
 /******************************************************************************/
-void SoundEngine::playSound2D(ISoundSource* sound, bool loop)
+void SoundEngine::playSound2D(ISoundSource* sound, bool loop, bool effects)
 {
-	ISound *snd = engine->play2D(sound, loop, false, false, true);
+	ISound *snd = engine->play2D(sound, loop, false, false, effects);
 	if (distortionEnabled)
 	{
 		if (snd)
@@ -115,10 +130,10 @@ the sound source to play
 if true, will loop the sound
 */
 /******************************************************************************/
-void SoundEngine::playSound3D(ISoundSource* sound, Vector3 &pos, bool loop)
+void SoundEngine::playSound3D(ISoundSource* sound, Vector3 &pos, bool loop, bool effects)
 {
-	ISound *snd = engine->play3D(sound, vec3df(pos.x, pos.y, pos.z), loop, false, false, true);
-	
+	ISound *snd = engine->play3D(sound, vec3df(pos.x, pos.y, pos.z), loop, false, false, effects);
+
 	if (distortionEnabled)
 	{
 		if (snd)

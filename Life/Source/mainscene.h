@@ -279,13 +279,18 @@ class mainscene : public Scene
 	enum SOUND_TYPE
 	{
 		ST_STEP,
-		ST_STEP_2,
+		ST_JUMP,
+		ST_LAND,
 		ST_BUZZER,
 		ST_ALERT,
 		ST_BACKGROUND,
 
 		ST_SLOWMO_ENTER,
 		ST_SLOWMO_EXIT,
+		ST_HEARTBEAT,
+
+		ST_WALL_POWER_ENTER,
+		ST_WALL_POWER_EXIT,
 
 		ST_WEAPON_CLICK,
 		ST_WEAPON_M9_SHOOT,
@@ -373,10 +378,12 @@ private:
 	irrklang::ISoundSource *soundList[ST_TOTAL];
 
 	Mesh* meshList[NUM_GEOMETRY];
-	std::vector<SecurityCam*> m_ScamList;
-	std::vector<CharacterObject*> m_charList;
 	std::vector<GameObject*> m_goList;
 	std::vector<Particle*> m_ParList;
+
+	void UpdateGO(double &dt);
+	void UpdateBO(BulletObject *BO, double &dt);
+	void UpdateCO(CharacterObject *CO, double &dt);
 
 	WorldObject *Floor, *Celling, *SWALL1, *SWALL2, *SWALL3, *SWALL4;
 
@@ -424,6 +431,7 @@ private:
 	float f_powerTint;
 	float f_powerTintSet;
 	Color c_powerColor;
+	float f_poweramount;
 
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);
@@ -434,7 +442,6 @@ private:
 	void UpdateSound(double &dt);
 	void UpdatePlayer(double &dt);
 	void UpdatePlayerPower(double &dt);
-	void UpdateGO(double &dt);
 	void generateParticle(Vector3 &Pos, Vector3 &scale, Vector3 &Velocity, Vector3 &Rotation = Vector3(0.f, 0.f, 0.f), int type = Particle::PAR_MESH, float lifetime = 5.f, Mesh *mesh = NULL);
 	void generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel);
 	void UpdateParticles(double &dt);
@@ -459,6 +466,7 @@ private:
 	void RenderSkybox(void);
 	void RenderUI(void);
 	void RenderAIDebugging(CharacterObject * CO);
+	void RenderSCDebugging(SecurityCam * SC);
 	bool collide(Vector3 &Position);
 	bool collideGO(GameObject *go, GameObject *go2);
 	MS modelStack, viewStack, projectionStack;

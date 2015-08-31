@@ -86,6 +86,7 @@ bool MapLoader::loadMap(std::string file)
 	}
 
 	worldSize = static_cast<float>(std::stoi(map_data[0][0]));
+	worldHeight = static_cast<float>(std::stoi(map_data[0][1]));
 
 	map_height = map_data.size();
 	return true;

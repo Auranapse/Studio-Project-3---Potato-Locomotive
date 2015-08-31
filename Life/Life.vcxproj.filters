@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Character">
-      <UniqueIdentifier>{8b712a6c-abb2-4bfd-be26-cdc21dd5b206}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Scenes">
       <UniqueIdentifier>{d6193425-76bf-4f0d-a032-4c13a2528bff}</UniqueIdentifier>
     </Filter>
@@ -39,9 +36,6 @@
     </Filter>
     <Filter Include="Header Files\Save/Load">
       <UniqueIdentifier>{19437899-3363-40c7-9ed9-42c75c239848}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Character">
-      <UniqueIdentifier>{f299ad50-7261-4260-b481-f6e4c5ed3b9a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Visuals">
       <UniqueIdentifier>{82555ad9-3d9a-4376-bd6d-586d09c5f361}</UniqueIdentifier>
@@ -97,6 +91,12 @@
     <Filter Include="Source Files\Assets\NonLiving">
       <UniqueIdentifier>{2ddf455c-cb7a-4291-a0b6-30f9b4d44fb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GameObject\Character">
+      <UniqueIdentifier>{8b712a6c-abb2-4bfd-be26-cdc21dd5b206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObject\Character">
+      <UniqueIdentifier>{f299ad50-7261-4260-b481-f6e4c5ed3b9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -109,10 +109,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\CharacterObject.cpp">
-      <Filter>Source Files\Character</Filter>
+      <Filter>Source Files\GameObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Anim4.cpp">
-      <Filter>Source Files\Character</Filter>
+      <Filter>Source Files\GameObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\MenuScene.cpp">
       <Filter>Source Files\Scenes</Filter>
@@ -154,7 +154,7 @@
       <Filter>Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp">
-      <Filter>Source Files\Character</Filter>
+      <Filter>Source Files\GameObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\DepthFBO.cpp">
       <Filter>Source Files\Visuals</Filter>
@@ -175,10 +175,10 @@
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI.cpp">
-      <Filter>Source Files\Character</Filter>
+      <Filter>Source Files\GameObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Strategy.cpp">
-      <Filter>Source Files\Character</Filter>
+      <Filter>Source Files\GameObject\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\WeaponsObject.cpp">
       <Filter>Source Files\GameObject</Filter>
@@ -243,14 +243,20 @@
     <ClCompile Include="Source\SoundEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\aPlayer.cpp">
       <Filter>Source Files\Assets\Living</Filter>
     </ClCompile>
     <ClCompile Include="Source\BulletObject.cpp">
       <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Weapon.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Wall.cpp">
+      <Filter>Source Files\Assets\NonLiving</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneManager.cpp">
+      <Filter>Source Files\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -264,10 +270,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\CharacterObject.h">
-      <Filter>Header Files\Character</Filter>
+      <Filter>Header Files\GameObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Anim4.h">
-      <Filter>Header Files\Character</Filter>
+      <Filter>Header Files\GameObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\mainscene.h">
       <Filter>Header Files\Scenes</Filter>
@@ -312,7 +318,7 @@
       <Filter>Header Files\Visuals\Mesh\Model/Texture</Filter>
     </ClInclude>
     <ClInclude Include="Source\Player.h">
-      <Filter>Header Files\Character</Filter>
+      <Filter>Header Files\GameObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\GBuffer.h">
       <Filter>Header Files\Visuals</Filter>
@@ -339,10 +345,10 @@
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\AI.h">
-      <Filter>Header Files\Character</Filter>
+      <Filter>Header Files\GameObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Strategy.h">
-      <Filter>Header Files\Character</Filter>
+      <Filter>Header Files\GameObject\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\WeaponsObject.h">
       <Filter>Header Files\GameObject</Filter>
@@ -389,9 +395,6 @@
     <ClInclude Include="Source\Asset.h">
       <Filter>Header Files\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\NonLiving.h">
       <Filter>Header Files\Assets\NonLiving</Filter>
     </ClInclude>
@@ -418,6 +421,15 @@
     </ClInclude>
     <ClInclude Include="Source\BulletObject.h">
       <Filter>Header Files\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Wall.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Weapon.h">
+      <Filter>Header Files\Assets\NonLiving</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneManager.h">
+      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

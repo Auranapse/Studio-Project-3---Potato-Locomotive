@@ -29,6 +29,7 @@ bool Vector3::IsEqual(float a, float b) const
 /******************************************************************************/
 Vector3::Vector3(float a, float b, float c) : x(a), y(b), z(c)
 {
+
 }
 
 /******************************************************************************/
@@ -41,6 +42,7 @@ Vector3::Vector3(float a, float b, float c) : x(a), y(b), z(c)
 /******************************************************************************/
 Vector3::Vector3(const Vector3 &rhs) : x(rhs.x), y(rhs.y), z(rhs.z)
 {
+
 }
 
 /******************************************************************************/
@@ -50,6 +52,7 @@ Vector3::Vector3(const Vector3 &rhs) : x(rhs.x), y(rhs.y), z(rhs.z)
 /******************************************************************************/
 Vector3::~Vector3()
 {
+
 }
 
 /******************************************************************************/
@@ -186,6 +189,7 @@ operator* overload for scalar multiplication
 \exception None
 \return Resulting vector
 */
+/******************************************************************************/
 Vector3 Vector3::operator*( float scalar ) const
 {
 	return Vector3(scalar * x, scalar * y, scalar * z);
@@ -221,6 +225,7 @@ operator* overload for scalar division
 \exception None
 \return Resulting vector
 */
+/******************************************************************************/
 Vector3 Vector3::operator/( float scalar ) const
 {
 	return Vector3(scalar / x, scalar / y, scalar / z);

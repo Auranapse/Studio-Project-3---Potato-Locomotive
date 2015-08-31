@@ -29,6 +29,7 @@ public:
 	unsigned int map_height;
 	unsigned int map_width;
 	float worldSize;
+	float worldHeight;
 
 	bool fileExists(std::string file);
 	bool loadMap(std::string file);

@@ -27,9 +27,10 @@ public:
 	ISoundSource* preloadSound(const char* dir);
 
 
+	bool isSoundPlaying(ISoundSource* sound);
 	void effectDistortion(bool enable, float gain = 0.f);
-	void playSound2D(ISoundSource* sound, bool loop = false);
-	void playSound3D(ISoundSource* sound, Vector3 &pos, bool loop = false);
+	void playSound2D(ISoundSource* sound, bool loop = false, bool effects = true);
+	void playSound3D(ISoundSource* sound, Vector3 &pos, bool loop = false, bool effects = true);
 
 	
 	void Init(void);

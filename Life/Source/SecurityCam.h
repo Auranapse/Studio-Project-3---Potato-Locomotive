@@ -18,12 +18,24 @@ public:
 	SecurityCam(void);
 	~SecurityCam(void);
 
-	void update(const double &dt, Vector3 &playerPos, std::vector<CharacterObject*> charList);
-	float getAngle();
+	void setRotationAngle(float f_rotationAngle);
+	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);
+	void CollisionChecking(std::vector<GameObject *> &m_goList);
+
 	CAMERA_STATE getState();
-private:
-	float angle;
+	float getCameraFOV();
+	float getCameraRange();
 	Vector3 Lookat;
+	float offsetY;
+private:
 	CAMERA_STATE c_State;
+
+	float alerttimer;
+	bool rotationState;
+	float f_rotationLimiter;
+	float f_rotationAngle;
+	bool b_alertAI;
+	static float f_cameraFOV;
+	static float f_cameraRange;
 };
 
