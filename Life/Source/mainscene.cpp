@@ -1563,9 +1563,9 @@ delta time
 /******************************************************************************/
 void mainscene::UpdateGO(double &dt)
 {
-	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	for (unsigned i = 0; i < m_goList.size(); ++i)
 	{
-		GameObject *go = (GameObject *)*it;
+		GameObject *go = m_goList[i];
 		if (go->active)
 		{
 			go->collisionMesh.Position = go->pos;
@@ -1713,6 +1713,22 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
+		if(ai->getState() == AI::ATTACK)
+		{
+			if(ai->holding != NULL)
+			{
+				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(ai->holding);
+				if(WO != NULL)
+				{
+					if(ai->attackrate + WO->attackRate < timer)
+					{
+						ai->attackrate = timer;
+						Shoot(ai->pos + ai->CamOffset + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+					}
+				}
+			}
+		}
+
 		ai->Update(dt, P_Player.pos, m_goList);
 
 		//Temp collision for AI to weapon
@@ -1847,6 +1863,9 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 	BO->pos = Pos;
 	BO->vel = Dir * Speed;
 	BO->life = Longevity;
+	BO->collisionMesh.Type == CollisionBox::CT_AABB;
+	BO->colEnable = true;
+	BO->collisionMesh.ColBox.Set(0.5f, 0.5f, 0.5f);
 	BO->scale.Set(0.5f, 0.5f, 0.5f);
 	if (!melee)
 	{

@@ -22,7 +22,8 @@ Default constructor
 */
 /******************************************************************************/
 AI::AI() :
-f_alert_timer(0.f)
+f_alert_timer(0.f),
+attackrate(0.f)
 {
 
 }

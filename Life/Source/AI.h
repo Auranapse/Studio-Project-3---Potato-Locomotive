@@ -62,6 +62,7 @@ public:
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
 	void setDestination(const Vector3 &destination);
+	float attackrate;
 private:
 	//-------------------------------------Variables------------------------------------------------
 	E_AI_STATE e_State;
