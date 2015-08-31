@@ -689,8 +689,6 @@ void mainscene::Init()
 
 
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
-	std::cout<<PlayerSound->getSoundRadius();
-
 }
 
 /******************************************************************************/
@@ -2341,7 +2339,11 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	CheckPlayerSound();
+	//CheckPlayerSound();
+
+	if (CollisionBetween(Vector3(0,0,0), Vector3(100,0,100)))
+		std::cout<<"TRIPPED!";
+
 }
 
 /******************************************************************************/
@@ -3478,12 +3480,19 @@ bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
-		if (go->collisionMesh.Position != NULL)
+		if (go->active)
 		{
-			if (go->active)
+			AI *ai = dynamic_cast<AI*>(go);
+			
+			if(ai != NULL)
 			{
+				//std::cout<<go->collisionMesh.Type<<"A\n";
+				//std::cout<<Ray.Type<<"R\n";
 				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
+				{
+					//std::cout<<"CHECK!"<<go->collisionMesh.Type<<Ray.Type;
 					return true;
+				}
 			}
 		}
 	}

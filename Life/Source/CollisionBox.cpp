@@ -17,44 +17,46 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	c1 = (CB1.Type < CB2.Type) ? (c1 = CB1.Type) : (c1 = CB2.Type);
 	c2 = (CB2.Type > CB1.Type) ? (c2 = CB2.Type) : (c2 = CB1.Type);
 
+	CollisionBox T1 = CB1;
+	CollisionBox T2 = CB2;
+
 	if (CB2.Type < CB1.Type)
 	{
-		COLLISION_TYPE Temp = CB1.Type;
-		CB1.Type = CB2.Type;
-		CB2.Type = Temp;
+		COLLISION_TYPE Temp = T1.Type;
+		T1.Type = T2.Type;
+		T2.Type = Temp;
 	}
-	//std::cout<<"CHECK!"<<c1<<c2;
-	switch (c1)
+	switch (T1.Type)
 	{
 	default:
 	case 0:
 	{
-		switch (c2)
+		switch (T2.Type)
 		{
 		default:
 		case 0://AABB to AABB Collision
 		{
-			return AABB_AABB(CB1, CB2);
+			return AABB_AABB(T1, T2);
 			break;
 		}
 		case 1://AABB to Sphere Collision
 		{
-			return AABB_SPHERE(CB1, CB2);
+			return AABB_SPHERE(T1, T2);
 			break;
 		}
 		case 2://AABB to Point Collision
 		{
-			return AABB_POINT(CB1, CB2);
+			return AABB_POINT(T1, T2);
 			break;
 		}
 		case 3://AABB to Ray Collision
 		{
-			return AABB_RAY(CB1, CB2);
+			return AABB_RAY(T1, T2);
 			break;
 		}
 		case 4://AABB to Plane Collision
 		{
-			return AABB_PLANE(CB1, CB2);
+			return AABB_PLANE(T1, T2);
 			break;
 		}
 		}
@@ -62,27 +64,27 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	}
 	case 1:
 	{
-		switch (c2)
+		switch (T2.Type)
 		{
 		default:
 		case 1://Sphere To Sphere Collision
 		{
-			return SPHERE_SPHERE(CB1, CB2);
+			return SPHERE_SPHERE(T1, T2);
 			break;
 		}
 		case 2://Sphere To Point Collision
 		{
-			return SPHERE_POINT(CB1, CB2);
+			return SPHERE_POINT(T1, T2);
 			break;
 		}
 		case 3://Sphere To Ray Collision
 		{
-			return SPHERE_RAY(CB1, CB2);
+			return SPHERE_RAY(T1, T2);
 			break;
 		}
 		case 4://Sphere To Plane Collision
 		{
-			return SPHERE_PLANE(CB1, CB2);
+			return SPHERE_PLANE(T1, T2);
 			break;
 		}
 		}
@@ -90,22 +92,22 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	}
 	case 2:
 	{
-		switch (c2)
+		switch (T2.Type)
 		{
 		default:
 		case 2://Point To Point Collision
 		{
-			return POINT_POINT(CB1, CB2);
+			return POINT_POINT(T1, T2);
 			break;
 		}
 		case 3://Point To Ray Collision
 		{
-			return POINT_RAY(CB1, CB2);
+			return POINT_RAY(T1, T2);
 			break;
 		}
 		case 4://Point To Plane Collision
 		{
-			return POINT_PLANE(CB1, CB2);
+			return POINT_PLANE(T1, T2);
 			break;
 		}
 		}
@@ -113,17 +115,17 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	}
 	case 3:
 	{
-		switch (c2)
+		switch (T2.Type)
 		{
 		default:
 		case 3://Point To Ray Collision
 		{
-			return RAY_RAY(CB1, CB2);
+			return RAY_RAY(T1, T2);
 			break;
 		}
 		case 4://Point To Plane Collision
 		{
-			return RAY_PLANE(CB1, CB2);
+			return RAY_PLANE(T1, T2);
 			break;
 		}
 		}
@@ -131,12 +133,12 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 	}
 	case 4:
 	{
-		switch (c2)
+		switch (T2.Type)
 		{
 		default:
 		case 4://Point To Plane Collision
 		{
-			return PLANE_PLANE(CB1, CB2);
+			return PLANE_PLANE(T1, T2);
 			break;
 		}
 		}
@@ -221,6 +223,7 @@ bool CollisionBox::AABB_POINT(CollisionBox &CB1, CollisionBox &CB2)
 
 bool CollisionBox::AABB_RAY(CollisionBox &CB1, CollisionBox &CB2)
 {
+	//std::cout<<"RANAR!";
 	Vector3 topRight = CB1.Position + CB1.ColBox;
 	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
 	float xmin, xmax, ymin, ymax, zmin, zmax;
