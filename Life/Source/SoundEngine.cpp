@@ -152,6 +152,17 @@ void SoundEngine::playSound3D(ISoundSource* sound, Vector3 &pos, bool loop, bool
 /******************************************************************************/
 /*!
 \brief
+Stops playing all sounds
+*/
+/******************************************************************************/
+void SoundEngine::stopAllSounds(void)
+{
+	engine->stopAllSounds();
+}
+
+/******************************************************************************/
+/*!
+\brief
 Updates engine effects
 */
 /******************************************************************************/

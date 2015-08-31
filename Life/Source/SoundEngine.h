@@ -31,7 +31,7 @@ public:
 	void effectDistortion(bool enable, float gain = 0.f);
 	void playSound2D(ISoundSource* sound, bool loop = false, bool effects = true);
 	void playSound3D(ISoundSource* sound, Vector3 &pos, bool loop = false, bool effects = true);
-
+	void stopAllSounds(void);
 	
 	void Init(void);
 	void Update(void);

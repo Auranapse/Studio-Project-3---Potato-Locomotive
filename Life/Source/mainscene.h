@@ -288,7 +288,10 @@ class mainscene : public Scene
 
 		ST_SLOWMO_ENTER,
 		ST_SLOWMO_EXIT,
+
 		ST_HEARTBEAT,
+		ST_BREATHING,
+		ST_DEATH,
 
 		ST_WALL_POWER_ENTER,
 		ST_WALL_POWER_EXIT,
@@ -298,6 +301,7 @@ class mainscene : public Scene
 		ST_WEAPON_KATANA,
 
 		ST_AI_DEATH,
+		ST_AI_ALERT,
 
 		ST_CAMERA_SPOTTED,
 		ST_CAMERA_FOUND,

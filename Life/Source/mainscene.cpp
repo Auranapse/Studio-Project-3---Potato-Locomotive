@@ -664,8 +664,10 @@ void mainscene::Init()
 
 	soundList[ST_SLOWMO_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_enter.mp3");
 	soundList[ST_SLOWMO_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//slowmo_exit.mp3");
+
 	soundList[ST_HEARTBEAT] = SE_Engine.preloadSound("GameData//sounds//effects//heartbeat.mp3");
-	soundList[ST_HEARTBEAT]->setDefaultVolume(0.5f);
+	soundList[ST_BREATHING] = SE_Engine.preloadSound("GameData//sounds//effects//breathing.mp3");
+	soundList[ST_DEATH] = SE_Engine.preloadSound("GameData//sounds//effects//death.mp3");
 
 	soundList[ST_WALL_POWER_ENTER] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_enter.mp3");
 	soundList[ST_WALL_POWER_EXIT] = SE_Engine.preloadSound("GameData//sounds//effects//wall_power_exit.mp3");
@@ -678,12 +680,16 @@ void mainscene::Init()
 
 	soundList[ST_WEAPON_M9_SHOOT] = SE_Engine.preloadSound("GameData//sounds//weapons//M9//FIRE.wav");
 	soundList[ST_WEAPON_M9_SHOOT]->setDefaultVolume(0.3f);
+	soundList[ST_WEAPON_M9_SHOOT]->setDefaultMinDistance(1000.f);
 
 	soundList[ST_WEAPON_KATANA] = SE_Engine.preloadSound("GameData//sounds//weapons//Katana.mp3");
 
 	soundList[ST_WEAPON_CLICK] = SE_Engine.preloadSound("GameData//sounds//weapons//empty.wav");
 
 	soundList[ST_AI_DEATH] = SE_Engine.preloadSound("GameData//sounds//other//ai_hit.mp3");
+	soundList[ST_AI_DEATH]->setDefaultVolume(0.5f);
+
+	soundList[ST_AI_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//ai_alert.mp3");
 
 	soundList[ST_CAMERA_SPOTTED] = SE_Engine.preloadSound("GameData//sounds//other//EnemySpotted.mp3");
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
@@ -738,6 +744,7 @@ bool mainscene::loadLevel(int level)
 	SWALL4 = NULL;
 
 	f_targetfov = f_defaultfov;
+	P_Player.active = false;
 	P_Player.vel.SetZero();
 	P_Player.DropObject();
 	PowerActive = false;
@@ -785,7 +792,9 @@ bool mainscene::loadLevel(int level)
 
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
+				P_Player.active = true;
 				P_Player.pos.Set(x*worldsize*2.f, 5.f, y*worldsize*2.f);
+				P_Player.collisionMesh.Position = P_Player.pos;
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'I')
 			{
@@ -957,9 +966,11 @@ bool mainscene::loadLevel(int level)
 				WO->scale.Set(1, 1, 1);
 				WO->pos.Set(x*worldsize*2.f, 1, y*worldsize*2.f);
 				WO->collisionMesh.Type = CollisionBox::CT_SPHERE;
-				WO->collisionMesh.radius = 100.f;
+				WO->collisionMesh.radius = 10.f;
+				WO->collisionMesh.Position = WO->pos;
 				WO->dynamicRendering = true;
 				WO->mesh = meshList[GEO_MP5K];
+				WO_END = WO;
 				m_goList.push_back(WO);
 			}
 		}
@@ -1047,7 +1058,17 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	lights[0].position.y = worldHeight * 2.5f;
-	//Warning for end not defined
+	
+	if (!P_Player.active)
+	{
+		std::cout << "!!! Warning !!! No player spawn location is found.\n";
+	}
+
+	if (WO_END == NULL)
+	{
+		std::cout << "!!! Warning !!! No exit is found.\n";
+	}
+
 	FPC.Init(P_Player.pos + P_Player.CamOffset, P_Player.pos + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
@@ -1397,6 +1418,15 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
+	if (f_poweramount < 0)
+	{
+		SE_Engine.stopAllSounds();
+		SE_Engine.effectDistortion(false);
+		SE_Engine.playSound2D(soundList[ST_DEATH]);
+		Application::SetCursor(true);
+		GAMESTATE = GS_DEATH;
+	}
+
 	FPC = FPC + (P_Player.vel * static_cast<float>(tempDT));
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(tempDT);
@@ -1485,7 +1515,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		abilityPressed_2 = false;
 	}
-
+	
 	if (PowerActive)
 	{
 		switch (CurrentPower)
@@ -1506,9 +1536,10 @@ void mainscene::UpdatePlayerPower(double &dt)
 					dt = d_dt;
 				}
 			}
-			if (!SE_Engine.isSoundPlaying(soundList[ST_HEARTBEAT]))
+			
+			if (!SE_Engine.isSoundPlaying(soundList[ST_BREATHING]))
 			{
-				SE_Engine.playSound2D(soundList[ST_HEARTBEAT]);
+				SE_Engine.playSound2D(soundList[ST_BREATHING]);
 			}
 
 			if (f_poweramount <= 0)
@@ -1549,11 +1580,19 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		if (f_poweramount < 20)
 		{
-			f_poweramount += static_cast<float>(d_dt);
+			f_poweramount += static_cast<float>(d_dt) * 2.f;
 		}
 		else if (f_poweramount < 100)
 		{
-			f_poweramount += static_cast<float>(d_dt) * 2.f;
+			f_poweramount += static_cast<float>(d_dt) * 4.f;
+		}
+	}
+
+	if (f_poweramount < 20)
+	{
+		if (!SE_Engine.isSoundPlaying(soundList[ST_HEARTBEAT]))
+		{
+			SE_Engine.playSound2D(soundList[ST_HEARTBEAT]);
 		}
 	}
 
@@ -2088,7 +2127,7 @@ void mainscene::UpdateSound(double &dt)
 		SE_Engine.effectDistortion(false);
 	}
 
-	SE_Engine.UpdateListenerPosition(FPC.position, (FPC.target - FPC.target), FPC.up);
+	SE_Engine.UpdateListenerPosition(FPC.position, (FPC.target - FPC.position), FPC.up);
 }
 
 /******************************************************************************/
@@ -2183,6 +2222,20 @@ void mainscene::Update(double dt)
 
 		weaponsUpdate(dt);
 		UpdateSound(dt);
+
+		if (WO_END != NULL)
+		{
+			if (CollisionBox::checkCollision(P_Player.collisionMesh, WO_END->collisionMesh))
+			{
+				++currentLevel;
+				if (!loadLevel(currentLevel))
+				{
+					Application::SetCursor(true);
+					GAMESTATE = GS_END;
+				}
+			}
+		}
+
 		if (Application::IsKeyPressed(VK_ESCAPE) && !isEscPressed)
 		{
 			isEscPressed = true;
@@ -2193,16 +2246,6 @@ void mainscene::Update(double dt)
 			Application::SetCursor(true);
 			GAMESTATE = GS_PAUSED;
 		}
-
-		if (WO_END != NULL)
-		{
-			if (CollisionBox::checkCollision(WO_END->collisionMesh, P_Player.collisionMesh))
-			{
-				Application::SetCursor(true);
-				GAMESTATE = GS_END;
-			}
-		}
-
 		break;
 	}
 	case mainscene::GS_PAUSED:
