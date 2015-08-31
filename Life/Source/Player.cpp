@@ -17,7 +17,7 @@ Default constructor
 /******************************************************************************/
 Player::Player()
 {
-	CamOffset.Set(0, 25, 0);
+	CamOffset.Set(0, 22, 0);
 	//f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
 	f_move_crawl = 150.f;
 	f_move_walk = 700.f;

@@ -365,7 +365,7 @@ private:
 	void RenderTextCenter(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color);
 	void RenderTextCenterOnScreen(Mesh* mesh, std::string text, Color color, float size = 1.f, float x = 0.f, float y = 0.f);
-	void RenderMesh(Mesh *mesh, bool enableLight);
+	void RenderMesh(Mesh *mesh, bool enableLight, float Glow = 0, Color GlowColor = Color(1.f, 0.f, 0.f));
 	void RenderMeshOnScreen(Mesh* mesh, float Glow = 0, Color GlowColor = Color(1.f, 0.f, 0.f));
 
 	/******************************************************************************/

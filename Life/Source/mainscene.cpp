@@ -1051,7 +1051,7 @@ Particle* mainscene::FetchParticle(void)
 	{
 		if (!m_ParList[i]->active)
 		{
-			m_ParList[i]->active = true;
+			m_ParList[i]->active = false;
 			m_ParList[i]->ParticleType = Particle::PAR_SPARKS;
 			return m_ParList[i];
 			break;
@@ -1085,7 +1085,7 @@ BulletObject* mainscene::FetchBullet(void)
 		{
 			if (!BO->active)
 			{
-				BO->active = true;
+				BO->active = false;
 				BO->gravityEnabled = false;
 				return dynamic_cast<BulletObject*>(m_goList[i]);
 				break;
@@ -1097,7 +1097,7 @@ BulletObject* mainscene::FetchBullet(void)
 	{
 		BulletObject *BO;
 		BO = new BulletObject();
-		BO->active = true;
+		BO->active = false;
 		BO->gravityEnabled = false;
 		m_goList.push_back(BO);
 	}
@@ -1779,27 +1779,27 @@ Generates particles at position
 void mainscene::generateCharacterParticle(CharacterObject *CO, Vector3 &HeadVel, Vector3 &ArmLeftVel, Vector3 &ArmRightVel, Vector3 &LegLeftVel, Vector3 &LegRightVel, Vector3 &BodyVel)
 {
 	float CharRotation = CalAnglefromPosition(CO->Lookat, CO->pos, true);
-	generateParticle(CO->pos + CO->ModelPos + CO->HeadPos, CO->scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 1.f, CO->Head);
+	generateParticle(CO->pos + CO->ModelPos + CO->HeadPos, CO->scale, HeadVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Head);
 
 	Mtx44 Rotation;
 	Rotation.SetToRotation(CharRotation, 0, 1, 0);
 	Vector3 tempArm = CO->ArmPos;
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Arm_right);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Arm_right);
 	tempArm = Vector3(-CO->ArmPos.x, CO->ArmPos.y, CO->ArmPos.z);
 	tempArm = Rotation * tempArm;
-	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Arm_left);
+	generateParticle(CO->pos + CO->ModelPos + tempArm, CO->scale, ArmLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Arm_left);
 
-	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Leg_left);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegLeftVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Leg_left);
 
-	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 3.f, CO->Leg_right);
+	generateParticle(CO->pos + CO->ModelPos + CO->LegPos, CO->scale, LegRightVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Leg_right);
 
-	generateParticle(CO->pos + CO->ModelPos, CO->scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 5.f, CO->Chest);
+	generateParticle(CO->pos + CO->ModelPos, CO->scale, BodyVel, Vector3(0, CharRotation, 0), Particle::PAR_MESH, 2.f, CO->Chest);
 
 	for (unsigned i = 0; i < 64; ++i)
 	{
 		float bloodsize = Math::RandFloatMinMax(0.1f, .8f);
-		generateParticle(CO->pos + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 4.f);
+		generateParticle(CO->pos + CO->ModelPos, Vector3(bloodsize, bloodsize, bloodsize), Vector3(Math::RandFloatMinMax(-70, 70), Math::RandFloatMinMax(-5, 70), Math::RandFloatMinMax(-70, 70)) + BodyVel, Vector3(0.f, 0.f, 0.f), Particle::PAR_BLOOD, 2.f);
 	}
 }
 
@@ -1839,6 +1839,7 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 {
 	BulletObject *BO;
 	BO = FetchBullet();
+	BO->active = true;
 	BO->pos = Pos;
 	BO->vel = Dir * Speed;
 	BO->life = Longevity;
@@ -2975,7 +2976,7 @@ void mainscene::RenderWorldShadow(void)
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
 		{
-			//if (isVisible(FPC.position, FPC.target, f_fov + go->ColBox.x, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 4000)//Dynamic rendering
+			if (!go->dynamicRendering)
 			{
 				CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
 				if (CO != NULL)
@@ -2985,6 +2986,21 @@ void mainscene::RenderWorldShadow(void)
 				else
 				{
 					RenderGO(go);
+				}
+			}
+			else
+			{
+				if (isVisible(FPC.position, FPC.target, f_fov, go->pos) || (Vector3(FPC.position.x - go->pos.x, 0, FPC.position.z - go->pos.z)).LengthSquared() < 5000)//Dynamic rendering
+				{
+					CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
+					if (CO != NULL)
+					{
+						RenderCharacter(CO);
+					}
+					else
+					{
+						RenderGO(go);
+					}
 				}
 			}
 		}

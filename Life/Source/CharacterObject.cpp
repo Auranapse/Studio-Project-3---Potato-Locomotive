@@ -94,9 +94,9 @@ direction vector
 /******************************************************************************/
 Vector3 CharacterObject::getDirection(bool XZ)
 {
-	if(XZ)
+	if (XZ)
 	{
-		if(Lookat == pos)
+		if (Lookat == pos)
 		{
 			return Vector3(0, 0, 1);
 		}

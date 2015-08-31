@@ -1053,8 +1053,11 @@ Renders mesh
 \param enableLight - should the mesh rendered be affected by light?
 */
 /******************************************************************************/
-void MenuScene::RenderMesh(Mesh *mesh, bool enableLight)
+void MenuScene::RenderMesh(Mesh *mesh, bool enableLight, float Glow, Color GlowColor)
 {
+	glUniform1i(u_m_parameters[U_UNI_GLOW], static_cast<GLint>(Glow));
+	glUniform3fv(u_m_parameters[U_UNI_GLOW_COLOR], 1, &GlowColor.r);
+
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
@@ -1180,6 +1183,7 @@ Renders text on screen
 /******************************************************************************/
 void MenuScene::RenderTextOnScreen(Mesh* mesh, std::string text, Color color)
 {
+	glUniform1i(u_m_parameters[U_UNI_GLOW], static_cast<GLint>(0));
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
 

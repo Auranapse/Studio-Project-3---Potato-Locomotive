@@ -2,7 +2,7 @@
 
 CollisionBox::CollisionBox() : ColOffset(0.f, 0.f, 0.f), Type(CT_POINT)
 {
-	
+
 }
 
 CollisionBox::~CollisionBox()
@@ -14,131 +14,130 @@ bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 {
 	//Swaps it so that c1 always has lower type than c2
 	int c1, c2;//c1 = Lower Type, C2 = Higher Type
-	c1 = (CB1.Type < CB2.Type) ? (c1 = CB1.Type) :(c1 = CB2.Type);
-	c2 = (CB2.Type > CB1.Type) ? (c2 = CB2.Type) :(c2 = CB1.Type);
+	c1 = (CB1.Type < CB2.Type) ? (c1 = CB1.Type) : (c1 = CB2.Type);
+	c2 = (CB2.Type > CB1.Type) ? (c2 = CB2.Type) : (c2 = CB1.Type);
 
 	switch (c1)
 	{
 	default:
 	case 1:
+	{
+		switch (c2)
 		{
-			switch (c2)
-			{
-			default:
-			case 0://AABB to AABB Collision
-				{
-					return AABB_AABB(CB1, CB2);
-					break;
-				}
-			case 1://AABB to Sphere Collision
-				{
-					return AABB_SPHERE(CB1, CB2);
-					break;
-				}
-			case 2://AABB to Point Collision
-				{
-					return AABB_POINT(CB1, CB2);
-					break;
-				}
-			case 3://AABB to Ray Collision
-				{
-					return AABB_RAY(CB1, CB2);
-					break;
-				}
-			case 4://AABB to Plane Collision
-				{
-					return AABB_PLANE(CB1, CB2);
-					break;
-				}
-			}
+		default:
+		case 0://AABB to AABB Collision
+		{
+			return AABB_AABB(CB1, CB2);
 			break;
 		}
+		case 1://AABB to Sphere Collision
+		{
+			return AABB_SPHERE(CB1, CB2);
+			break;
+		}
+		case 2://AABB to Point Collision
+		{
+			return AABB_POINT(CB1, CB2);
+			break;
+		}
+		case 3://AABB to Ray Collision
+		{
+			return AABB_RAY(CB1, CB2);
+			break;
+		}
+		case 4://AABB to Plane Collision
+		{
+			return AABB_PLANE(CB1, CB2);
+			break;
+		}
+		}
+		break;
+	}
 	case 2:
+	{
+		switch (c2)
 		{
-			switch (c2)
-			{
-			default:
-			case 1://Sphere To Sphere Collision
-				{
-					return SPHERE_SPHERE(CB1, CB2);
-					break;
-				}
-			case 2://Sphere To Point Collision
-				{
-					return SPHERE_POINT(CB1, CB2);
-					break;
-				}
-			case 3://Sphere To Ray Collision
-				{
-					return SPHERE_RAY(CB1, CB2);
-					break;
-				}
-			case 4://Sphere To Plane Collision
-				{
-					return SPHERE_PLANE(CB1, CB2);
-					break;
-				}
-			}
+		default:
+		case 1://Sphere To Sphere Collision
+		{
+			return SPHERE_SPHERE(CB1, CB2);
 			break;
 		}
+		case 2://Sphere To Point Collision
+		{
+			return SPHERE_POINT(CB1, CB2);
+			break;
+		}
+		case 3://Sphere To Ray Collision
+		{
+			return SPHERE_RAY(CB1, CB2);
+			break;
+		}
+		case 4://Sphere To Plane Collision
+		{
+			return SPHERE_PLANE(CB1, CB2);
+			break;
+		}
+		}
+		break;
+	}
 	case 3:
+	{
+		switch (c2)
 		{
-			switch (c2)
-			{
-			default:
-			case 2://Point To Point Collision
-				{
-					return POINT_POINT(CB1, CB2);
-					break;
-				}
-			case 3://Point To Ray Collision
-				{
-					return POINT_RAY(CB1, CB2);
-					break;
-				}
-			case 4://Point To Plane Collision
-				{
-					return POINT_PLANE(CB1, CB2);
-					break;
-				}
-			}
+		default:
+		case 2://Point To Point Collision
+		{
+			return POINT_POINT(CB1, CB2);
 			break;
 		}
+		case 3://Point To Ray Collision
+		{
+			return POINT_RAY(CB1, CB2);
+			break;
+		}
+		case 4://Point To Plane Collision
+		{
+			return POINT_PLANE(CB1, CB2);
+			break;
+		}
+		}
+		break;
+	}
 	case 4:
+	{
+		switch (c2)
 		{
-			switch (c2)
-			{
-			default:
-			case 3://Point To Ray Collision
-				{
-					return RAY_RAY(CB1, CB2);
-					break;
-				}
-			case 4://Point To Plane Collision
-				{
-					return RAY_PLANE(CB1, CB2);
-					break;
-				}
-			}
+		default:
+		case 3://Point To Ray Collision
+		{
+			return RAY_RAY(CB1, CB2);
 			break;
 		}
-		case 5:
+		case 4://Point To Plane Collision
 		{
-			switch (c2)
-			{
-			default:
-			case 4://Point To Plane Collision
-				{
-					return PLANE_PLANE(CB1, CB2);
-					break;
-				}
-			}
+			return RAY_PLANE(CB1, CB2);
 			break;
 		}
+		}
+		break;
+	}
+	case 5:
+	{
+		switch (c2)
+		{
+		default:
+		case 4://Point To Plane Collision
+		{
+			return PLANE_PLANE(CB1, CB2);
+			break;
+		}
+		}
+		break;
+	}
 	}
 	return false;
 }
-
 
 /*******************************************************************************
 ******************************AABB COLLISION(S)*********************************
@@ -180,7 +179,7 @@ bool CollisionBox::AABB_SPHERE(CollisionBox &CB1, CollisionBox &CB2)
 		Temp = CB2.Position.z - bottomLeft.z;
 		DistanceBetween += Temp*Temp;
 	}
-	else if (CB2.Position.z > topRight.z){
+	else if (CB2.Position.z > topRight.z) {
 		Temp = CB2.Position.z - topRight.z;
 		DistanceBetween += Temp*Temp;
 	}
@@ -262,7 +261,7 @@ bool CollisionBox::AABB_PLANE(CollisionBox &CB1, CollisionBox &CB2)
 	Vector3 topRight = CB1.Position + CB1.ColBox;
 	Vector3 bottomLeft = CB1.Position - CB1.ColBox;
 	Vector3 v1 = (topRight - bottomLeft) * 0.5f;
-	
+
 	float rad = abs(CB2.planeNormal.x * v1.x) + abs(CB2.planeNormal.y * v1.y) + abs(CB2.planeNormal.z * v1.z);
 
 	CB1.radius = rad;
@@ -329,7 +328,7 @@ bool CollisionBox::SPHERE_PLANE(CollisionBox &CB1, CollisionBox &CB2)
 *****************************POINT COLLISION(S)*********************************
 ********************************************************************************/
 bool CollisionBox::POINT_POINT(CollisionBox &CB1, CollisionBox &CB2)
-{ 
+{
 	if (CB1.Position == CB2.Position)
 		return true;
 	else

@@ -29,7 +29,7 @@ public:
 	Vector3 Direction;//Normalized
 	Vector3 end;//Another Point on Ray(Preferably the end of the ray)
 	float t1, t2; //Intersection Interval(Length before Ray/AABB can be tested again, t1 = Min, t2 = Max)
-	
+
 	//For Plane
 	Vector3 planeNormal;//Normalized
 	float offset;//How far it is from the origin in the direction of normal
@@ -38,7 +38,7 @@ public:
 	v1,v2,v0 = Any Points of Plane
 		Vector3 vecAB = v1 - v0;
 		Vector3 vecAC = v2 - v0;
- 
+
 		// Cross vecAB and vecAC
 		Vector3 normal = vecAB.Cross(vecAC);
 		normal.normalize();
@@ -65,7 +65,7 @@ private:
 	static bool SPHERE_POINT(CollisionBox &CB1, CollisionBox &CB2);
 	static bool SPHERE_RAY(CollisionBox &CB1, CollisionBox &CB2);//FORGOT!!
 	static bool SPHERE_PLANE(CollisionBox &CB1, CollisionBox &CB2);
-	
+
 	static bool POINT_POINT(CollisionBox &CB1, CollisionBox &CB2);
 	static bool POINT_RAY(CollisionBox &CB1, CollisionBox &CB2);
 	static bool POINT_PLANE(CollisionBox &CB1, CollisionBox &CB2);
