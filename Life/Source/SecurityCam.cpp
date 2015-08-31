@@ -10,6 +10,9 @@ SecurityCam::SecurityCam(void) : Lookat(0, 0, -1), c_State(NOTFOUND)
 	f_rotationLimiter = 0.f;
 	rotationState = false;
 	b_alertAI = true;
+	prevRotation = NULL;
+	f_currentRotation = 0;
+	b_cameraRotating = true;
 }
 
 
@@ -50,7 +53,7 @@ void SecurityCam::CollisionChecking(std::vector<GameObject *> &m_goList)
 			SCPos.y = SCLookat.y = 0;
 			if (isVisible(SCPos, SCLookat, f_cameraFOV, go->pos))
 			{
-				f_cameraRange = (SCPos - go->pos).Length();
+				f_cameraRange = (SCPos - go->pos).LengthSquared();
 			}
 			else
 			{
@@ -132,47 +135,123 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 
 	case NOTFOUND:
 		{
-			//Check whether enemy is within security camera's FOV
-			if (((isVisible(SCPos, SCLookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
+			if(prevRotation == NULL)
 			{
-				c_State = SPOTTED;
+				if (rotationState)
+				{
+					f_currentRotation = 20;
+
+					if (f_rotationLimiter > f_rotationAngle)
+					{
+						rotationState = false;
+					}
+				}
+				else
+				{
+					f_currentRotation = -20;
+
+					if (f_rotationLimiter < -f_rotationAngle)
+					{
+						rotationState = true;
+					}
+				}
+
+				if (f_currentRotation != 0)
+				{
+					Mtx44 rotation;
+					Lookat = Lookat - pos;
+					f_rotationLimiter += f_currentRotation * static_cast<float>(dt);
+					rotation.SetToRotation(f_currentRotation * static_cast<float>(dt), 0, 1, 0);
+					Lookat = rotation * Lookat;
+					Lookat = Lookat + pos;
+				}
+				//rotationState = false;
+				//Check whether enemy is within security camera's FOV
+				if (((isVisible(SCPos, SCLookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
+				{
+					c_State = SPOTTED;
+					prevRotation.x = Lookat.x;
+					prevRotation.z = Lookat.z;
+				}
+			}
+			else
+			{
+				if (b_cameraRotating)
+				{
+					/*static float rotationSpeed = 50;
+
+					if(Lookat.x > prevRotation.x)
+					{
+						Lookat.x -= rotationSpeed * dt;
+					}
+					else if (Lookat.x < prevRotation.x)
+					{
+						Lookat.x += rotationSpeed * dt;
+					}
+
+					if(Lookat.z > prevRotation.z)
+					{
+						Lookat.z -= rotationSpeed * dt;
+					}
+					else if (Lookat.z < prevRotation.z)
+					{
+						Lookat.z += rotationSpeed * dt;
+					}
+
+					Vector3 LookatA = Lookat;
+					LookatA.y = 0;
+					std::cout << (LookatA - prevRotation).LengthSquared() << std::endl;
+					if((LookatA - prevRotation).LengthSquared() < 26)
+					{
+						b_cameraRotating = false;
+					}*/
+
+				/*	Vector3 LookatA = Lookat;
+					LookatA.y = 0;
+					std::cout << (LookatA - prevRotation)- pos << std::endl;
+					if((LookatA - prevRotation).Length() < 26)
+					{
+						b_cameraRotating = false;
+					}*/
+					float angle = CalAnglefromPosition(Vector3(defaultLookat.x, 0, defaultLookat.z), Vector3(Lookat.x, 0, Lookat.z), true);
+					std::cout << angle << std::endl;
+					
+					if(angle < offsetY + 10)
+					{
+						std::cout << "Orange" << std::endl;
+						Mtx44 rotation;
+						Lookat = Lookat - pos;
+						rotation.SetToRotation(static_cast<float>(-20 * dt), 0, 1, 0);
+						Lookat = rotation * Lookat;
+						Lookat = Lookat + pos;
+					}
+					else if (angle > offsetY - 10)
+					{
+						std::cout << "Apple" << std::endl;
+						Mtx44 rotation;
+						Lookat = Lookat - pos;
+						rotation.SetToRotation(static_cast<float>(20 * dt), 0, 1, 0);
+						Lookat = rotation * Lookat;
+						Lookat = Lookat + pos;
+					}
+					else
+					{
+						std::cout << "Senpai no notice me" << std::endl;
+						b_cameraRotating = false;
+					}
+				}
+				else
+				{
+				/*	Lookat.x = prevRotation.x;
+					Lookat.z = prevRotation.z;*/
+					f_rotationLimiter = 0.f;
+					rotationState = false;
+					f_currentRotation = 0.f;
+					prevRotation = NULL;
+					b_cameraRotating = true;
+				}
 			}
 		}
 		break;
 	}
-	
-	if (c_State == NOTFOUND)
-	{
-		float f_currentRotation = 0;
-
-		if (rotationState)
-		{
-			f_currentRotation = 20;
-
-			if (f_rotationLimiter > f_rotationAngle)
-			{
-				rotationState = false;
-			}
-		}
-		else
-		{
-			f_currentRotation = -20;
-
-			if (f_rotationLimiter < -f_rotationAngle)
-			{
-				rotationState = true;
-			}
-		}
-
-		if (f_currentRotation != 0)
-		{
-			Mtx44 rotation;
-			Lookat = Lookat - pos;
-			f_rotationLimiter += f_currentRotation * static_cast<float>(dt);
-			rotation.SetToRotation(f_currentRotation * static_cast<float>(dt), 0, 1, 0);
-			Lookat = rotation * Lookat;
-			Lookat = Lookat + pos;
-		}
-	}
-	//CollisionChecking(m_goList);
 }

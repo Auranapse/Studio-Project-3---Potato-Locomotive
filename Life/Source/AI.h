@@ -85,10 +85,7 @@ private:
 	static double d_detectionRangeMax;
 	static double d_playerEscapeRange;
 	bool b_aiScanning;
-	Vector3 test;
-
-	bool positiveX, positiveZ, negativeX, negativeZ;
-	Vector3 diff;
+	bool b_aiRotating;
 };
 
 #endif

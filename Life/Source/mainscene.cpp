@@ -941,8 +941,10 @@ bool mainscene::loadLevel(int level)
 				Vector3 templookat(0, 0, -1);
 				SC->offsetY = worldHeight;
 				SC->Lookat = (rotationMtx * templookat) + SC->pos;
+				SC->defaultLookat = (rotationMtx * templookat) + SC->pos;
 				SC->dynamicRendering = true;
 				SC->mesh = meshList[GEO_SECURITYCAMERA];
+				SC->offsetY = SCAngle;
 
 				m_goList.push_back(SC);
 			}

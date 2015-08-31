@@ -27,6 +27,7 @@ public:
 	float getCameraRange();
 	Vector3 Lookat;
 	float offsetY;
+	Vector3 defaultLookat;
 private:
 	CAMERA_STATE c_State;
 
@@ -35,6 +36,9 @@ private:
 	float f_rotationLimiter;
 	float f_rotationAngle;
 	bool b_alertAI;
+	Vector3 prevRotation;
+	bool b_cameraRotating;
+	float f_currentRotation;
 	static float f_cameraFOV;
 	static float f_cameraRange;
 };

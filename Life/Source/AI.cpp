@@ -42,9 +42,8 @@ f_alert_timer(0.f)
 	b_rotateClockwiseFirst = NULL;
 	currentLookat = NULL;
 	b_goAlert = b_goAttack = false;
-	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
-	diff.Set(0.f, 0.f, 1.f);
 	b_aiScanning = false;
+	b_aiRotating = true;
 }
 
 /******************************************************************************/
@@ -683,8 +682,8 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 {
 	static float rotationSpeed = 50;
-	static bool test = false;
-	if (test == false)
+
+	if (b_aiRotating == true)
 	{
 		if (Lookat.x < currentLookat.x)
 		{
@@ -706,7 +705,7 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 
 		if ((Lookat - currentLookat).LengthSquared() < 26)
 		{
-			test = true;
+			b_aiRotating = false;
 		}
 	}
 	else
@@ -727,7 +726,7 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 
 		Lookat = currentLookat;
 		currentLookat = NULL;
-		test = false;
+		b_aiRotating = true;
 		currentLookat = NULL;
 	}
 }
@@ -744,49 +743,50 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
-	if (currentLookat == NULL)
+	aiStateHandling(dt, playerPos);
+
+	if(currentLookat != NULL)
 	{
-		aiStateHandling(dt, playerPos);
+		vel.SetZero();
+		AiLookatRotation(dt, playerPos);
+	}
 
-		Mtx44 rotation;
-		rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
-		Vector3 L, R, C;
-		C = rotation * Vector3(0.f, ModelPos.y, 50.f);
-		L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
-		R = rotation * Vector3(15.f, ModelPos.y, 15.f);
+	Mtx44 rotation;
+	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
+	Vector3 L, R, C;
+	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
+	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
 
-		if (b_aiScanning == false)
+	if (b_aiScanning == false)
+	{
+		if (e_State == WALKING)
 		{
-			if (e_State == WALKING)
-			{
-				SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-			}
-			else
-			{
-				SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-			}
+			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 		}
-		if (vel.x != 0)
+		else
 		{
-			float SForceX = 0 - vel.x;
-			vel.x += SForceX * 0.1f;
-		}
-
-		if (vel.z != 0)
-		{
-			float SForceZ = 0 - vel.z;
-			vel.z += SForceZ * 0.1f;
-		}
-
-		if (b_updateAI)
-		{
-			Animation.Update(dt, vel.LengthSquared() * 4);
-			Lookat += vel * 10 * static_cast<float>(dt);
-			pos += vel * 10 * static_cast<float>(dt);
+			SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 		}
 	}
-	else
-		AiLookatRotation(dt, playerPos);
+	if (vel.x != 0)
+	{
+		float SForceX = 0 - vel.x;
+		vel.x += SForceX * 0.1f;
+	}
+
+	if (vel.z != 0)
+	{
+		float SForceZ = 0 - vel.z;
+		vel.z += SForceZ * 0.1f;
+	}
+
+	if (b_updateAI)
+	{
+		Animation.Update(dt, vel.LengthSquared() * 4);
+		Lookat += vel * 10 * static_cast<float>(dt);
+		pos += vel * 10 * static_cast<float>(dt);
+	}
 }
 
 /******************************************************************************/
@@ -805,10 +805,10 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<GameObject *> &m_GOList)
 		GameObject* go = (GameObject*)*it;
 		if (go->active && go->colEnable && go->pos != pos)
 		{
-				if (intersect(go->pos + go->collisionMesh.ColBox, go->pos - go->collisionMesh.ColBox, pos))
-				{
-					return true;
-				}
+			if (intersect(go->pos + go->collisionMesh.ColBox, go->pos - go->collisionMesh.ColBox, pos))
+			{
+				return true;
+			}
 		}
 	}
 	return false;
