@@ -47,6 +47,7 @@ f_alert_timer(0.f)
 	diff.Set(0.f, 0.f, 1.f);
 	b_aiScanning = false;
 	b_aiRotating = false;
+	b_SHOOTLA = false;
 }
 
 /******************************************************************************/
@@ -513,106 +514,138 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 	switch (e_State)
 	{
 	case WALKING:
-	{
-		//Have the AI partol a certain area
-		//Need Pathfinding i think
-
-		if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos))
 		{
-			//If player is infront and near player, then ai will switch to attack state
-			if ((playerPos - pos).LengthSquared() < d_detectionRange)
+			//Have the AI partol a certain area
+			//Need Pathfinding i think
+
+			if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos))
 			{
-				currentLookat.x = playerPos.x;
-				currentLookat.z = playerPos.z;
-				prevPosition = pos;
-				b_goAttack = true;
-			}
-			//if ai saw player but is too far way, the ai will investigate
-			else if ((playerPos - pos).LengthSquared() >= d_detectionRange && (playerPos - pos).LengthSquared() <= d_detectionRangeMax)
-			{
-				destination.x = playerPos.x;
-				destination.z = playerPos.z;
-				currentLookat.x = playerPos.x;
-				currentLookat.z = playerPos.z;
-				prevPosition = pos;
-				b_goAlert = true;
+				//If player is infront and near player, then ai will switch to attack state
+				if ((playerPos - pos).LengthSquared() < d_detectionRange)
+				{
+					currentLookat.x = playerPos.x;
+					currentLookat.z = playerPos.z;
+					prevPosition = pos;
+					b_goAttack = true;
+				}
+				//if ai saw player but is too far way, the ai will investigate
+				else if ((playerPos - pos).LengthSquared() >= d_detectionRange && (playerPos - pos).LengthSquared() <= d_detectionRangeMax)
+				{
+					destination.x = playerPos.x;
+					destination.z = playerPos.z;
+					currentLookat.x = playerPos.x;
+					currentLookat.z = playerPos.z;
+					prevPosition = pos;
+					b_goAlert = true;
+				}
 			}
 		}
-	}
-	break;
+		break;
 
 	case ALERT:
-	{
-
-		//AI will move towards the destination
-		if ((pos - destination).LengthSquared() > 2)
 		{
-			//Move the ai towards the destination
-			Lookat = destination;
-		}
-		//if ai is at the destination
-		else
-		{
-			ai_ScanArea(dt);
-		} 
-
-		//If player is infront and near player, then ai will switch to attack state
-		if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
-		{
-			e_State = ATTACK;
-			b_updateAI = true;
-			b_rotateClockwiseFirst = NULL;
-
-			if(this->b_aiScanning)
+			//AI will move towards the destination
+			if ((pos - destination).LengthSquared() > 2)
 			{
-				e_State = WALKING;
-				d_totalRotation = 0.f;
+				//Move the ai towards the destination
+				Lookat = destination;
+			}
+			//if ai is at the destination
+			else
+			{
+				ai_ScanArea(dt);
+			} 
+
+			//If player is infront and near player, then ai will switch to attack state
+			if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
+			{
+				e_State = ATTACK;
 				b_updateAI = true;
 				b_rotateClockwiseFirst = NULL;
-				b_aiScanning = false;
 			}
 		}
-	}
-	break;
+		break;
 
 	case ATTACK:
 		{
 			destination = playerPos;
 
-			//if enemy is holding a weapon
-			if (holding != NULL)
+
+			if(e_Type == AI_SECURITY)
 			{
-				if (holding->isWeapon)
+				//if enemy is holding a weapon
+				if (holding != NULL)
 				{
-					WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
-
-					//Enemy is holding a gun
-					if (WO->isGun)
+					if (holding->isWeapon)
 					{
-						//Make enemy move a certain distance away from the enemy before shooting
-					}
-					//Enemy is holding a melee weapon
-					else
-					{
+						WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
 
+						//Enemy is holding a gun
+						if (WO->isGun)
+						{
+							//Make enemy move a certain distance away from the enemy before shooting
+							if(isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
+							{
+								currentLookat = playerPos;
+								b_SHOOTLA = true;
+							}
+
+							else
+								b_SHOOTLA = false;
+						}
+						//Enemy is holding a melee weapon
+						else
+						{
+
+						}
 					}
 				}
+				//Enemy is not holding a weapon
+				else
+				{
+					//make the enemy move closer to the player before attacking
+				}
 			}
-			//Enemy is not holding a weapon
+
+			//AI TYPE == SCIENTIST.
 			else
 			{
-				//make the enemy move closer to the enemy before attacking
+				//if enemy is holding a weapon
+				if (holding != NULL)
+				{
+					if (holding->isWeapon)
+					{
+						WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
+
+						//Enemy is holding a gun
+						if (WO->isGun)
+						{
+							//Make enemy move a certain distance away from the enemy before shooting
+							if(isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
+							{
+								currentLookat = playerPos;
+								b_SHOOTLA = true;
+							}
+
+							else
+								b_SHOOTLA = false;
+						}
+
+						//Enemy is holding a melee weapon
+						else
+						{
+
+						}
+					}
+				}
+				//Enemy is not holding a weapon
+				else
+				{
+					//make the enemy move closer to the player before attacking
+				}
 			}
-
-			//AI return to alert state if player have avoided enemy
-			/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
-			{
-			b_aiCooldown = true;
-			e_State = ALERT;
-			}*/
+			break;
 		}
-		break;
-
 	default:
 		break;
 	}
@@ -632,7 +665,6 @@ Update the AI Lookat based on its current Lookat
 /******************************************************************************/
 void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 {
-	std::cout << "Rotating" << std::endl;
 	if(currentLookat != NULL)
 	{
 		static float rotationSpeed = 2;
@@ -682,6 +714,7 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 			currentLookat = NULL;
 			b_aiRotating = false;
 		}
+		
 	}
 }
 

@@ -76,6 +76,7 @@ private:
 	Vector3 destination;
 	Vector3 currentLookat;
 	bool b_updateAI;
+	bool b_SHOOTLA;
 	double d_totalRotation;
 	double d_enemyRotation;
 	bool b_goAlert;
