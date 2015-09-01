@@ -222,12 +222,14 @@ bool CollisionBox::AABB_RAY(CollisionBox &CB1, CollisionBox &CB2)
 	Vector3 topRight = CB1.Position + CB1.ColBox + CB1.ColOffset;;
 	Vector3 bottomLeft = CB1.Position - CB1.ColBox + CB1.ColOffset;;
 	float xmin, xmax, ymin, ymax, zmin, zmax;
+
+	//Near Slab
 	if (CB2.Direction.x >= 0)
 	{
 		xmin = (bottomLeft.x - CB2.Position.x) / CB2.Direction.x;
 		xmax = (topRight.x - CB2.Position.x) / CB2.Direction.x;
 	}
-	else
+	else//F
 	{
 		xmin = (topRight.x - CB2.Position.x) / CB2.Direction.x;
 		xmax = (bottomLeft.x - CB2.Position.x) / CB2.Direction.x;

@@ -553,6 +553,9 @@ void mainscene::Init()
 	meshList[GEO_KATANA] = MeshBuilder::GenerateOBJ("Katana", "GameData//OBJ//weapons//Katana.obj");
 	meshList[GEO_KATANA]->textureID[0] = LoadTGA("GameData//Image//weapons//Katana.tga", true);
 
+	meshList[GEO_SCALPLE] = MeshBuilder::GenerateOBJ("Katana", "GameData//OBJ//weapons//Scalple.obj");
+	meshList[GEO_SCALPLE]->textureID[0] = LoadTGA("GameData//Image//weapons//Scalple.tga", true);
+
 	meshList[GEO_ITEM_SYRINGE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Items//Syringe.obj");
 	meshList[GEO_ITEM_SYRINGE]->textureID[0] = LoadTGA("GameData//Image//Items//Syringe.tga", true);
 
@@ -564,6 +567,7 @@ void mainscene::Init()
 	meshList[GEO_SPAS12]->material = meshList[GEO_M9]->material;
 	meshList[GEO_MP5K]->material = meshList[GEO_M9]->material;
 	meshList[GEO_KATANA]->material = meshList[GEO_M9]->material;
+	meshList[GEO_SCALPLE]->material = meshList[GEO_M9]->material;
 	meshList[GEO_ITEM_SYRINGE]->material = meshList[GEO_M9]->material;
 
 	//----------------------SKYBOX
@@ -826,6 +830,10 @@ bool mainscene::loadLevel(int level)
 					{
 						WO = new WeaponsObject(WO_presetList[WO_KATANA]);
 					}
+					else if (GAME_MAP.map_data[y][x] == "IW_SCALPLE")
+					{
+						WO = new WeaponsObject(WO_presetList[WO_SCALPLE]);
+					}
 
 					if (WO != NULL)
 					{
@@ -839,7 +847,7 @@ bool mainscene::loadLevel(int level)
 					ItemObject *IO;
 					if (GAME_MAP.map_data[y][x] == "II_SYRINGE")
 					{
-						IO = new WeaponsObject(WO_presetList[WO_M9]);
+						IO = new ItemObject(IO_presetList[IO_SYRINGE]);
 					}
 
 					if (IO != NULL)
@@ -1221,6 +1229,25 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
 	WO_presetList[WO_KATANA].range = 0.1f;
 
+	WO_presetList[WO_SCALPLE].active = true;
+	WO_presetList[WO_SCALPLE].mesh = meshList[GEO_SCALPLE];
+	WO_presetList[WO_SCALPLE].attackRate = 0.05f;
+	WO_presetList[WO_SCALPLE].AnimSpeed = 10.f;
+	WO_presetList[WO_SCALPLE].scale.Set(0.3f, 0.3f, 0.3f);
+	WO_presetList[WO_SCALPLE].pos.Set(0, 10, 0);
+	WO_presetList[WO_SCALPLE].pos1.Set(-4.f, -4.f, 6.f);
+	WO_presetList[WO_SCALPLE].pos2.Set(-4.f, -4.f, 12.f);
+	WO_presetList[WO_SCALPLE].Rotation1.Set(70, 0, 0);
+	WO_presetList[WO_SCALPLE].Rotation2.Set(90, 0, 0);
+	WO_presetList[WO_SCALPLE].isGun = false;
+	WO_presetList[WO_SCALPLE].isWeapon = true;
+	WO_presetList[WO_SCALPLE].enablePhysics = true;
+	WO_presetList[WO_SCALPLE].colEnable = true;
+	WO_presetList[WO_SCALPLE].collisionMesh.Type = CollisionBox::CT_AABB;
+	WO_presetList[WO_SCALPLE].collisionMesh.ColBox.Set(3, 3, 3);
+	WO_presetList[WO_SCALPLE].AttackSound = ST_WEAPON_KATANA;
+	WO_presetList[WO_SCALPLE].range = 0.05f;
+
 	f_curRecoil = 0.f;
 }
 
@@ -1391,8 +1418,14 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]))
+	static bool isinteractPressed = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && !isinteractPressed)
 	{
+		isinteractPressed = true;
+	}
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && isinteractPressed)
+	{
+		isinteractPressed = false;
 		if (P_Player.holding == NULL)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
@@ -2075,6 +2108,18 @@ void mainscene::weaponsUpdate(double &dt)
 		{
 			isAttackPressed = false;
 		}
+
+		static bool isinteractPressed = false;
+		if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && !isinteractPressed)
+		{
+			isinteractPressed = true;
+		}
+		else if (!Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && isinteractPressed)
+		{
+			isinteractPressed = false;
+			firerate = 0.f;
+			P_Player.DropObject();
+		}
 	}
 }
 
@@ -2421,11 +2466,13 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	CheckPlayerSound();
-
-	if (CollisionBetween(Vector3(0,0,0), Vector3(100,0,100)))
-		std::cout<<"TRIPPED!";
-
+	
+	Vector3 newRad = P_Player.vel;
+	if (P_Player.vel.y == 0)
+	{
+		PlayerSound->setSoundRadius(newRad.Length());
+		CheckPlayerSound();
+	}
 }
 
 /******************************************************************************/
@@ -3099,7 +3146,7 @@ void mainscene::RenderWorldShadow(void)
 	RenderCharacter(&P_Player);
 	RenderParticles();
 
-	for (int i = 0; i < Dialogues.size(); ++i)
+	for (unsigned i = 0; i < Dialogues.size(); ++i)
 	{
 		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
 		//std::cout<<Result;
@@ -3575,35 +3622,42 @@ void mainscene::Exit(void)
 
 bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
 {
-	CollisionBox Ray;
-	Ray.Type = CollisionBox::CT_RAY;
-	Ray.end = end;
-	Ray.Position = start;
-	Ray.t1 = 0;
-	Ray.t2 = 1;
+	std::vector<CollisionBox>Temporary; 
+	Vector3 direction = (end-start).Normalized(); 
+	float length = (end-start).Length(); 
+	float line = 0; 
 
-	Ray.Direction = (end-start).Normalized();
 
-	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
-	{
-		GameObject *go = (GameObject *)*it;
-		if (go->active)
-		{
-			AI *ai = dynamic_cast<AI*>(go);
-			
-			if(ai != NULL)
-			{
-				//std::cout<<go->collisionMesh.Type<<"A\n";
-				//std::cout<<Ray.Type<<"R\n";
-				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
-				{
-					//std::cout<<"CHECK!"<<go->collisionMesh.Type<<Ray.Type;
-					return true;
-				}
-			}
-		}
-	}
-	return false;
+	while(line < length) 
+	{ 
+		CollisionBox Test; 
+		Test.Type = CollisionBox::CT_SPHERE; 
+		Test.radius = 5; 
+		start += direction * 5; 
+		Test.Position = start; 
+		line += 5; 
+		Temporary.push_back(Test); 
+	} 
+
+
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it) 
+	{ 
+		GameObject *go = (GameObject *)*it; 
+		if (go->active) 
+		{	 
+			WorldObject *WO = dynamic_cast<WorldObject*>(go); 
+			if(WO != NULL) 
+			{ 
+				for (int i = 0; i < Temporary.size(); ++i) 
+				{ 
+					if (CollisionBox::checkCollision(Temporary[i], go->collisionMesh)) 
+						return true; 
+				} 
+			} 
+		} 
+	} 
+	return false; 
+
 }
 
 void mainscene::CheckPlayerSound(void)
@@ -3618,6 +3672,7 @@ void mainscene::CheckPlayerSound(void)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
+					std::cout<<"- Player has been heard!\n";
 					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 				}	
