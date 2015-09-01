@@ -1783,7 +1783,7 @@ delta time
 */
 /******************************************************************************/
 void mainscene::UpdateCO(CharacterObject *CO, double &dt)
-{
+{		
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
@@ -2406,7 +2406,7 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	//CheckPlayerSound();
+	CheckPlayerSound();
 
 	if (CollisionBetween(Vector3(0,0,0), Vector3(100,0,100)))
 		std::cout<<"TRIPPED!";
@@ -3582,6 +3582,7 @@ bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
 				//std::cout<<Ray.Type<<"R\n";
 				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
 				{
+					std::cout << "FML" << std::endl;
 					//std::cout<<"CHECK!"<<go->collisionMesh.Type<<Ray.Type;
 					return true;
 				}
@@ -3601,10 +3602,11 @@ void mainscene::CheckPlayerSound(void)
 			AI *ai = dynamic_cast<AI*>(go);
 			if(ai != NULL)
 			{
-				if (PlayerSound->heard(go->pos))
+				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
 					std::cout<<"Player has been heard!";
-					//You put whatever functions want in 
+					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
+					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 				}	
 			}
 		}

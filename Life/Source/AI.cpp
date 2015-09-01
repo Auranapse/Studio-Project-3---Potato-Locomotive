@@ -46,6 +46,7 @@ f_alert_timer(0.f)
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
 	b_aiScanning = false;
+	b_aiRotating = false;
 }
 
 /******************************************************************************/
@@ -144,7 +145,7 @@ Update the sensors for pathfinding to player
 sensors made to see if there is anything in the way of the AI and also move towards the player
 */
 /******************************************************************************/
-void AI::SensorUpdate2(double &dt, Vector3 &destination, bool left, bool mid, bool right)
+void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 {
 	float rotationDiff = CalAnglefromPosition(destination, pos, true) - CalAnglefromPosition(Lookat, pos, true);
 	movementLR(dt, false, rotationDiff);
@@ -490,84 +491,10 @@ void AI::setDestination(const Vector3 &destination)
 	this->destination = destination;
 }
 
-/******************************************************************************/
-/*!
-\brief
-Update the AI Lookat based on its current Lookat
-
-\param 
-		delta time
-		Player Position
-		AI Lookat
-		AI Current Lookat
-*/
-/******************************************************************************/
-void AI::UpdateLookat(const double &dt, const Vector3 &playerPos)
+void AI::setcurrentLookat(Vector3 &currentLookat)
 {
-	if(currentLookat != NULL)
-	{
-		b_updateAI = false;
-
-		if(Lookat != currentLookat)
-		{
-			float theta = Math::RadianToDegree(acos((Lookat.Dot(currentLookat)) / (Lookat.Length() * currentLookat.Length())));
-
-			//if(theta >= 5)
-			{
-				if(Lookat.x > currentLookat.x)
-					Lookat.x -= 50 * static_cast<float>(dt);
-				else
-					Lookat.x += 50 * static_cast<float>(dt);
-
-				if(Lookat.z > currentLookat.z)
-					Lookat.z -= 50 * static_cast<float>(dt);
-				else
-					Lookat.z += 50 * static_cast<float>(dt);
-			}
-			if (theta < 1)
-			{
-				Lookat = currentLookat;
-			}
-		}
-		else
-		{
-			//if(e_State == WALKING)
-			//{
-			//	if ((playerPos - Position).LengthSquared() < d_detectionRange)
-			//	{
-			//		prevPosition = Position;
-			//		e_State = ATTACK;
-			//		b_aiCooldown = false;
-			//	}
-			//	//if ai saw player but is too far way, the ai will investigate
-			//	else if ((playerPos - Position).LengthSquared() > d_detectionRange && (playerPos - Position).LengthSquared() < d_detectionRangeMax) 
-			//	{
-			//		destination = currentLookat;
-			//		prevPosition = Position;
-			//		e_State = ALERT;
-			//		b_aiCooldown = false;
-
-			//	}
-			//}
-
-			if(b_goAttack)
-			{
-				prevPosition = pos;
-				e_State = ATTACK;
-				b_goAttack = false;
-			}
-			else if (b_goAlert)
-			{
-				destination = currentLookat;
-				prevPosition = pos;
-				e_State = ALERT;
-				b_goAlert = false;
-			}
-			
-			b_updateAI = true;
-			currentLookat = NULL;
-		}
-	}
+	this->currentLookat = currentLookat;
+	this->b_goAlert = true;
 }
 
 /******************************************************************************/
@@ -616,6 +543,7 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 
 	case ALERT:
 	{
+
 		//AI will move towards the destination
 		if ((pos - destination).LengthSquared() > 2)
 		{
@@ -681,55 +609,69 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief
+Update the AI Lookat based on its current Lookat
+
+\param 
+		delta time
+		Player Position
+		AI Lookat
+		AI Current Lookat
+*/
+/******************************************************************************/
 void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 {
-	static float rotationSpeed = 50;
-	static bool test = false;
-	if (test == false)
+	if(currentLookat != NULL)
 	{
-		if (Lookat.x < currentLookat.x)
+		static float rotationSpeed = 2;
+
+		if(b_goAttack)
 		{
-			Lookat.x += rotationSpeed * dt;
+			rotationSpeed = 10;
 		}
-		else if (Lookat.x > currentLookat.x)
+		else
 		{
-			Lookat.x -= rotationSpeed * dt;
+			rotationSpeed = 2;
 		}
 
-		if (Lookat.z < currentLookat.z)
+		if (b_aiRotating == false)
 		{
-			Lookat.z += rotationSpeed * dt;
-		}
-		else if (Lookat.z > currentLookat.z)
-		{
-			Lookat.z -= rotationSpeed * dt;
-		}
+			float rotationdiff = (CalAnglefromPosition(currentLookat, pos, true) - CalAnglefromPosition(Lookat, pos, true)) * 2.f;
+			static float f_rotationLimiter = 0.f;
 
-		if ((Lookat - currentLookat).LengthSquared() < 26)
-		{
-			test = true;
-		}
-	}
-	else
-	{
-		if (b_goAttack)
-		{
-			prevPosition = pos;
-			e_State = ATTACK;
-			b_goAttack = false;
-		}
-		else if (b_goAlert)
-		{
-			destination = currentLookat;
-			prevPosition = pos;
-			e_State = ALERT;
-			b_goAlert = false;
-		}
+			Mtx44 rotation;
+			Lookat = Lookat - pos;
+			f_rotationLimiter += rotationdiff * static_cast<float>(dt);
+			rotation.SetToRotation(rotationdiff * rotationSpeed * static_cast<float>(dt), 0, 1, 0);
+			Lookat = rotation * Lookat;
+			Lookat = Lookat + pos;
 
-		Lookat = currentLookat;
-		currentLookat = NULL;
-		test = false;
-		currentLookat = NULL;
+			if(rotationdiff < 1.2 && rotationdiff > -1.2)
+			{
+				b_aiRotating = true;
+			}
+		}
+		else
+		{
+			if (b_goAttack)
+			{
+				prevPosition = pos;
+				e_State = ATTACK;
+				b_goAttack = false;
+			}
+			else if (b_goAlert)
+			{
+				destination = currentLookat;
+				prevPosition = pos;
+				e_State = ALERT;
+				b_goAlert = false;
+			}
+
+			currentLookat = NULL;
+			b_aiRotating = false;
+		}
 	}
 }
 
@@ -745,49 +687,52 @@ GameObject vector list - To check collision
 /******************************************************************************/
 void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
-	if (currentLookat == NULL)
+	if(currentLookat == NULL)
 	{
 		aiStateHandling(dt, playerPos);
-
-		Mtx44 rotation;
-		rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
-		Vector3 L, R, C;
-		C = rotation * Vector3(0.f, ModelPos.y, 50.f);
-		L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
-		R = rotation * Vector3(15.f, ModelPos.y, 15.f);
-
-		if (b_aiScanning == false)
-		{
-			if (e_State == WALKING)
-			{
-				SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-			}
-			else
-			{
-				SensorUpdate2(dt, destination, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-			}
-		}
-		if (vel.x != 0)
-		{
-			float SForceX = 0 - vel.x;
-			vel.x += SForceX * 0.1f;
-		}
-
-		if (vel.z != 0)
-		{
-			float SForceZ = 0 - vel.z;
-			vel.z += SForceZ * 0.1f;
-		}
-
-		if (b_updateAI)
-		{
-			Animation.Update(dt, vel.LengthSquared() * 4);
-			Lookat += vel * 10 * static_cast<float>(dt);
-			pos += vel * 10 * static_cast<float>(dt);
-		}
 	}
 	else
+	{
+		vel.SetZero();
 		AiLookatRotation(dt, playerPos);
+	}
+
+	Mtx44 rotation;
+	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
+	Vector3 L, R, C;
+	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
+	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
+
+	if (b_aiScanning == false)
+	{
+		if (e_State == WALKING)
+		{
+			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+		}
+		else
+		{
+			SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+		}
+	}
+	if (vel.x != 0)
+	{
+		float SForceX = 0 - vel.x;
+		vel.x += SForceX * 0.1f;
+	}
+
+	if (vel.z != 0)
+	{
+		float SForceZ = 0 - vel.z;
+		vel.z += SForceZ * 0.1f;
+	}
+
+	if (b_updateAI)
+	{
+		Animation.Update(dt, vel.LengthSquared() * 4);
+		Lookat += vel * 10 * static_cast<float>(dt);
+		pos += vel * 10 * static_cast<float>(dt);
+	}
 }
 
 /******************************************************************************/

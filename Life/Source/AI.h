@@ -46,7 +46,7 @@ public:
 	void movementLR(double &dt, bool left = true, float rotation_speed = 90.f);
 
 	void SensorUpdate(double &dt, bool left = false, bool middle = false, bool right = false);
-	void SensorUpdate2(double &dt, Vector3 &destination, bool left = false, bool middle = false, bool right = false);
+	void SensorUpdate2(double &dt, bool left = false, bool middle = false, bool right = false);
 	virtual void Update(double &dt, const Vector3 &playerPos, std::vector<GameObject *> &m_GOList);
 	bool collisionChecking(Vector3 &Position, std::vector<GameObject *> &m_GOList);
 
@@ -62,6 +62,7 @@ public:
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
 	void setDestination(const Vector3 &destination);
+	void setcurrentLookat(Vector3 &currentLookat);
 	float attackrate;
 private:
 	//-------------------------------------Variables------------------------------------------------
@@ -88,6 +89,7 @@ private:
 	bool b_aiScanning;
 	Vector3 test;
 
+	bool b_aiRotating;
 	bool positiveX, positiveZ, negativeX, negativeZ;
 	Vector3 diff;
 };
