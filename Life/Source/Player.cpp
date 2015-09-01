@@ -86,6 +86,6 @@ delta time
 /******************************************************************************/
 void Player::Update(double &dt)
 {
-	Animation.Update(dt, Vector3(vel.x, 0, vel.z).LengthSquared()*0.03f);
+	Animation.Update(dt*0.5f, Vector3(vel.x, 0, vel.z).LengthSquared()*0.03f);
 	pos += vel * static_cast<float>(dt);
 }

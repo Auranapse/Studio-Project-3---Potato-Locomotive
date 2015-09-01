@@ -49,7 +49,7 @@ void CustomCam1::Init(const Vector3& pos, const Vector3& target, const Vector3& 
 	mouseY = 0.0;
 
 	f_currentPitch = CalAnglefromPosition(target, position, false);
-	f_pitchLimit = 89.f;
+	f_pitchLimit = 80.f;
 }
 
 /******************************************************************************/
@@ -81,33 +81,46 @@ void CustomCam1::Update(double dt)
 		up = rotation * up;
 		target += position;
 	}
-
+	
 	if (mouseY != 0)
 	{
 		if (mouseY + f_currentPitch > f_pitchLimit && mouseY > 0)
 		{
 			mouseY = f_pitchLimit - f_currentPitch;
+
+			if (f_currentPitch >= f_pitchLimit)
+			{
+				mouseY = 0.f;
+			}
 		}
 
 		else if (mouseY + f_currentPitch < -f_pitchLimit && mouseY < 0)
 		{
 			mouseY = -f_pitchLimit - f_currentPitch;
+
+			if (f_currentPitch <= -f_pitchLimit)
+			{
+				mouseY = 0.f;
+			}
 		}
 
-		Vector3 view = (target - position).Normalized();
-		Vector3 right = view.Cross(up);
-		right.y = 0;
-		right.Normalize();
-		up = right.Cross(view).Normalized();
-		Mtx44 rotation;
-		target -= position;
-		f_currentPitch += mouseY;
-		rotation.SetToRotation(static_cast<float>(mouseY), right.x, right.y, right.z);
-		target = rotation * target;
-		target += position;
+		if (mouseY != 0)
+		{
+			Vector3 view = (target - position).Normalized();
+			Vector3 right = view.Cross(up);
+			right.y = 0;
+			right.Normalize();
+			up = right.Cross(view).Normalized();
+			Mtx44 rotation;
+			target -= position;
+			f_currentPitch += mouseY;
+			rotation.SetToRotation(static_cast<float>(mouseY), right.x, right.y, right.z);
+			target = rotation * target;
+			target += position;
+		}
 	}
 
-	if (mouseY != 0 || mouseX != 0)
+	//if (mouseY != 0 || mouseX != 0)
 	{
 		Application::SetMouseinput(Xaxis, Yaxis);
 	}
@@ -123,19 +136,37 @@ the degrees to rotate by
 /******************************************************************************/
 void CustomCam1::rotateCamVertical(float degrees)
 {
-	if (target.y - position.y < 0.97f && degrees > 0 || target.y - position.y > -0.97f && degrees < 0)
+	if (degrees + f_currentPitch > f_pitchLimit && degrees > 0)
 	{
-		Vector3 view = (target - position).Normalized();
-		Vector3 right = view.Cross(up);
-		right.y = 0;
-		right.Normalize();
-		up = right.Cross(view).Normalized();
-		Mtx44 rotation;
-		target -= position;
-		rotation.SetToRotation(static_cast<float>(degrees), right.x, right.y, right.z);
-		target = rotation * target;
-		target += position;
+		degrees = f_pitchLimit - f_currentPitch;
+
+		if (f_currentPitch >= f_pitchLimit)
+		{
+			degrees = 0.f;
+		}
 	}
+
+	else if (degrees + f_currentPitch < -f_pitchLimit && degrees < 0)
+	{
+		degrees = -f_pitchLimit - f_currentPitch;
+
+		if (f_currentPitch <= -f_pitchLimit)
+		{
+			degrees = 0.f;
+		}
+	}
+
+	Vector3 view = (target - position).Normalized();
+	Vector3 right = view.Cross(up);
+	right.y = 0;
+	right.Normalize();
+	up = right.Cross(view).Normalized();
+	Mtx44 rotation;
+	target -= position;
+	f_currentPitch += degrees;
+	rotation.SetToRotation(static_cast<float>(degrees), right.x, right.y, right.z);
+	target = rotation * target;
+	target += position;
 }
 
 CustomCam1 operator+(CustomCam1 C1, const Vector3 Delta)

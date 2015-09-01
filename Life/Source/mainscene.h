@@ -403,7 +403,7 @@ private:
 	unsigned m_parameters[U_TOTAL];
 
 	CustomCam1 FPC;
-	float f_step;
+	bool b_step;
 	float f_mouseSensitivity;
 	float mousePosX, mousePosY;
 
