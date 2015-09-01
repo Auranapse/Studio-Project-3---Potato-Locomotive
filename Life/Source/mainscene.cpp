@@ -633,7 +633,7 @@ void mainscene::Init()
 	P_Player.collisionMesh.ColBox.Set(6, 15, 6);
 	P_Player.collisionMesh.ColOffset.Set(0, 15, 0);
 
-	b_step = false;
+	f_step = 0.f;
 
 	gravity_force.Set(0.f, -9.82f * 25, 0.f);
 
@@ -665,14 +665,8 @@ void mainscene::Init()
 	soundList[ST_WALL_POWER_EXIT]->setDefaultVolume(0.5f);
 
 	soundList[ST_STEP] = SE_Engine.preloadSound("GameData//sounds//other//step1.wav");
-	soundList[ST_STEP]->setDefaultVolume(0.3f);
-
 	soundList[ST_JUMP] = SE_Engine.preloadSound("GameData//sounds//other//jump.wav");
-	soundList[ST_JUMP]->setDefaultVolume(0.8f);
-
 	soundList[ST_LAND] = SE_Engine.preloadSound("GameData//sounds//other//land.wav");
-	soundList[ST_LAND]->setDefaultVolume(0.8f);
-
 	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
 	soundList[ST_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//alert.wav");
 
@@ -696,8 +690,28 @@ void mainscene::Init()
 
 	currentLevel = 1;
 	loadLevel(currentLevel);
-	
+
+	//Sound Detection
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
+
+	//Dialogue Test
+	CollisionBox DBox;
+	DBox.Type = CollisionBox::CT_SPHERE;
+	DBox.Position = Vector3(0,0,0);
+	DBox.radius = 50;
+	PressurePlate *Dialogue1 = new PressurePlate(DBox, 1000);
+	std::string S1 = "Welcome To Gene!";
+	std::string S2 = "Press V - Slow Down Time!";
+	std::vector<std::string>Messages;
+	Messages.push_back(S1);
+	Messages.push_back(S2);
+	double T1 = 800;
+	double T2 = 100;
+	std::vector<double>MsgSeq;
+	MsgSeq.push_back(T1);
+	MsgSeq.push_back(T2);
+	Dialogue1->setDialogue(Messages,MsgSeq);
+	Dialogues.push_back(Dialogue1);
 }
 
 /******************************************************************************/
@@ -1230,13 +1244,14 @@ delta time
 /******************************************************************************/
 void mainscene::UpdatePlayer(double &dt)
 {
-	static bool inAir = false;
+	float walkSoundDelay = 0.7f;
+	bool inAir = false;
 
 	double tempDT;
 
 	if (d_dt != d_dt2)
 	{
-		tempDT = (d_dt + d_dt2) * 0.5f;
+		tempDT = (d_dt + d_dt2) / 2;
 	}
 	else
 	{
@@ -1262,16 +1277,15 @@ void mainscene::UpdatePlayer(double &dt)
 	{
 		if (collide(Vector3(P_Player.pos + Vector3(0.f, 4.f, 0.f))))//This is to prevent floor clipping, or rather, to make it bounce back up if it's clipping
 		{
-			P_Player.vel.y = 2000 * static_cast<float>(tempDT);
+			P_Player.vel.y = 50 * static_cast<float>(tempDT);
 		}
 
 		else if (collide(Vector3(P_Player.pos + Vector3(0.f, 2.f, 0.f))))
 		{
-			P_Player.vel.y = 1000 * static_cast<float>(tempDT);
+			P_Player.vel.y = 20 * static_cast<float>(tempDT);
 		}
 		else if (P_Player.vel.y != 0)
 		{
-			inAir = false;
 			P_Player.vel.y = 0.f;
 			SE_Engine.playSound2D(soundList[ST_LAND]);
 		}
@@ -1292,28 +1306,52 @@ void mainscene::UpdatePlayer(double &dt)
 
 	if (f_poweramount < 20)
 	{
-		P_Player.f_movementSpeed *= f_poweramount * 0.025f;
+		P_Player.f_movementSpeed *= 0.5f;
 	}
 
 	//Player movement
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]))
 	{
 		P_Player.movementFB(tempDT);
+
+		if (walkSoundDelay + f_step < timer && !inAir)
+		{
+			SE_Engine.playSound2D(soundList[ST_STEP]);
+			f_step = timer;
+		}
 	}
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_BACK]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_FRONT]))
 	{
 		P_Player.movementFB(tempDT, false);
+
+		if (walkSoundDelay + f_step < timer && !inAir)
+		{
+			SE_Engine.playSound2D(soundList[ST_STEP]);
+			f_step = timer;
+		}
 	}
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]))
 	{
 		P_Player.movementLR(tempDT);
+
+		if (walkSoundDelay + f_step < timer && !inAir)
+		{
+			SE_Engine.playSound2D(soundList[ST_STEP]);
+			f_step = timer;
+		}
 	}
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_RIGHT]) && !Application::IsKeyPressed(us_control[E_CTRL_MOVE_LEFT]))
 	{
 		P_Player.movementLR(tempDT, false);
+
+		if (walkSoundDelay + f_step < timer && !inAir)
+		{
+			SE_Engine.playSound2D(soundList[ST_STEP]);
+			f_step = timer;
+		}
 	}
 
 	if (Application::IsKeyPressed(us_control[E_CTRL_MOVE_JUMP]))
@@ -1410,20 +1448,6 @@ void mainscene::UpdatePlayer(double &dt)
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(tempDT);
 	P_Player.collisionMesh.Position = P_Player.pos;
-	
-	if (!inAir)
-	{
-		if (P_Player.getAnimation().LEFT_LEG < 0 && b_step)
-		{
-			SE_Engine.playSound2D(soundList[ST_STEP]);
-			b_step = false;
-		}
-		else if (P_Player.getAnimation().LEFT_LEG > 0 && !b_step)
-		{
-			SE_Engine.playSound2D(soundList[ST_STEP]);
-			b_step = true;
-		}
-	}
 }
 
 /******************************************************************************/
@@ -1973,9 +1997,8 @@ void mainscene::weaponsUpdate(double &dt)
 						{
 							firerate = timer;
 							Vector3 ShootVector = FPC.target - FPC.position;
-							ShootVector.Normalize();
 							FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
-							Shoot(FPC.position + ShootVector * 8.f, ShootVector, WO->shootvelocity, WO->range);
+							Shoot(FPC.position, ShootVector.Normalize(), WO->shootvelocity, WO->range);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
@@ -1997,8 +2020,7 @@ void mainscene::weaponsUpdate(double &dt)
 							WO->toggleAnimation();
 
 							Vector3 ShootVector = FPC.target - FPC.position;
-							ShootVector.Normalize();
-							Shoot(FPC.position + ShootVector * 8.f, ShootVector, 300.f, WO->range, true);
+							Shoot(FPC.position, ShootVector.Normalize(), 300.f, WO->range, true);
 
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 						}
@@ -2387,11 +2409,9 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	//CheckPlayerSound();
-
-	if (CollisionBetween(Vector3(0,0,0), Vector3(100,0,100)))
-		std::cout<<"TRIPPED!";
-
+	//if (P_Player.
+	CheckPlayerSound();
+	PlayerSound->setSoundRadius(P_Player.vel.Length());
 }
 
 /******************************************************************************/
@@ -3064,6 +3084,15 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&P_Player);
 	RenderParticles();
+	for (int i = 0; i < Dialogues.size(); ++i)
+	{
+		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
+		//std::cout<<Result;
+		if (Result == "TIME")
+			delete Dialogues[i];
+		else if (Result != "")
+			RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0,1,1), 3.5f, 15.f, 10.f); 
+	}
 }
 
 /******************************************************************************/
@@ -3111,7 +3140,7 @@ void mainscene::RenderUI(void)
 
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
+		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
 		modelStack.PopMatrix();
 				
@@ -3166,26 +3195,17 @@ void mainscene::RenderUI(void)
 					modelStack.PopMatrix();
 				}
 			}
-			else
-			{
-				modelStack.PushMatrix();
-				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
-				modelStack.Rotate(-45, 0, 0, 1);
-				modelStack.Scale(0.8f, 2.f, 1.f);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, Color(0.8f, 0.8f, 0.8f));
-				modelStack.PopMatrix();
-			}
 		}
 		if (f_poweramount > 0)
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(0, 0, 0.2f);
+			modelStack.Translate(0, 0, 0.1f);
 			modelStack.Scale(1, 10.f, 0.f);
-			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.2f));
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.f));
 			modelStack.PopMatrix();
 
 			modelStack.PushMatrix();
-			modelStack.Translate(0, 0, 0.3f);
+			modelStack.Translate(0, 0, 0.2f);
 			modelStack.Scale(1, f_poweramount*0.1f, 0.f);
 			if (f_poweramount < 20)
 			{
@@ -3575,7 +3595,6 @@ void mainscene::CheckPlayerSound(void)
 				if (PlayerSound->heard(go->pos))
 				{
 					std::cout<<"Player has been heard!";
-					//You put whatever functions want in 
 				}	
 			}
 		}
