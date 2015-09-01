@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SECURITYCAM_H
+#define SECURITYCAM_H
+
 #include "GameObject.h"
 #include "GabrielDLC.h"
 #include "Collision.h"
@@ -39,3 +41,4 @@ private:
 	static float f_cameraRange;
 };
 
+#endif

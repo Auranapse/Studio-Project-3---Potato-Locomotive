@@ -72,7 +72,15 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 	{
 	case SPOTTED:
 		{
-			Lookat = playerPos;
+			float rotationdiff = (CalAnglefromPosition(playerPos, pos, true) - CalAnglefromPosition(Lookat, pos, true)) * 2.f;
+
+			Mtx44 rotation;
+			Lookat = Lookat - pos;
+			f_rotationLimiter += rotationdiff * static_cast<float>(dt);
+			rotation.SetToRotation(rotationdiff * static_cast<float>(dt), 0, 1, 0);
+			Lookat = rotation * Lookat;
+			Lookat = Lookat + pos;
+
 			//Check whether player is still in the fov of security camera
 			if (((isVisible(SCPos, SCLookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
 			{
@@ -98,7 +106,14 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 
 	case FOUND:
 		{
-			Lookat = playerPos;
+			float rotationdiff = (CalAnglefromPosition(playerPos, pos, true) - CalAnglefromPosition(Lookat, pos, true)) * 2.f;
+			
+			Mtx44 rotation;
+			Lookat = Lookat - pos;
+			f_rotationLimiter += rotationdiff * static_cast<float>(dt);
+			rotation.SetToRotation(rotationdiff * static_cast<float>(dt), 0, 1, 0);
+			Lookat = rotation * Lookat;
+			Lookat = Lookat + pos;
 
 			//Alert all the ai to the camera's position
 			if (b_alertAI)
