@@ -704,23 +704,42 @@ void mainscene::Init()
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
 
 	//Dialogue Test
-	CollisionBox DBox;
-	DBox.Type = CollisionBox::CT_SPHERE;
-	DBox.Position = Vector3(0,0,0);
-	DBox.radius = 50;
-	PressurePlate *Dialogue1 = new PressurePlate(DBox, 1000);
-	std::string S1 = "Welcome To Gene!";
-	std::string S2 = "Press V - Slow Down Time!";
-	std::vector<std::string>Messages;
-	Messages.push_back(S1);
-	Messages.push_back(S2);
-	double T1 = 800;
-	double T2 = 100;
-	std::vector<double>MsgSeq;
-	MsgSeq.push_back(T1);
-	MsgSeq.push_back(T2);
-	Dialogue1->setDialogue(Messages,MsgSeq);
+	CollisionBox DBox1;
+	DBox1.Type = CollisionBox::CT_SPHERE;
+	DBox1.Position = Vector3(40,0,520);
+	DBox1.radius = 100;
+	PressurePlate *Dialogue1 = new PressurePlate(DBox1, 1000);
+	std::string S1_1 = "Welcome To Gene!";
+	std::string S2_1 = "Press B - See Through Walls!";
+	std::vector<std::string>Messages1;
+	Messages1.push_back(S1_1);
+	Messages1.push_back(S2_1);
+	double T1_1 = 800;
+	double T2_1 = 100;
+	std::vector<double>MsgSeq1;
+	MsgSeq1.push_back(T1_1);
+	MsgSeq1.push_back(T2_1);
+	Dialogue1->setDialogue(Messages1,MsgSeq1);
 	Dialogues.push_back(Dialogue1);
+
+	//Dialogue Test
+	CollisionBox DBox2;
+	DBox2.Type = CollisionBox::CT_SPHERE;
+	DBox2.Position = Vector3(10,0,70);
+	DBox2.radius = 50;
+	PressurePlate *Dialogue2 = new PressurePlate(DBox2, 400);
+	std::string S1_2 = "Too Loud! You'll get caught!";
+	std::string S2_2 = "Press Ctrl to Stealth Walk!";
+	std::vector<std::string>Messages2;
+	Messages2.push_back(S1_2);
+	Messages2.push_back(S2_2);
+	double T1_2 = 300;
+	double T2_2 = 10;
+	std::vector<double>MsgSeq2;
+	MsgSeq2.push_back(T1_2);
+	MsgSeq2.push_back(T2_2);
+	Dialogue2->setDialogue(Messages2,MsgSeq2);
+	Dialogues.push_back(Dialogue2);
 }
 
 /******************************************************************************/
@@ -2514,6 +2533,7 @@ void mainscene::Update(double dt)
 		PlayerSound->setSoundRadius(newRad.Length());
 		CheckPlayerSound();
 	}
+	std::cout<<P_Player.pos.x<<" "<<P_Player.pos.z<<"\n";
 }
 
 /******************************************************************************/
