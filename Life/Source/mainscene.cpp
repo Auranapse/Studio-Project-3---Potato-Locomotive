@@ -848,44 +848,7 @@ bool mainscene::loadLevel(int level)
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'I')
 			{
-				if (GAME_MAP.map_data[y][x][1] == 'W')
-				{
-					WeaponsObject *WO;
-					if (GAME_MAP.map_data[y][x] == "IW_M9")
-					{
-						WO = new WeaponsObject(WO_presetList[WO_M9]);
-					}
-					else if (GAME_MAP.map_data[y][x] == "IW_KATANA")
-					{
-						WO = new WeaponsObject(WO_presetList[WO_KATANA]);
-					}
-					else if (GAME_MAP.map_data[y][x] == "IW_SCALPLE")
-					{
-						WO = new WeaponsObject(WO_presetList[WO_SCALPLE]);
-					}
-
-					if (WO != NULL)
-					{
-						WO->pos.Set(x*worldsize*2.f, 10.f, y*worldsize*2.f);
-						m_goList.push_back(WO);
-					}
-					continue;
-				}
-				else if (GAME_MAP.map_data[y][x][1] == 'I')
-				{
-					ItemObject *IO;
-					if (GAME_MAP.map_data[y][x] == "II_SYRINGE")
-					{
-						IO = new ItemObject(IO_presetList[IO_SYRINGE]);
-					}
-
-					if (IO != NULL)
-					{
-						IO->pos.Set(x*worldsize*2.f, 10.f, y*worldsize*2.f);
-						m_goList.push_back(IO);
-					}
-					continue;
-				}
+				loadLevel_GenerateOBJ(GAME_MAP.map_data[y][x], Vector3(x*worldsize*2.f, 10.f, y*worldsize*2.f));
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'W')
 			{
@@ -1031,6 +994,60 @@ bool mainscene::loadLevel(int level)
 
 				m_goList.push_back(SC);
 			}
+			else if (GAME_MAP.map_data[y][x][0] == 'O')
+			{
+				WorldObject *WO;
+
+				if (GAME_MAP.map_data[y][x].size() > 1)
+				{
+					if (GAME_MAP.map_data[y][x][1] == 'T')
+					{
+						WO = new WorldObject();
+						WO->active = true;
+						WO->colEnable = true;
+						WO->scale.Set(5, 5, 5);
+						WO->collisionMesh.Type = CollisionBox::CT_AABB;
+
+						if (GAME_MAP.map_data[y][x][2] == '1')
+						{
+							WO->collisionMesh.ColBox.Set(14, 20, 24);
+						}
+						else
+						{
+							WO->rotation.y = 90.f;
+							WO->collisionMesh.ColBox.Set(24, 20, 14);
+						}
+						
+						WO->mesh = meshList[GEO_TABLE];
+
+						if (GAME_MAP.map_data[y][x].size() > 3)
+						{
+							if (GAME_MAP.map_data[y][x][4] == '1')
+							{
+								loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f));
+							}
+							if (GAME_MAP.map_data[y][x][4] == '2')
+							{
+								if (GAME_MAP.map_data[y][x][2] == '1')
+								{
+									loadLevel_GenerateOBJ("IW_KATANA", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f), Vector3(90, 0, 0));
+								}
+								else
+								{
+									loadLevel_GenerateOBJ("IW_KATANA", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f), Vector3(0, 0, 90));
+								}
+							}
+						}
+					}
+				}
+				
+				if (WO != NULL)
+				{
+					WO->pos.Set(x*worldsize*2.f, 0, y*worldsize*2.f);
+					WO->dynamicRendering = true;
+					m_goList.push_back(WO);
+				}
+			}
 			else if (GAME_MAP.map_data[y][x] == "EXIT")
 			{
 				WorldObject *WO;
@@ -1146,6 +1163,62 @@ bool mainscene::loadLevel(int level)
 	FPC.Init(P_Player.pos + P_Player.CamOffset, P_Player.pos + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
 	return true;
+}
+
+/******************************************************************************/
+/*!
+\brief
+Generates an object at a certain position
+\param object
+name of the object to load
+\param Position
+the position of the object to spawn in
+*/
+/******************************************************************************/
+void mainscene::loadLevel_GenerateOBJ(std::string object, Vector3 &Position, Vector3 &rotation)
+{
+	if (object[0] == 'I')
+	{
+		if (object[1] == 'W')
+		{
+			WeaponsObject *WO;
+			if (object == "IW_M9")
+			{
+				WO = new WeaponsObject(WO_presetList[WO_M9]);
+			}
+			else if (object == "IW_KATANA")
+			{
+				WO = new WeaponsObject(WO_presetList[WO_KATANA]);
+			}
+			else if (object == "IW_SCALPLE")
+			{
+				WO = new WeaponsObject(WO_presetList[WO_SCALPLE]);
+			}
+			if (WO != NULL)
+			{
+				WO->pos = Position;
+				WO->rotation = rotation;
+				m_goList.push_back(WO);
+				return;
+			}
+		}
+		else if (object[1] == 'I')
+		{
+			ItemObject *IO;
+			if (object == "II_SYRINGE")
+			{
+				IO = new ItemObject(IO_presetList[IO_SYRINGE]);
+			}
+
+			if (IO != NULL)
+			{
+				IO->pos = Position;
+				IO->rotation = rotation;
+				m_goList.push_back(IO);
+				return;
+			}
+		}
+	}
 }
 
 /******************************************************************************/
@@ -1811,6 +1884,14 @@ void mainscene::UpdateGO(double &dt)
 					if (go->vel.z < 0)
 					{
 						go->vel.z = 0;
+					}
+				}
+
+				if (collide(Vector3(go->pos.x, go->pos.y + go->collisionMesh.ColBox.y, go->pos.z)))
+				{
+					if (go->vel.y > 0)
+					{
+						go->vel.y = 0;
 					}
 				}
 

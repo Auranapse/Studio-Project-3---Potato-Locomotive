@@ -449,6 +449,8 @@ private:
 
 	MapLoader GAME_MAP;
 	bool loadLevel(int level);
+	void loadLevel_GenerateOBJ(std::string object, Vector3 &Position, Vector3 &rotation = Vector3(0, 0, 0));
+
 	int currentLevel;
 	Particle* FetchParticle(void);
 	BulletObject* FetchBullet(void);
