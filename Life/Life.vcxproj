@@ -115,7 +115,6 @@
     <ClCompile Include="Source\particle.cpp" />
     <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\Player.cpp" />
-    <ClCompile Include="Source\PressurePlate.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\Ray.cpp" />
     <ClCompile Include="Source\Room.cpp" />
@@ -149,7 +148,6 @@
     <ClInclude Include="Source\Living.h" />
     <ClInclude Include="Source\NonLiving.h" />
     <ClInclude Include="Source\Plane.h" />
-    <ClInclude Include="Source\PressurePlate.h" />
     <ClInclude Include="Source\Projectile.h" />
     <ClInclude Include="Source\Ray.h" />
     <ClInclude Include="Source\Room.h" />

@@ -43,7 +43,6 @@ Main scene
 
 #include "SceneManager.h"
 #include "SoundDetect.h"
-#include "PressurePlate.h"
 
 
 /******************************************************************************/
@@ -482,10 +481,9 @@ private:
 	SoundEngine SE_Engine;
 
 
-	//Sound/Collision
+	//Ray Collision
 	bool CollisionBetween(Vector3 &start, Vector3 &end);
 	void CheckPlayerSound(void);
-	std::vector<PressurePlate*> Dialogues;
 };
 
 #endif

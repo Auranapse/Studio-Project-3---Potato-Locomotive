@@ -261,9 +261,6 @@
     <ClCompile Include="Source\SoundDetect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\PressurePlate.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -439,9 +436,6 @@
     </ClInclude>
     <ClInclude Include="Source\SoundDetect.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PressurePlate.h">
-      <Filter>Header Files\Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
