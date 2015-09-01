@@ -41,27 +41,32 @@ public:
 	AI(E_AI_STATE, E_TYPE);
 	virtual ~AI();
 
+	bool b_isDestinationVisible;
+	bool b_isDestinationWithinFOV;
 	void movementRW(bool run = true);
 	void movementFB(double &dt, bool forward = true);
 	void movementLR(double &dt, bool left = true, float rotation_speed = 90.f);
 
 	void SensorUpdate(double &dt, bool left = false, bool middle = false, bool right = false);
 	void SensorUpdate2(double &dt, bool left = false, bool middle = false, bool right = false);
-	virtual void Update(double &dt, const Vector3 &playerPos, std::vector<GameObject *> &m_GOList);
+	virtual void Update(double &dt, Vector3 &playerPos, std::vector<GameObject *> &m_GOList);
 	bool collisionChecking(Vector3 &Position, std::vector<GameObject *> &m_GOList);
+	void collisionHandler(std::vector<GameObject *> &m_GOList);
 
-	void ai_ScanArea(const double &dt);
-	void UpdateLookat(const double &dt, const Vector3 &playerPos);
-	void aiStateHandling(const double &dt, const Vector3 &playerPos);
-	void AiLookatRotation(const double &dt, const Vector3 &playerPos);
+	void ai_ScanArea(double &dt);
+	void UpdateLookat(double &dt, Vector3 &playerPos);
+	void aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*> &m_GOList);
+	void AiLookatRotation(double &dt);
+	void moveToDestination(double &dt);
 	double getPlayerEscapeRange();
 	double getDetectionAngle();
 	double getDetectionRange();
 	double getDetectionRange_Max();
+	bool getShootGun();
 	Vector3 getDestination();
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
-	void setDestination(const Vector3 &destination);
+	void setDestination(Vector3 &destination);
 	void setcurrentLookat(Vector3 &currentLookat);
 	float attackrate;
 private:
@@ -79,8 +84,6 @@ private:
 	bool b_SHOOTLA;
 	double d_totalRotation;
 	double d_enemyRotation;
-	bool b_goAlert;
-	bool b_goAttack;
 	bool b_rotateClockwiseFirst;
 
 	static double d_detectionAngle;

@@ -1955,14 +1955,28 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
-		if (CollisionBetween(ai->pos + ai->ModelPos + ai->HeadPos, P_Player.pos + P_Player.ModelPos + P_Player.HeadPos))
+		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()))
 		{
-			std::cout << "true" << std::endl;
+			ai->b_isDestinationWithinFOV = true;
 		}
 		else
 		{
-			std::cout << "false" << std::endl;
+			ai->b_isDestinationWithinFOV = false;
+			ai->b_isDestinationVisible = false;
 		}
+
+		if(ai->b_isDestinationWithinFOV)
+		{
+			if (CollisionBetween(ai->pos + ai->ModelPos + ai->HeadPos, ai->getDestination() + Vector3(0, 10, 0)))
+			{
+				ai->b_isDestinationVisible = true;
+			}
+			else
+			{
+				ai->b_isDestinationVisible = false;
+			}
+		}
+		
 		if(ai->getState() == AI::ATTACK)
 		{
 			if(ai->holding != NULL)
@@ -1976,7 +1990,11 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 						{
 							ai->attackrate = timer;
 							SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
-							Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+
+							if(ai->getShootGun() == true)
+							{
+								Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+							}
 						}
 					}
 				}
@@ -3819,9 +3837,9 @@ bool mainscene::CollisionBetween(Vector3 start, Vector3 &end)
 				} 
 			} 
 		} 
-	} 
-	return false; 
+	}
 
+	return false;
 }
 
 void mainscene::CheckPlayerSound(void)

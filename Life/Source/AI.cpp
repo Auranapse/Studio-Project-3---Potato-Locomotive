@@ -23,7 +23,7 @@ Default constructor
 /******************************************************************************/
 AI::AI() :
 f_alert_timer(0.f),
-attackrate(0.f)
+	attackrate(0.f)
 {
 
 }
@@ -42,12 +42,13 @@ f_alert_timer(0.f)
 	d_enemyRotation = 0.0;
 	b_rotateClockwiseFirst = NULL;
 	currentLookat = NULL;
-	b_goAlert = b_goAttack = false;
 	positiveX = false, positiveZ = true, negativeX = false, negativeZ = false;
 	diff.Set(0.f, 0.f, 1.f);
 	b_aiScanning = false;
 	b_aiRotating = false;
 	b_SHOOTLA = false;
+	b_isDestinationVisible = false;
+	b_isDestinationWithinFOV = false;
 }
 
 /******************************************************************************/
@@ -306,7 +307,6 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	}
 }
 
-
 /******************************************************************************/
 /*!
 \brief
@@ -315,7 +315,7 @@ AI will scan the area for the player
 use to update the rotation of the ai
 */
 /******************************************************************************/
-void AI::ai_ScanArea(const double &dt)
+void AI::ai_ScanArea(double &dt)
 {
 	b_updateAI = false;
 	b_aiScanning = true;
@@ -366,10 +366,10 @@ void AI::ai_ScanArea(const double &dt)
 Return the player escape range
 
 \param 
-		d_playerEscapeRange
+d_playerEscapeRange
 
 \return 
-		d_playerEscapeRange
+d_playerEscapeRange
 */
 /******************************************************************************/
 double AI::getPlayerEscapeRange()
@@ -383,10 +383,10 @@ double AI::getPlayerEscapeRange()
 Return the AI detection angle range
 
 \param 
-		d_detectionAngle
+d_detectionAngle
 
 \return 
-		d_detectionAngle
+d_detectionAngle
 */
 /******************************************************************************/
 double AI::getDetectionAngle()
@@ -400,10 +400,10 @@ double AI::getDetectionAngle()
 Return the AI detection range
 
 \param 
-		d_detectionRange
+d_detectionRange
 
 \return 
-		d_detectionRange
+d_detectionRange
 */
 /******************************************************************************/
 double AI::getDetectionRange()
@@ -417,10 +417,10 @@ double AI::getDetectionRange()
 Return the AI detection maximum range
 
 \param 
-		d_detectionRangeMax
+d_detectionRangeMax
 
 \return 
-		d_detectionRangeMax
+d_detectionRangeMax
 */
 /******************************************************************************/
 double AI::getDetectionRange_Max()
@@ -435,10 +435,10 @@ double AI::getDetectionRange_Max()
 Return the AI destination
 
 \param 
-		destination
+destination
 
 \return 
-		destination
+destination
 */
 /******************************************************************************/
 Vector3 AI::getDestination()
@@ -452,10 +452,10 @@ Vector3 AI::getDestination()
 Return the AI state
 
 \param 
-		e_State
+e_State
 
 \return 
-		e_State
+e_State
 */
 /******************************************************************************/
 AI::E_AI_STATE AI::getState()
@@ -470,7 +470,7 @@ AI::E_AI_STATE AI::getState()
 Set the AI state
 
 \param 
-		e_State
+e_State
 */
 /******************************************************************************/
 void AI::setState(E_AI_STATE e_State)
@@ -484,18 +484,40 @@ void AI::setState(E_AI_STATE e_State)
 Set the AI destination
 
 \param 
-		destination
+destination
 */
 /******************************************************************************/
-void AI::setDestination(const Vector3 &destination)
+void AI::setDestination(Vector3 &destination)
 {
 	this->destination = destination;
 }
 
+/******************************************************************************/
+/*!
+\brief
+Set the AI lookat
+
+\param 
+lookat
+*/
+/******************************************************************************/
+
 void AI::setcurrentLookat(Vector3 &currentLookat)
 {
 	this->currentLookat = currentLookat;
-	this->b_goAlert = true;
+}
+/******************************************************************************/
+/*!
+\brief
+Return the bool to determine whether the AI shud shoot or not
+
+\param 
+Shoot Or Not to shoot
+*/
+/******************************************************************************/
+bool AI::getShootGun()
+{
+	return b_SHOOTLA;
 }
 
 /******************************************************************************/
@@ -504,21 +526,28 @@ void AI::setcurrentLookat(Vector3 &currentLookat)
 Update AI base on its state
 
 \param 
-		delta time
-		Player Position
-		Enemy state
+delta time
+Player Position
+Enemy state
 */
 /******************************************************************************/
-void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
+void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
+	Mtx44 rotation;
+	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
+	Vector3 L, R, C;
+	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
+	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
+	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
+
 	switch (e_State)
 	{
 	case WALKING:
 		{
 			//Have the AI partol a certain area
 			//Need Pathfinding i think
-
-			if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos))
+			destination = playerPos;
+			if (b_isDestinationWithinFOV && b_isDestinationVisible)
 			{
 				//If player is infront and near player, then ai will switch to attack state
 				if ((playerPos - pos).LengthSquared() < d_detectionRange)
@@ -526,7 +555,8 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 					currentLookat.x = playerPos.x;
 					currentLookat.z = playerPos.z;
 					prevPosition = pos;
-					b_goAttack = true;
+					e_State = ATTACK;
+					break;
 				}
 				//if ai saw player but is too far way, the ai will investigate
 				else if ((playerPos - pos).LengthSquared() >= d_detectionRange && (playerPos - pos).LengthSquared() <= d_detectionRangeMax)
@@ -536,32 +566,39 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 					currentLookat.x = playerPos.x;
 					currentLookat.z = playerPos.z;
 					prevPosition = pos;
-					b_goAlert = true;
+					e_State = ALERT;
+					break;
 				}
 			}
+
+			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 		}
 		break;
 
 	case ALERT:
-		{
-			//AI will move towards the destination
-			if ((pos - destination).LengthSquared() > 2)
+		{					
+			//If destination is not visible
+			if (!b_isDestinationVisible)
 			{
-				//Move the ai towards the destination
-				Lookat = destination;
+				//use sensor update 2 to get to the destination
+				SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 			}
-			//if ai is at the destination
-			else
-			{
-				ai_ScanArea(dt);
-			} 
-
 			//If player is infront and near player, then ai will switch to attack state
-			if (isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
+			else if (b_isDestinationWithinFOV && (playerPos - pos).LengthSquared() < d_detectionRange)
 			{
 				e_State = ATTACK;
 				b_updateAI = true;
 				b_rotateClockwiseFirst = NULL;
+			}
+
+			if(b_isDestinationVisible && b_isDestinationWithinFOV)
+			{
+				moveToDestination(dt);
+			}
+
+			if((pos - destination).LengthSquared() < 300)
+			{
+				e_State = WALKING;
 			}
 		}
 		break;
@@ -569,7 +606,6 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 	case ATTACK:
 		{
 			destination = playerPos;
-
 
 			if(e_Type == AI_SECURITY)
 			{
@@ -583,27 +619,39 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 						//Enemy is holding a gun
 						if (WO->isGun)
 						{
-							//Make enemy move a certain distance away from the enemy before shooting
-							if(isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
+							//Make enemy stay at the same pos 
+							if(b_isDestinationWithinFOV && (playerPos - pos).LengthSquared() < d_detectionRange)
 							{
-								currentLookat = playerPos;
+								currentLookat.x = playerPos.x;
+								currentLookat.z = playerPos.z;
 								b_SHOOTLA = true;
 							}
-
 							else
+							{
 								b_SHOOTLA = false;
-						}
-						//Enemy is holding a melee weapon
-						else
-						{
-
+								if(!b_isDestinationVisible)
+								{
+									SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+								}
+								else
+								{
+									moveToDestination(dt);
+								}
+							}
 						}
 					}
 				}
 				//Enemy is not holding a weapon
 				else
 				{
-					//make the enemy move closer to the player before attacking
+					if(!b_isDestinationVisible)
+					{
+						SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+					}
+					else
+					{
+						moveToDestination(dt);
+					}
 				}
 			}
 
@@ -623,25 +671,51 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 							//Make enemy move a certain distance away from the enemy before shooting
 							if(isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
 							{
-								currentLookat = playerPos;
+								currentLookat.x = playerPos.x;
+								currentLookat.z = playerPos.z;
 								b_SHOOTLA = true;
 							}
 
 							else
+							{
 								b_SHOOTLA = false;
+
+								if(!b_isDestinationVisible)
+								{
+									SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+								}
+								else
+								{
+									moveToDestination(dt);
+								}
+							}
 						}
 
 						//Enemy is holding a melee weapon
 						else
 						{
-
+							if(!b_isDestinationVisible)
+							{
+								SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+							}
+							else
+							{
+								moveToDestination(dt);
+							}
 						}
 					}
 				}
 				//Enemy is not holding a weapon
 				else
 				{
-					//make the enemy move closer to the player before attacking
+					if(!b_isDestinationVisible)
+					{
+						SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+					}
+					else
+					{
+						moveToDestination(dt);
+					}
 				}
 			}
 			break;
@@ -654,28 +728,44 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 /******************************************************************************/
 /*!
 \brief
+AI moves directly towards the destination
+WARNING: Do not use if wall between AI and destination
+
+\param dt
+delta time
+*/
+/******************************************************************************/
+void AI::moveToDestination(double &dt)
+{
+	currentLookat = destination;
+	movementFB(dt, true);
+}
+
+/******************************************************************************/
+/*!
+\brief
 Update the AI Lookat based on its current Lookat
 
 \param 
-		delta time
-		Player Position
-		AI Lookat
-		AI Current Lookat
+delta time
+Player Position
+AI Lookat
+AI Current Lookat
 */
 /******************************************************************************/
-void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
+void AI::AiLookatRotation(double &dt)
 {
-	if(currentLookat != NULL)
+	if(currentLookat != 0)
 	{
 		static float rotationSpeed = 2;
 
-		if(b_goAttack)
+		if(e_State == ATTACK)
 		{
 			rotationSpeed = 10;
 		}
 		else
 		{
-			rotationSpeed = 2;
+			rotationSpeed = 5;
 		}
 
 		if (b_aiRotating == false)
@@ -690,31 +780,26 @@ void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 			Lookat = rotation * Lookat;
 			Lookat = Lookat + pos;
 
-			if(rotationdiff < 1.2 && rotationdiff > -1.2)
+			if(rotationdiff < 0.1 && rotationdiff > -0.1)
 			{
 				b_aiRotating = true;
 			}
 		}
 		else
 		{
-			if (b_goAttack)
+			if (e_State == ATTACK)
 			{
 				prevPosition = pos;
-				e_State = ATTACK;
-				b_goAttack = false;
 			}
-			else if (b_goAlert)
+			else if (e_State == ALERT)
 			{
 				destination = currentLookat;
 				prevPosition = pos;
-				e_State = ALERT;
-				b_goAlert = false;
 			}
 
-			currentLookat = NULL;
+			currentLookat = 0;
 			b_aiRotating = false;
 		}
-		
 	}
 }
 
@@ -728,36 +813,15 @@ CharacterObject vector list - To check collision
 GameObject vector list - To check collision
 */
 /******************************************************************************/
-void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
+void AI::Update(double &dt, Vector3 &playerPos, std::vector<GameObject*> &m_GOList)
 {
-	if(currentLookat == NULL)
+	aiStateHandling(dt, playerPos, m_GOList);
+	if(currentLookat != 0 || e_State == ATTACK)
 	{
-		aiStateHandling(dt, playerPos);
-	}
-	else
-	{
-		vel.SetZero();
-		AiLookatRotation(dt, playerPos);
+		AiLookatRotation(dt);
 	}
 
-	Mtx44 rotation;
-	rotation.SetToRotation(CalAnglefromPosition(Lookat, pos, true), 0.f, 1.f, 0.f);
-	Vector3 L, R, C;
-	C = rotation * Vector3(0.f, ModelPos.y, 50.f);
-	L = rotation * Vector3(-15.f, ModelPos.y, 15.f);
-	R = rotation * Vector3(15.f, ModelPos.y, 15.f);
-
-	if (b_aiScanning == false)
-	{
-		if (e_State == WALKING)
-		{
-			SensorUpdate(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-		}
-		else
-		{
-			SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-		}
-	}
+	collisionHandler(m_GOList);
 
 	if (vel.x != 0)
 	{
@@ -776,6 +840,47 @@ void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &
 		Animation.Update(dt, vel.LengthSquared() * 4);
 		Lookat += vel * 10 * static_cast<float>(dt);
 		pos += vel * 10 * static_cast<float>(dt);
+	}
+}
+
+/******************************************************************************/
+/*!
+\brief
+Prevent AI from clipping into walls completely
+*/
+/******************************************************************************/
+void AI::collisionHandler(std::vector<GameObject *> &m_GOList)
+{
+	if(collisionChecking(pos + Vector3(collisionMesh.ColBox.x, ModelPos.y, 0), m_GOList))
+	{
+		if(vel.x > 0)
+		{
+			vel.x = 0;
+		}
+	}
+
+	if(collisionChecking(pos + Vector3(-collisionMesh.ColBox.x, ModelPos.y, 0), m_GOList))
+	{
+		if(vel.x < 0)
+		{
+			vel.x = 0;
+		}
+	}
+
+	if(collisionChecking(pos + Vector3(0, ModelPos.y, collisionMesh.ColBox.z), m_GOList))
+	{
+		if(vel.z > 0)
+		{
+			vel.z = 0;
+		}
+	}
+
+	if(collisionChecking(pos + Vector3(0, ModelPos.y, -collisionMesh.ColBox.z), m_GOList))
+	{
+		if(vel.z < 0)
+		{
+			vel.z = 0;
+		}
 	}
 }
 
