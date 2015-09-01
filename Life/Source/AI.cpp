@@ -152,11 +152,6 @@ void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 	float rotationDiff = CalAnglefromPosition(destination, pos, true) - CalAnglefromPosition(Lookat, pos, true);
 	movementLR(dt, false, rotationDiff);
 
-	if(mid || left || right)
-	{
-		destination = pos;
-	}
-
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
@@ -489,6 +484,7 @@ destination
 /******************************************************************************/
 void AI::setDestination(Vector3 &destination)
 {
+	currentLookat = destination;
 	this->destination = destination;
 }
 
@@ -584,7 +580,7 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 				SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 			}
 			//If player is infront and near player, then ai will switch to attack state
-			else if (b_isDestinationWithinFOV && (playerPos - pos).LengthSquared() < d_detectionRange)
+			if (isVisible(pos, Lookat, getDetectionAngle(), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
 			{
 				e_State = ATTACK;
 				b_updateAI = true;
@@ -596,7 +592,7 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 				moveToDestination(dt);
 			}
 
-			if((pos - destination).LengthSquared() < 300)
+			if((pos - destination).LengthSquared() < 10)
 			{
 				e_State = WALKING;
 			}
