@@ -553,6 +553,9 @@ void mainscene::Init()
 	meshList[GEO_KATANA] = MeshBuilder::GenerateOBJ("Katana", "GameData//OBJ//weapons//Katana.obj");
 	meshList[GEO_KATANA]->textureID[0] = LoadTGA("GameData//Image//weapons//Katana.tga", true);
 
+	meshList[GEO_SCALPLE] = MeshBuilder::GenerateOBJ("Katana", "GameData//OBJ//weapons//Scalple.obj");
+	meshList[GEO_SCALPLE]->textureID[0] = LoadTGA("GameData//Image//weapons//Scalple.tga", true);
+
 	meshList[GEO_ITEM_SYRINGE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Items//Syringe.obj");
 	meshList[GEO_ITEM_SYRINGE]->textureID[0] = LoadTGA("GameData//Image//Items//Syringe.tga", true);
 
@@ -564,6 +567,7 @@ void mainscene::Init()
 	meshList[GEO_SPAS12]->material = meshList[GEO_M9]->material;
 	meshList[GEO_MP5K]->material = meshList[GEO_M9]->material;
 	meshList[GEO_KATANA]->material = meshList[GEO_M9]->material;
+	meshList[GEO_SCALPLE]->material = meshList[GEO_M9]->material;
 	meshList[GEO_ITEM_SYRINGE]->material = meshList[GEO_M9]->material;
 
 	//----------------------SKYBOX
@@ -826,6 +830,10 @@ bool mainscene::loadLevel(int level)
 					{
 						WO = new WeaponsObject(WO_presetList[WO_KATANA]);
 					}
+					else if (GAME_MAP.map_data[y][x] == "IW_SCALPLE")
+					{
+						WO = new WeaponsObject(WO_presetList[WO_SCALPLE]);
+					}
 
 					if (WO != NULL)
 					{
@@ -839,7 +847,7 @@ bool mainscene::loadLevel(int level)
 					ItemObject *IO;
 					if (GAME_MAP.map_data[y][x] == "II_SYRINGE")
 					{
-						IO = new WeaponsObject(WO_presetList[WO_M9]);
+						IO = new ItemObject(IO_presetList[IO_SYRINGE]);
 					}
 
 					if (IO != NULL)
@@ -1221,6 +1229,25 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
 	WO_presetList[WO_KATANA].range = 0.1f;
 
+	WO_presetList[WO_SCALPLE].active = true;
+	WO_presetList[WO_SCALPLE].mesh = meshList[GEO_SCALPLE];
+	WO_presetList[WO_SCALPLE].attackRate = 0.05f;
+	WO_presetList[WO_SCALPLE].AnimSpeed = 10.f;
+	WO_presetList[WO_SCALPLE].scale.Set(0.3f, 0.3f, 0.3f);
+	WO_presetList[WO_SCALPLE].pos.Set(0, 10, 0);
+	WO_presetList[WO_SCALPLE].pos1.Set(-4.f, -4.f, 6.f);
+	WO_presetList[WO_SCALPLE].pos2.Set(-4.f, -4.f, 12.f);
+	WO_presetList[WO_SCALPLE].Rotation1.Set(70, 0, 0);
+	WO_presetList[WO_SCALPLE].Rotation2.Set(90, 0, 0);
+	WO_presetList[WO_SCALPLE].isGun = false;
+	WO_presetList[WO_SCALPLE].isWeapon = true;
+	WO_presetList[WO_SCALPLE].enablePhysics = true;
+	WO_presetList[WO_SCALPLE].colEnable = true;
+	WO_presetList[WO_SCALPLE].collisionMesh.Type = CollisionBox::CT_AABB;
+	WO_presetList[WO_SCALPLE].collisionMesh.ColBox.Set(3, 3, 3);
+	WO_presetList[WO_SCALPLE].AttackSound = ST_WEAPON_KATANA;
+	WO_presetList[WO_SCALPLE].range = 0.05f;
+
 	f_curRecoil = 0.f;
 }
 
@@ -1391,8 +1418,14 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]))
+	static bool isinteractPressed = false;
+	if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && !isinteractPressed)
 	{
+		isinteractPressed = true;
+	}
+	else if (!Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && isinteractPressed)
+	{
+		isinteractPressed = false;
 		if (P_Player.holding == NULL)
 		{
 			for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
@@ -2059,6 +2092,18 @@ void mainscene::weaponsUpdate(double &dt)
 		else if (!Application::IsKeyPressed(us_control[E_CTRL_ATTACK]) && isAttackPressed)
 		{
 			isAttackPressed = false;
+		}
+
+		static bool isinteractPressed = false;
+		if (Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && !isinteractPressed)
+		{
+			isinteractPressed = true;
+		}
+		else if (!Application::IsKeyPressed(us_control[E_CTRL_INTERACT]) && isinteractPressed)
+		{
+			isinteractPressed = false;
+			firerate = 0.f;
+			P_Player.DropObject();
 		}
 	}
 }

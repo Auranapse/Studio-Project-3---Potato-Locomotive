@@ -97,6 +97,7 @@ class mainscene : public Scene
 		GEO_MP5K,
 		GEO_SPAS12,
 		GEO_KATANA,
+		GEO_SCALPLE,
 		//Objects
 		GEO_ITEM_SYRINGE,
 
@@ -325,6 +326,7 @@ class mainscene : public Scene
 	{
 		WO_KATANA,
 		WO_M9,
+		WO_SCALPLE,
 		WO_TOTAL,
 	};
 
