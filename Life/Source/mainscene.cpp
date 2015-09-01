@@ -1864,21 +1864,6 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	{
 		if(ai->getState() == AI::ATTACK)
 		{
-			//for(std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
-			//{
-			//	GameObject * go = (GameObject*)*it;
-			//	if(go != NULL)
-			//	{
-			//		if (isVisible(ai->pos, ai->Lookat, ai->getDetectionAngle(), go->pos) || (Vector3(ai->pos.x - go->pos.x, 0, ai->pos.z - go->pos.z)).LengthSquared() < ai->get)//Dynamic rendering
-			//		{
-			//			std::cout << "true" << std::endl;
-			//		}
-			//		else
-			//		{
-			//			std::cout << "False" << std::endl;
-			//		}
-			//	}
-			//}
 			if(ai->holding != NULL)
 			{
 				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(ai->holding);
@@ -3202,7 +3187,16 @@ void mainscene::RenderWorldShadow(void)
 					CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
 					if (CO != NULL)
 					{
-						RenderCharacter(CO);
+						if (CurrentPower == PT_SUPERVISION && PowerActive)
+						{
+							glDisable(GL_DEPTH_TEST);
+							RenderCharacter(CO);
+							glEnable(GL_DEPTH_TEST);
+						}
+						else
+						{
+							RenderCharacter(CO);
+						}
 					}
 					else
 					{

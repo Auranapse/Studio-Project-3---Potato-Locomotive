@@ -762,13 +762,13 @@ void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &
 	if (vel.x != 0)
 	{
 		float SForceX = 0 - vel.x;
-		vel.x += SForceX * 0.1f;
+		vel.x += SForceX * static_cast<float>(dt) * 4.f;
 	}
 
 	if (vel.z != 0)
 	{
 		float SForceZ = 0 - vel.z;
-		vel.z += SForceZ * 0.1f;
+		vel.z += SForceZ * static_cast<float>(dt) * 4.f;
 	}
 
 	if (b_updateAI)
