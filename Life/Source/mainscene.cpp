@@ -1955,6 +1955,14 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
+		if (CollisionBetween(ai->pos + ai->ModelPos + ai->HeadPos, P_Player.pos + P_Player.ModelPos + P_Player.HeadPos))
+		{
+			std::cout << "true" << std::endl;
+		}
+		else
+		{
+			std::cout << "false" << std::endl;
+		}
 		if(ai->getState() == AI::ATTACK)
 		{
 			if(ai->holding != NULL)
@@ -2611,7 +2619,6 @@ void mainscene::Update(double dt)
 		PlayerSound->setSoundRadius(newRad.Length());
 		CheckPlayerSound();
 	}
-	std::cout<<P_Player.pos.x<<" "<<P_Player.pos.z<<"\n";
 }
 
 /******************************************************************************/
@@ -3777,7 +3784,7 @@ void mainscene::Exit(void)
 }
 
 
-bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
+bool mainscene::CollisionBetween(Vector3 start, Vector3 &end)
 {
 	std::vector<CollisionBox>Temporary; 
 	Vector3 direction = (end-start).Normalized(); 
