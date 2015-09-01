@@ -2451,11 +2451,13 @@ void mainscene::Update(double dt)
 		break;
 	}
 
-	CheckPlayerSound();
-
-	if (CollisionBetween(Vector3(0,0,0), Vector3(100,0,100)))
-		std::cout<<"TRIPPED!";
-
+	
+	Vector3 newRad = P_Player.vel;
+	if (P_Player.vel.y == 0)
+	{
+		PlayerSound->setSoundRadius(newRad.Length());
+		CheckPlayerSound();
+	}
 }
 
 /******************************************************************************/
@@ -3603,37 +3605,8 @@ void mainscene::Exit(void)
 }
 
 
-bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
+bool mainscene::CollisionBetween(Vector3&, Vector3&)
 {
-	CollisionBox Ray;
-	Ray.Type = CollisionBox::CT_RAY;
-	Ray.end = end;
-	Ray.Position = start;
-	Ray.t1 = 0;
-	Ray.t2 = 1;
-
-	Ray.Direction = (end-start).Normalized();
-
-	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
-	{
-		GameObject *go = (GameObject *)*it;
-		if (go->active)
-		{
-			AI *ai = dynamic_cast<AI*>(go);
-			
-			if(ai != NULL)
-			{
-				//std::cout<<go->collisionMesh.Type<<"A\n";
-				//std::cout<<Ray.Type<<"R\n";
-				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
-				{
-					std::cout << "FML" << std::endl;
-					//std::cout<<"CHECK!"<<go->collisionMesh.Type<<Ray.Type;
-					return true;
-				}
-			}
-		}
-	}
 	return false;
 }
 
@@ -3649,7 +3622,7 @@ void mainscene::CheckPlayerSound(void)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
-					std::cout<<"Player has been heard!";
+					std::cout<<"- Player has been heard!\n";
 					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 				}	

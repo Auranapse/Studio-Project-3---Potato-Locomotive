@@ -485,7 +485,7 @@ private:
 
 
 	//Ray Collision
-	bool CollisionBetween(Vector3 &start, Vector3 &end);
+	bool CollisionBetween(Vector3&, Vector3&);
 	void CheckPlayerSound(void);
 	std::vector<PressurePlate*> Dialogues;
 };
