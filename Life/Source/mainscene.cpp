@@ -920,23 +920,43 @@ bool mainscene::loadLevel(int level)
 				m_goList.push_back(WO);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'A')
-			{
-				AI *ai;
-				ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
-				ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//PlayerSkin.tga");
-				ai->Lookat = ai->pos + Vector3(0, 0, 10);
-				ai->scale.Set(10, 10, 10);
-				ai->collisionMesh.Type = CollisionBox::CT_AABB;
-				ai->collisionMesh.Position = ai->pos;
-				ai->collisionMesh.ColBox.Set(6, 15, 6);
-				ai->collisionMesh.ColOffset.Set(0, 15, 0);
+			{				
+				if (GAME_MAP.map_data[y][x].size() > 1)
+				{
+					AI *ai;
+					if (GAME_MAP.map_data[y][x][1] == '1')
+					{
+						ai = new AI(AI::WALKING, AI::AI_SCIENTIST);
+						ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//scientist.tga");
 
+						ItemObject *IO;
+						IO = new ItemObject(IO_presetList[IO_SYRINGE]);
+						ai->HoldObject(IO);
+						m_goList.push_back(IO);
+					}
+					else if (GAME_MAP.map_data[y][x][1] == '2')
+					{
+						ai = new AI(AI::WALKING, AI::AI_SECURITY);
+						ai->Init(Vector3(x*worldsize*2.f, 0, y*worldsize*2.f), Vector3(0, 0, 0), "GameData//Image//player//security.tga");
 
-				WeaponsObject *WO;
-				WO = new WeaponsObject(WO_presetList[WO_M9]);
-				ai->HoldObject(WO);
-				m_goList.push_back(WO);
-				m_goList.push_back(ai);
+						WeaponsObject *WO;
+						WO = new WeaponsObject(WO_presetList[WO_M9]);
+						ai->HoldObject(WO);
+						m_goList.push_back(WO);
+					}
+
+					if (ai != NULL)
+					{
+						ai->Lookat = ai->pos + Vector3(0, 0, 10);
+						ai->scale.Set(10, 10, 10);
+						ai->collisionMesh.Type = CollisionBox::CT_AABB;
+						ai->collisionMesh.Position = ai->pos;
+						ai->collisionMesh.ColBox.Set(6, 15, 6);
+						ai->collisionMesh.ColOffset.Set(0, 15, 0);
+
+						m_goList.push_back(ai);
+					}
+				}				
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'S')
 			{
@@ -1317,9 +1337,12 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 		else if (P_Player.vel.y != 0)
 		{
-			inAir = false;
 			P_Player.vel.y = 0.f;
 			SE_Engine.playSound2D(soundList[ST_LAND]);
+		}
+		else if (P_Player.vel.y == 0)
+		{
+			inAir = false;
 		}
 	}
 
@@ -1850,18 +1873,20 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 							SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
 							Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
 						}
-
 					}
-
-					else
+				}
+				else
+				{
+					if ((P_Player.pos - ai->pos).LengthSquared() < 800)
 					{
-						if((P_Player.pos - ai->pos).LengthSquared() < 300)
+						if (f_poweramount < 20)
 						{
-							if(ai->attackrate + WO->attackRate < timer)
-							{
-								ai->attackrate = timer;
-								f_poweramount -= 10.f;
-							}
+							f_poweramount -= 20.f * static_cast<float>(dt);
+						}
+						else if (ai->attackrate + 0.2f < timer)
+						{
+							ai->attackrate = timer;
+							f_poweramount -= 20.f;
 						}
 					}
 				}
@@ -1888,7 +1913,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 							BO->active = false;
 							CO->DropObject();
 							CO->active = false;
-							generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-50, 50), Math::RandFloatMinMax(20, 120), Math::RandFloatMinMax(-50, 50)));
+							generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)));
 						}
 						else
 						{
@@ -2008,7 +2033,7 @@ void mainscene::Shoot(const Vector3 &Pos, const Vector3 &Dir, float Speed, float
 	}
 	else
 	{
-		BO->collisionMesh.radius = 5.f;
+		BO->collisionMesh.radius = 3.f;
 		BO->mesh = NULL;
 	}
 }
