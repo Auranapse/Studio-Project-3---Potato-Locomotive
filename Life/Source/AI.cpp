@@ -160,13 +160,13 @@ void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
-		movementLR(dt, false, 720.f);
+		movementLR(dt, false, 360.f);
 	}
 
 	//when left has nothing to collide
 	else if (left == false && mid == true && right == true)
 	{
-		movementLR(dt, true, 720.f);
+		movementLR(dt, true, 360.f);
 	}
 
 	//when middle has nothing to collide
@@ -195,7 +195,7 @@ void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 			movementFB(dt, true);
 
 		else
-			movementLR(dt, false, 720.f);
+			movementLR(dt, false, 360.f);
 	}
 
 	//random betwee walking straight and left
@@ -208,7 +208,7 @@ void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 		else
 		{
 			movementFB(dt, false);
-			movementLR(dt, true, 720.f);
+			movementLR(dt, true, 360.f);
 		}
 	}
 
@@ -240,13 +240,13 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
-		movementLR(dt, false, 720.f);
+		movementLR(dt, false, 360.f);
 	}
 
 	//when left has nothing to collide
 	else if (left == false && mid == true && right == true)
 	{
-		movementLR(dt, true, 720.f);
+		movementLR(dt, true, 360.f);
 	}
 
 	//when middle has nothing to collide
@@ -275,7 +275,7 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 			movementFB(dt, true);
 
 		else
-			movementLR(dt, false, 720.f);
+			movementLR(dt, false, 360.f);
 	}
 
 	//random betwee walking straight and left
@@ -288,7 +288,7 @@ void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 		else
 		{
 			movementFB(dt, false);
-			movementLR(dt, true, 720.f);
+			movementLR(dt, true, 360.f);
 		}
 	}
 
@@ -554,6 +554,7 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 				{
 					currentLookat.x = playerPos.x;
 					currentLookat.z = playerPos.z;
+					destination = playerPos;
 					prevPosition = pos;
 					e_State = ATTACK;
 					break;
@@ -563,8 +564,7 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 				{
 					destination.x = playerPos.x;
 					destination.z = playerPos.z;
-					currentLookat.x = playerPos.x;
-					currentLookat.z = playerPos.z;
+					destination = playerPos;
 					prevPosition = pos;
 					e_State = ALERT;
 					break;
@@ -604,111 +604,41 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 		break;
 
 	case ATTACK:
+	{
+		destination = playerPos;
+		//if enemy is holding a weapon
+		if (holding != NULL)
 		{
-			destination = playerPos;
-
-			if(e_Type == AI_SECURITY)
+			if (holding->isWeapon)
 			{
-				//if enemy is holding a weapon
-				if (holding != NULL)
-				{
-					if (holding->isWeapon)
-					{
-						WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
+				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
 
-						//Enemy is holding a gun
-						if (WO->isGun)
-						{
-							//Make enemy stay at the same pos 
-							if(b_isDestinationWithinFOV && (playerPos - pos).LengthSquared() < d_detectionRange)
-							{
-								currentLookat.x = playerPos.x;
-								currentLookat.z = playerPos.z;
-								b_SHOOTLA = true;
-							}
-							else
-							{
-								b_SHOOTLA = false;
-								if(!b_isDestinationVisible)
-								{
-									SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-								}
-								else
-								{
-									moveToDestination(dt);
-								}
-							}
-						}
-					}
-				}
-				//Enemy is not holding a weapon
-				else
+				//Enemy is holding a gun
+				if (WO->isGun)
 				{
-					if(!b_isDestinationVisible)
+					//Make enemy stay at the same pos 
+					if (b_isDestinationVisible && b_isDestinationWithinFOV && (playerPos - pos).LengthSquared() < d_detectionRange)
 					{
-						SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+						currentLookat.x = playerPos.x;
+						currentLookat.z = playerPos.z;
+						b_SHOOTLA = true;
 					}
 					else
 					{
-						moveToDestination(dt);
-					}
-				}
-			}
-
-			//AI TYPE == SCIENTIST.
-			else
-			{
-				//if enemy is holding a weapon
-				if (holding != NULL)
-				{
-					if (holding->isWeapon)
-					{
-						WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
-
-						//Enemy is holding a gun
-						if (WO->isGun)
+						b_SHOOTLA = false;
+						if (!b_isDestinationVisible)
 						{
-							//Make enemy move a certain distance away from the enemy before shooting
-							if(isVisible(pos, Lookat, static_cast<float>(d_detectionAngle), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
-							{
-								currentLookat.x = playerPos.x;
-								currentLookat.z = playerPos.z;
-								b_SHOOTLA = true;
-							}
-
-							else
-							{
-								b_SHOOTLA = false;
-
-								if(!b_isDestinationVisible)
-								{
-									SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-								}
-								else
-								{
-									moveToDestination(dt);
-								}
-							}
+							SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 						}
-
-						//Enemy is holding a melee weapon
 						else
 						{
-							if(!b_isDestinationVisible)
-							{
-								SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
-							}
-							else
-							{
-								moveToDestination(dt);
-							}
+							moveToDestination(dt);
 						}
 					}
 				}
-				//Enemy is not holding a weapon
 				else
 				{
-					if(!b_isDestinationVisible)
+					if (!b_isDestinationVisible)
 					{
 						SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 					}
@@ -718,8 +648,32 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 					}
 				}
 			}
-			break;
+			else
+			{
+				if (!b_isDestinationVisible)
+				{
+					SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+				}
+				else
+				{
+					moveToDestination(dt);
+				}
+			}
 		}
+		//Enemy is not holding a weapon
+		else
+		{
+			if (!b_isDestinationVisible)
+			{
+				SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
+			}
+			else
+			{
+				moveToDestination(dt);
+			}
+		}
+		break;
+	}
 	default:
 		break;
 	}

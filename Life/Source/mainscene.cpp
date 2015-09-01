@@ -1958,6 +1958,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()))
 		{
 			ai->b_isDestinationWithinFOV = true;
+			ai->b_isDestinationVisible = false;
 		}
 		else
 		{
@@ -1969,11 +1970,11 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 		{
 			if (CollisionBetween(ai->pos + ai->ModelPos + ai->HeadPos, ai->getDestination() + Vector3(0, 10, 0)))
 			{
-				ai->b_isDestinationVisible = true;
+				ai->b_isDestinationVisible = false;
 			}
 			else
 			{
-				ai->b_isDestinationVisible = false;
+				ai->b_isDestinationVisible = true;
 			}
 		}
 		
