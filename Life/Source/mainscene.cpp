@@ -3159,7 +3159,16 @@ void mainscene::RenderWorldShadow(void)
 				CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
 				if (CO != NULL)
 				{
-					RenderCharacter(CO);
+					if(CurrentPower == PT_SUPERVISION && PowerActive)
+					{
+						glDisable(GL_DEPTH_TEST);
+						RenderCharacter(CO);
+						glEnable(GL_DEPTH_TEST);
+					}
+					else
+					{
+						RenderCharacter(CO);
+					}
 				}
 				else
 				{
