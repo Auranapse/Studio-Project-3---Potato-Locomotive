@@ -727,14 +727,14 @@ void mainscene::Init()
 	DBox2.Type = CollisionBox::CT_SPHERE;
 	DBox2.Position = Vector3(10,0,70);
 	DBox2.radius = 50;
-	PressurePlate *Dialogue2 = new PressurePlate(DBox2, 400);
+	PressurePlate *Dialogue2 = new PressurePlate(DBox2, 1000);
 	std::string S1_2 = "Too Loud! You'll get caught!";
 	std::string S2_2 = "Press Ctrl to Stealth Walk!";
 	std::vector<std::string>Messages2;
 	Messages2.push_back(S1_2);
 	Messages2.push_back(S2_2);
-	double T1_2 = 300;
-	double T2_2 = 10;
+	double T1_2 = 800;
+	double T2_2 = 400;
 	std::vector<double>MsgSeq2;
 	MsgSeq2.push_back(T1_2);
 	MsgSeq2.push_back(T2_2);
@@ -790,6 +790,12 @@ bool mainscene::loadLevel(int level)
 	f_powerTintSet = 0.f;
 	f_poweramount = 60.f;
 	f_playerHealthTint = 0.f;
+
+	//Dialogue Reload
+	for (unsigned i = 0; i < Dialogues.size(); ++i)
+	{
+		Dialogues[i]->setTimer(1000);
+	}
 
 	while (m_goList.size() > 0)
 	{
@@ -1167,6 +1173,8 @@ Particle* mainscene::FetchParticle(void)
 		m_ParList.push_back(Par);
 	}
 	return m_ParList.back();
+
+
 }
 
 /******************************************************************************/
