@@ -1827,11 +1827,27 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(ai->holding);
 				if(WO != NULL)
 				{
-					if(ai->attackrate + WO->attackRate < timer)
+					if(WO->isGun)
 					{
-						ai->attackrate = timer;
-						SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
-						Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+						if(ai->attackrate + WO->attackRate < timer)
+						{
+							ai->attackrate = timer;
+							SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
+							Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+						}
+
+					}
+
+					else
+					{
+						if((P_Player.pos - ai->pos).LengthSquared() < 300)
+						{
+							if(ai->attackrate + WO->attackRate < timer)
+							{
+								ai->attackrate = timer;
+								f_poweramount -= 10.f;
+							}
+						}
 					}
 				}
 			}
