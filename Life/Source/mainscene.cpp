@@ -1789,6 +1789,21 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	{
 		if(ai->getState() == AI::ATTACK)
 		{
+			//for(std::vector<GameObject*>::iterator it = m_goList.begin(); it != m_goList.end(); it++)
+			//{
+			//	GameObject * go = (GameObject*)*it;
+			//	if(go != NULL)
+			//	{
+			//		if (isVisible(ai->pos, ai->Lookat, ai->getDetectionAngle(), go->pos) || (Vector3(ai->pos.x - go->pos.x, 0, ai->pos.z - go->pos.z)).LengthSquared() < ai->get)//Dynamic rendering
+			//		{
+			//			std::cout << "true" << std::endl;
+			//		}
+			//		else
+			//		{
+			//			std::cout << "False" << std::endl;
+			//		}
+			//	}
+			//}
 			if(ai->holding != NULL)
 			{
 				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(ai->holding);
@@ -1798,7 +1813,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 					{
 						ai->attackrate = timer;
 						SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
-						Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+						//Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
 					}
 				}
 			}
@@ -3582,7 +3597,6 @@ bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
 				//std::cout<<Ray.Type<<"R\n";
 				if (CollisionBox::checkCollision(Ray, go->collisionMesh))
 				{
-					std::cout << "FML" << std::endl;
 					//std::cout<<"CHECK!"<<go->collisionMesh.Type<<Ray.Type;
 					return true;
 				}
@@ -3604,7 +3618,6 @@ void mainscene::CheckPlayerSound(void)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
-					std::cout<<"Player has been heard!";
 					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 				}	

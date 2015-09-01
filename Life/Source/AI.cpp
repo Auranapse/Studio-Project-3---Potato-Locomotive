@@ -11,8 +11,8 @@ Handles AI position and physics
 #include "Application.h"
 
 double AI::d_detectionAngle = 30;
-double AI::d_detectionRange = 6400;
-double AI::d_detectionRangeMax = 12800;
+double AI::d_detectionRange = 6400 * 10;
+double AI::d_detectionRangeMax = d_detectionRange * 2;
 double AI::d_playerEscapeRange = 40000;
 
 /******************************************************************************/
@@ -562,47 +562,56 @@ void AI::aiStateHandling(const double &dt, const Vector3 &playerPos)
 			e_State = ATTACK;
 			b_updateAI = true;
 			b_rotateClockwiseFirst = NULL;
+
+			if(this->b_aiScanning)
+			{
+				e_State = WALKING;
+				d_totalRotation = 0.f;
+				b_updateAI = true;
+				b_rotateClockwiseFirst = NULL;
+				b_aiScanning = false;
+			}
 		}
 	}
 	break;
 
 	case ATTACK:
-	{
-		destination = playerPos;
-
-		//if enemy is holding a weapon
-		if (holding != NULL)
 		{
-			if (holding->isWeapon)
+			destination = playerPos;
+
+			//if enemy is holding a weapon
+			if (holding != NULL)
 			{
-				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
-
-				//Enemy is holding a gun
-				if (WO->isGun)
+				if (holding->isWeapon)
 				{
-					//Make enemy move a certain distance away from the enemy before shooting
-				}
-				//Enemy is holding a melee weapon
-				else
-				{
+					WeaponsObject *WO = dynamic_cast<WeaponsObject*>(holding);
 
+					//Enemy is holding a gun
+					if (WO->isGun)
+					{
+						//Make enemy move a certain distance away from the enemy before shooting
+					}
+					//Enemy is holding a melee weapon
+					else
+					{
+
+					}
 				}
 			}
-		}
-		//Enemy is not holding a weapon
-		else
-		{
-			//make the enemy move closer to the enemy before attacking
-		}
+			//Enemy is not holding a weapon
+			else
+			{
+				//make the enemy move closer to the enemy before attacking
+			}
 
-		//AI return to alert state if player have avoided enemy
-		/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
-		{
-		b_aiCooldown = true;
-		e_State = ALERT;
-		}*/
-	}
-	break;
+			//AI return to alert state if player have avoided enemy
+			/*if ((Position - playerPos).LengthSquared() > d_playerEscapeRange)
+			{
+			b_aiCooldown = true;
+			e_State = ALERT;
+			}*/
+		}
+		break;
 
 	default:
 		break;
@@ -623,6 +632,7 @@ Update the AI Lookat based on its current Lookat
 /******************************************************************************/
 void AI::AiLookatRotation(const double &dt, const Vector3 &playerPos)
 {
+	std::cout << "Rotating" << std::endl;
 	if(currentLookat != NULL)
 	{
 		static float rotationSpeed = 2;
@@ -715,6 +725,7 @@ void AI::Update(double &dt, const Vector3 &playerPos, std::vector<GameObject*> &
 			SensorUpdate2(dt, collisionChecking(pos + L, m_GOList), collisionChecking(pos + C, m_GOList), collisionChecking(pos + R, m_GOList));
 		}
 	}
+
 	if (vel.x != 0)
 	{
 		float SForceX = 0 - vel.x;
@@ -751,10 +762,10 @@ bool AI::collisionChecking(Vector3 &pos, std::vector<GameObject *> &m_GOList)
 		GameObject* go = (GameObject*)*it;
 		if (go->active && go->colEnable && go->pos != pos)
 		{
-				if (intersect(go->pos + go->collisionMesh.ColBox, go->pos - go->collisionMesh.ColBox, pos))
-				{
-					return true;
-				}
+			if (intersect(go->pos + go->collisionMesh.ColBox, go->pos - go->collisionMesh.ColBox, pos))
+			{
+				return true;
+			}
 		}
 	}
 	return false;
