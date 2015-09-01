@@ -101,6 +101,9 @@ class mainscene : public Scene
 		//Objects
 		GEO_ITEM_SYRINGE,
 
+		//Other
+		GEO_TABLE,
+
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,

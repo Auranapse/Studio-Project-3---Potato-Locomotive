@@ -559,6 +559,9 @@ void mainscene::Init()
 	meshList[GEO_ITEM_SYRINGE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Items//Syringe.obj");
 	meshList[GEO_ITEM_SYRINGE]->textureID[0] = LoadTGA("GameData//Image//Items//Syringe.tga", true);
 
+	meshList[GEO_TABLE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Other//Table.obj");
+	meshList[GEO_TABLE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Table.tga", true);
+
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
 	meshList[GEO_M9]->material.kSpecular.Set(0.5f, 0.5f, 0.5f);
@@ -569,7 +572,8 @@ void mainscene::Init()
 	meshList[GEO_KATANA]->material = meshList[GEO_M9]->material;
 	meshList[GEO_SCALPLE]->material = meshList[GEO_M9]->material;
 	meshList[GEO_ITEM_SYRINGE]->material = meshList[GEO_M9]->material;
-
+	meshList[GEO_TABLE]->material = meshList[GEO_M9]->material;
+	
 	//----------------------SKYBOX
 	meshList[E_GEO_LEFT] = MeshBuilder::GenerateSkybox("left", Color(0.f, 0.f, 0.f), 1.f);
 	meshList[E_GEO_LEFT]->textureID[0] = LoadTGA("GameData//Image//skybox//plain_sky_left.tga");
@@ -831,7 +835,7 @@ bool mainscene::loadLevel(int level)
 	{
 		for (unsigned x = 0; x < GAME_MAP.map_width; ++x)
 		{
-			if (GAME_MAP.map_data[y][x] == ".")
+			if (GAME_MAP.map_data[y][x] == "." || GAME_MAP.map_data[y][x] == "")
 			{
 				continue;
 			}
