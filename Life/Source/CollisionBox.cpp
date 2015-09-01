@@ -12,19 +12,14 @@ CollisionBox::~CollisionBox()
 
 bool CollisionBox::checkCollision(CollisionBox &CB1, CollisionBox &CB2)
 {
-	//Swaps it so that c1 always has lower type than c2
-	int c1, c2;//c1 = Lower Type, C2 = Higher Type
-	c1 = (CB1.Type < CB2.Type) ? (c1 = CB1.Type) : (c1 = CB2.Type);
-	c2 = (CB2.Type > CB1.Type) ? (c2 = CB2.Type) : (c2 = CB1.Type);
 
 	CollisionBox T1 = CB1;
 	CollisionBox T2 = CB2;
 
 	if (CB2.Type < CB1.Type)
 	{
-		COLLISION_TYPE Temp = T1.Type;
-		T1.Type = T2.Type;
-		T2.Type = Temp;
+		T1 = CB2;
+		T2 = CB1;
 	}
 	switch (T1.Type)
 	{

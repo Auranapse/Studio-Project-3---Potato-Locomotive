@@ -698,6 +698,25 @@ void mainscene::Init()
 	loadLevel(currentLevel);
 	
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
+
+	//Dialogue Test
+	CollisionBox DBox;
+	DBox.Type = CollisionBox::CT_SPHERE;
+	DBox.Position = Vector3(0,0,0);
+	DBox.radius = 50;
+	PressurePlate *Dialogue1 = new PressurePlate(DBox, 1000);
+	std::string S1 = "Welcome To Gene!";
+	std::string S2 = "Press V - Slow Down Time!";
+	std::vector<std::string>Messages;
+	Messages.push_back(S1);
+	Messages.push_back(S2);
+	double T1 = 800;
+	double T2 = 100;
+	std::vector<double>MsgSeq;
+	MsgSeq.push_back(T1);
+	MsgSeq.push_back(T2);
+	Dialogue1->setDialogue(Messages,MsgSeq);
+	Dialogues.push_back(Dialogue1);
 }
 
 /******************************************************************************/
@@ -3064,6 +3083,16 @@ void mainscene::RenderWorldShadow(void)
 
 	RenderCharacter(&P_Player);
 	RenderParticles();
+
+	for (int i = 0; i < Dialogues.size(); ++i)
+	{
+		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
+		//std::cout<<Result;
+		if (Result == "TIME")
+			delete Dialogues[i];
+		else if (Result != "")
+			RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0,1,1), 3.5f, 15.f, 10.f); 
+	}
 }
 
 /******************************************************************************/
