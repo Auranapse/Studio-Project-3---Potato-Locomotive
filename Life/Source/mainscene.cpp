@@ -1955,7 +1955,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
-		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()))
+		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()) && (ai->getDestination() - ai->pos).LengthSquared() < ai->getDetectionRange_Max())
 		{
 			ai->b_isDestinationWithinFOV = true;
 			ai->b_isDestinationVisible = false;

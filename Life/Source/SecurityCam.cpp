@@ -127,9 +127,8 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 						if (ai->getState() == AI::WALKING)
 						{
 							ai->setState(AI::ALERT);
-							Vector3 cameraPos = pos;
-							cameraPos.y = 0;
-							ai->setDestination(cameraPos);
+							ai->setcurrentLookat(pos);
+							ai->setDestination(pos);
 						}
 					}
 				}
@@ -137,7 +136,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 			}
 			else
 			{
-				if (isVisible(pos, Lookat, f_cameraFOV, playerPos) && (playerPos - pos).LengthSquared() > f_cameraRange)
+				if (!isVisible(pos, Lookat, f_cameraFOV, playerPos) || (playerPos - pos).LengthSquared() > f_cameraRange)
 				{
 					c_State = NOTFOUND;
 				}
@@ -148,6 +147,7 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 	case NOTFOUND:
 		{
 			//Check whether enemy is within security camera's FOV
+			b_alertAI = true;
 			if (((isVisible(SCPos, SCLookat, static_cast<float>(f_cameraFOV), playerPos)) && (SCPos - playerPos).LengthSquared() < f_cameraRange))
 			{
 				c_State = SPOTTED;
