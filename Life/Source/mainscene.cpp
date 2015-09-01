@@ -3131,7 +3131,7 @@ void mainscene::RenderWorldShadow(void)
 	RenderCharacter(&P_Player);
 	RenderParticles();
 
-	for (int i = 0; i < Dialogues.size(); ++i)
+	for (unsigned i = 0; i < Dialogues.size(); ++i)
 	{
 		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
 		//std::cout<<Result;
@@ -3605,8 +3605,41 @@ void mainscene::Exit(void)
 }
 
 
-bool mainscene::CollisionBetween(Vector3&, Vector3&)
+bool mainscene::CollisionBetween(Vector3 &start, Vector3 &end)
 {
+	std::vector<CollisionBox>Temporary;
+	Vector3 direction = (end-start).Normalized();
+	float length = (end-start).Length();
+	float line = 0;
+
+	while(line < length)
+	{
+		CollisionBox Test;
+		Test.Type = CollisionBox::CT_SPHERE;
+		Test.radius = 5;
+		start += direction * 5;
+		Test.Position = start;
+		line += 5;
+		Temporary.push_back(Test);
+	}
+
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{	
+			WorldObject *WO = dynamic_cast<WorldObject*>(go);
+			if(WO != NULL)
+			{
+				for (int i = 0; i < Temporary.size(); ++i)
+				{
+					if (CollisionBox::checkCollision(Temporary[i], go->collisionMesh))
+						return true;
+				}
+			}
+		}
+	}
+	
 	return false;
 }
 
