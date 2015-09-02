@@ -809,7 +809,7 @@ bool mainscene::loadLevel(int level)
 	f_playerHealthTint = 0.f;
 
 	//Dialogue Reload
-	for (unsigned i =0; i < 4; ++i)
+	for (unsigned i = 0; i < 5; ++i)
 	{
 		for (unsigned k = 0; k < Dialogues[i].size(); ++k)
 		{
@@ -950,24 +950,10 @@ bool mainscene::loadLevel(int level)
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'D')
 			{
-
-				std::string temp_str_radius;
-				temp_str_radius = "";
-
-				float radius;
-
-				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != '\0'; ++i)
-				{
-					temp_str_radius += GAME_MAP.map_data[y][x][i];
-				}
-
-				radius = static_cast<float>(std::atoi(temp_str_radius.c_str()));
-				if (radius < 0)
-					radius = worldsize;
 				CollisionBox doorBound;
 				doorBound.Type = CollisionBox::CT_SPHERE;
 				doorBound.Position = Vector3(x * worldsize * 2.f, 30, y * worldsize * 2.f);
-				doorBound.radius = radius;
+				doorBound.radius = worldsize;
 				Doors.push_back(doorBound);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'A')
@@ -1116,7 +1102,7 @@ bool mainscene::loadLevel(int level)
 				WO->scale.Set(3.f, 3.f, 3.f);
 				WO->pos.Set(x*worldsize*2.f, 1, y*worldsize*2.f);
 				WO->collisionMesh.Type = CollisionBox::CT_SPHERE;
-				WO->collisionMesh.radius = 10.f;
+				WO->collisionMesh.radius = 30.f;
 				WO->collisionMesh.Position = WO->pos;
 				WO->dynamicRendering = true;
 				WO->mesh = meshList[GEO_OBJCAKE];
@@ -1382,7 +1368,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_M9].pos.Set(0, 10, 0);
 	WO_presetList[WO_M9].pos1.Set(-5, -4, 9);
 	WO_presetList[WO_M9].pos2.Set(0, -2.1f, 8);
-	WO_presetList[WO_M9].CurrentClip = 5;
+	WO_presetList[WO_M9].CurrentClip = 2;
 	WO_presetList[WO_M9].recoilEffect = 30.f;
 	WO_presetList[WO_M9].isGun = true;
 	WO_presetList[WO_M9].isWeapon = true;
@@ -2082,15 +2068,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 				{
 					if ((P_Player.pos - ai->pos).LengthSquared() < 800)
 					{
-						if (f_poweramount < 20)
-						{
-							f_poweramount -= 20.f * static_cast<float>(dt);
-						}
-						else if (ai->attackrate + 0.2f < timer)
-						{
-							ai->attackrate = timer;
-							f_poweramount -= 20.f;
-						}
+						f_poweramount -= 80.f * static_cast<float>(dt);
 					}
 				}
 			}
@@ -2098,7 +2076,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 			{
 				if ((P_Player.pos - ai->pos).LengthSquared() < 800)
 				{
-					f_poweramount -= 20.f * static_cast<float>(dt);
+					f_poweramount -= 30.f * static_cast<float>(dt);
 				}
 			}
 		}
@@ -2293,7 +2271,7 @@ void mainscene::weaponsUpdate(double &dt)
 							Vector3 ShootVector = FPC.target - FPC.position;
 							ShootVector.Normalize();
 							FPC.rotateCamVertical(static_cast<float>(dt)* WO->recoilEffect);
-							Shoot(FPC.position + ShootVector * 12.f, ShootVector, WO->shootvelocity, WO->range);
+							Shoot(FPC.position + ShootVector * 14.f, ShootVector, WO->shootvelocity, WO->range);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
@@ -2316,7 +2294,7 @@ void mainscene::weaponsUpdate(double &dt)
 
 							Vector3 ShootVector = FPC.target - FPC.position;
 							ShootVector.Normalize();
-							Shoot(FPC.position + ShootVector * 12.f, ShootVector, 350.f, WO->range, true);
+							Shoot(FPC.position + ShootVector * 14.f, ShootVector, 350.f, WO->range, true);
 
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 						}
@@ -2556,11 +2534,11 @@ void mainscene::Update(double dt)
 			PlayerSound->setSoundRadius(newRad.Length()*0.45f);
 			CheckPlayerSound();
 		}
-		KeyRotate += 25 * dt;
+		KeyRotate += 25 * static_cast<float>(dt);
 		if (KeyRotate >= 360)
 			KeyRotate = 0;
 
-		DoorRotate += 60 * dt;
+		DoorRotate += 60 * static_cast<float>(dt);
 		if (DoorRotate >= 360)
 			DoorRotate = 0;
 
@@ -3957,7 +3935,7 @@ bool mainscene::CollisionBetween(Vector3 start, Vector3 &end)
 			WorldObject *WO = dynamic_cast<WorldObject*>(go); 
 			if(WO != NULL) 
 			{ 
-				for (int i = 0; i < Temporary.size(); ++i) 
+				for (unsigned i = 0; i < Temporary.size(); ++i) 
 				{ 
 					if (CollisionBox::checkCollision(Temporary[i], go->collisionMesh)) 
 						return true; 
