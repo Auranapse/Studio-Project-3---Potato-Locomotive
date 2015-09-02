@@ -559,8 +559,16 @@ void mainscene::Init()
 	meshList[GEO_ITEM_SYRINGE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Items//Syringe.obj");
 	meshList[GEO_ITEM_SYRINGE]->textureID[0] = LoadTGA("GameData//Image//Items//Syringe.tga", true);
 
+
 	meshList[GEO_TABLE] = MeshBuilder::GenerateOBJ("Syringe", "GameData//OBJ//Other//Table.obj");
 	meshList[GEO_TABLE]->textureID[0] = LoadTGA("GameData//Image//OBJ//Table.tga", true);
+	
+	meshList[GEO_KEYCARD] = MeshBuilder::GenerateOBJ("Keycard", "GameData//OBJ//Items//keycard.obj");
+	meshList[GEO_KEYCARD]->textureID[0] = LoadTGA("GameData//Image//Items//keycard.tga", true);
+
+	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("Doorman", "GameData//OBJ//doorman.obj");
+	meshList[GEO_DOOR]->textureID[0] = LoadTGA("GameData//Image//doorman.tga");
+	
 
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
@@ -619,7 +627,7 @@ void mainscene::Init()
 	meshList[GEO_EMISSIVE_QUAD]->textureID[0] = m_gBuffer.GetTexture(GBuffer::GBUFFER_TEXTURE_TYPE_EMISSIVE);
 
 	meshList[GEO_SCREEN_OVERLAY] = MeshBuilder::GenerateQuad("Screen tint", Color(1, 1, 1), 1.f, 1.f, 1.f);
-	
+
 
 	renderAxis = false;
 
@@ -704,13 +712,13 @@ void mainscene::Init()
 
 	currentLevel = 1;
 	loadLevel(currentLevel);
-	
+
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
 
 	//Dialogue Test
 	CollisionBox DBox1;
 	DBox1.Type = CollisionBox::CT_SPHERE;
-	DBox1.Position = Vector3(40,0,520);
+	DBox1.Position = Vector3(40, 0, 520);
 	DBox1.radius = 100;
 	PressurePlate *Dialogue1 = new PressurePlate(DBox1, 1000);
 	std::string S1_1 = "Welcome To Gene!";
@@ -723,13 +731,13 @@ void mainscene::Init()
 	std::vector<double>MsgSeq1;
 	MsgSeq1.push_back(T1_1);
 	MsgSeq1.push_back(T2_1);
-	Dialogue1->setDialogue(Messages1,MsgSeq1);
+	Dialogue1->setDialogue(Messages1, MsgSeq1);
 	Dialogues.push_back(Dialogue1);
 
 	//Dialogue Test
 	CollisionBox DBox2;
 	DBox2.Type = CollisionBox::CT_SPHERE;
-	DBox2.Position = Vector3(10,0,70);
+	DBox2.Position = Vector3(10, 0, 70);
 	DBox2.radius = 50;
 	PressurePlate *Dialogue2 = new PressurePlate(DBox2, 1000);
 	std::string S1_2 = "Too Loud! You'll get caught!";
@@ -742,8 +750,11 @@ void mainscene::Init()
 	std::vector<double>MsgSeq2;
 	MsgSeq2.push_back(T1_2);
 	MsgSeq2.push_back(T2_2);
-	Dialogue2->setDialogue(Messages2,MsgSeq2);
+	Dialogue2->setDialogue(Messages2, MsgSeq2);
 	Dialogues.push_back(Dialogue2);
+
+	KeyRotate = 0;
+	KeyCount = 0;
 }
 
 /******************************************************************************/
@@ -798,8 +809,18 @@ bool mainscene::loadLevel(int level)
 	//Dialogue Reload
 	for (unsigned i = 0; i < Dialogues.size(); ++i)
 	{
+		std::cout << "Dialogues Cleared";
 		Dialogues[i]->setTimer(1000);
 	}
+
+	//Keys Clear
+	std::cout << "Keys Cleared\n";
+	Keys.clear();
+	KeyCount = 0;
+
+	//Status Clear
+	status = "\0";
+	statusTimer = 0;
 
 	while (m_goList.size() > 0)
 	{
@@ -911,8 +932,24 @@ bool mainscene::loadLevel(int level)
 				WO->mesh = meshList[GEO_WORLD_CUBE];
 				m_goList.push_back(WO);
 			}
+			else if (GAME_MAP.map_data[y][x][0] == 'K')
+			{
+				CollisionBox Key;
+				Key.Type = CollisionBox::CT_SPHERE;
+				Key.Position = Vector3(x * worldsize * 2.f, 0, y * worldsize * 2.f);
+				Key.radius = 5;
+				Keys.push_back(Key);
+			}
+			else if (GAME_MAP.map_data[y][x][0] == 'D')
+			{
+				CollisionBox doorBound;
+				doorBound.Type = CollisionBox::CT_SPHERE;
+				doorBound.Position = Vector3(x * worldsize * 2.f, 30, y * worldsize * 2.f);
+				doorBound.radius = 10;
+				Doors.push_back(doorBound);
+			}
 			else if (GAME_MAP.map_data[y][x][0] == 'A')
-			{				
+			{
 				if (GAME_MAP.map_data[y][x].size() > 1)
 				{
 					AI *ai;
@@ -948,7 +985,7 @@ bool mainscene::loadLevel(int level)
 
 						m_goList.push_back(ai);
 					}
-				}				
+				}
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'S')
 			{
@@ -1149,7 +1186,7 @@ bool mainscene::loadLevel(int level)
 	m_goList.push_back(WO);
 
 	lights[0].position.y = worldHeight * 2.5f;
-	
+
 	if (!P_Player.active)
 	{
 		std::cout << "!!! Warning !!! No player spawn location is found.\n";
@@ -1502,13 +1539,13 @@ void mainscene::UpdatePlayer(double &dt)
 	if (P_Player.vel.x != 0)
 	{
 		float SForceX = 0 - P_Player.vel.x;
-		P_Player.vel.x += SForceX * static_cast<float>(tempDT) * 6.f;
+		P_Player.vel.x += SForceX * static_cast<float>(tempDT)* 6.f;
 	}
 
 	if (P_Player.vel.z != 0)
 	{
 		float SForceZ = 0 - P_Player.vel.z;
-		P_Player.vel.z += SForceZ * static_cast<float>(tempDT) * 6.f;
+		P_Player.vel.z += SForceZ * static_cast<float>(tempDT)* 6.f;
 	}
 
 
@@ -1589,7 +1626,7 @@ void mainscene::UpdatePlayer(double &dt)
 	P_Player.Lookat = FPC.target;
 	P_Player.Update(tempDT);
 	P_Player.collisionMesh.Position = P_Player.pos;
-	
+
 	if (!inAir)
 	{
 		if (P_Player.getAnimation().LEFT_LEG < 0 && b_step)
@@ -1687,7 +1724,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		abilityPressed_2 = false;
 	}
-	
+
 	if (PowerActive)
 	{
 		switch (CurrentPower)
@@ -1708,7 +1745,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 					dt = d_dt;
 				}
 			}
-			
+
 			if (!SE_Engine.isSoundPlaying(soundList[ST_BREATHING]))
 			{
 				SE_Engine.playSound2D(soundList[ST_BREATHING]);
@@ -1721,7 +1758,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 				SE_Engine.playSound2D(soundList[ST_SLOWMO_EXIT]);
 			}
 
-			f_poweramount -= static_cast<float>(d_dt) * 6.f;
+			f_poweramount -= static_cast<float>(d_dt)* 6.f;
 			break;
 		case mainscene::PT_SUPERVISION:
 			if (f_poweramount <= 0)
@@ -1742,7 +1779,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 				f_powerTintSet = 0.f;
 				SE_Engine.playSound2D(soundList[ST_WALL_POWER_EXIT]);
 			}
-			f_poweramount -= static_cast<float>(d_dt) * 12.f;
+			f_poweramount -= static_cast<float>(d_dt)* 12.f;
 			break;
 		default:
 			break;
@@ -1752,11 +1789,11 @@ void mainscene::UpdatePlayerPower(double &dt)
 	{
 		if (f_poweramount < 20)
 		{
-			f_poweramount += static_cast<float>(d_dt) * 1.2f;
+			f_poweramount += static_cast<float>(d_dt)* 1.2f;
 		}
 		else if (f_poweramount < 100)
 		{
-			f_poweramount += static_cast<float>(d_dt) * 3.f;
+			f_poweramount += static_cast<float>(d_dt)* 3.f;
 		}
 	}
 
@@ -1780,7 +1817,7 @@ void mainscene::UpdatePlayerPower(double &dt)
 		}
 		else
 		{
-			f_powerTint += diff * static_cast<float>(d_dt) * 10.f;
+			f_powerTint += diff * static_cast<float>(d_dt)* 10.f;
 		}
 	}
 
@@ -1951,7 +1988,7 @@ delta time
 */
 /******************************************************************************/
 void mainscene::UpdateCO(CharacterObject *CO, double &dt)
-{		
+{
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
@@ -1980,20 +2017,20 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 		
 		if(ai->getState() == AI::ATTACK)
 		{
-			if(ai->holding != NULL)
+			if (ai->holding != NULL)
 			{
 				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(ai->holding);
-				if(WO != NULL)
+				if (WO != NULL)
 				{
-					if(WO->isGun)
+					if (WO->isGun)
 					{
-						if(ai->attackrate + WO->attackRate < timer)
+						if (ai->attackrate + WO->attackRate < timer)
 						{
 							ai->attackrate = timer;
-							SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
-
+							
 							if(ai->getShootGun() == true)
 							{
+								SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
 								Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
 							}
 						}
@@ -2206,7 +2243,7 @@ void mainscene::weaponsUpdate(double &dt)
 							firerate = timer;
 							Vector3 ShootVector = FPC.target - FPC.position;
 							ShootVector.Normalize();
-							FPC.rotateCamVertical(static_cast<float>(dt) * WO->recoilEffect);
+							FPC.rotateCamVertical(static_cast<float>(dt)* WO->recoilEffect);
 							Shoot(FPC.position + ShootVector * 8.f, ShootVector, WO->shootvelocity, WO->range);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
@@ -2425,12 +2462,12 @@ void mainscene::Update(double dt)
 		}
 		else
 		{
-			f_fov += diff * static_cast<float>(d_dt) * 10.f;
+			f_fov += diff * static_cast<float>(d_dt)* 10.f;
 		}
 
 		editFOV(f_fov);
 	}
-	
+
 	if (Application::IsKeyPressed('2'))
 	{
 		if (!Application::IsKeyPressed(VK_SHIFT))
@@ -2463,6 +2500,20 @@ void mainscene::Update(double dt)
 
 		weaponsUpdate(dt);
 		UpdateSound(dt);
+
+		Vector3 newRad = P_Player.vel;
+		if (P_Player.vel.y == 0)
+		{
+			PlayerSound->setSoundRadius(newRad.Length()*0.4f);
+			CheckPlayerSound();
+		}
+		KeyRotate += 25 * dt;
+		if (KeyRotate >= 360)
+			KeyRotate = 0;
+
+		checkDoor();
+		checkKey();
+		checkStatus();
 
 		if (WO_END != NULL)
 		{
@@ -2629,14 +2680,6 @@ void mainscene::Update(double dt)
 		break;
 	default:
 		break;
-	}
-
-	
-	Vector3 newRad = P_Player.vel;
-	if (P_Player.vel.y == 0)
-	{
-		PlayerSound->setSoundRadius(newRad.Length());
-		CheckPlayerSound();
 	}
 }
 
@@ -2878,18 +2921,32 @@ void mainscene::RenderParticles(void)
 			switch (Par->ParticleType)
 			{
 			case Particle::PAR_SPARKS:
-				{
-					modelStack.PushMatrix();
-					modelStack.Translate(Par->Pos);
-					modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
-					modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
-					modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
-					modelStack.Scale(Par->Scale);
-					RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
-					modelStack.PopMatrix();
-					break;
-				}
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(Par->Pos);
+				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+				modelStack.Scale(Par->Scale);
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.9f, 0.5f));
+				modelStack.PopMatrix();
+				break;
+			}
 			case Particle::PAR_BLOOD:
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(Par->Pos);
+				modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
+				modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
+				modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
+				modelStack.Scale(Par->Scale);
+				RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
+				modelStack.PopMatrix();
+				break;
+			}
+			case Particle::PAR_MESH:
+			{
+				if (Par->mesh != NULL)
 				{
 					modelStack.PushMatrix();
 					modelStack.Translate(Par->Pos);
@@ -2897,24 +2954,10 @@ void mainscene::RenderParticles(void)
 					modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
 					modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
 					modelStack.Scale(Par->Scale);
-					RenderMesh(meshList[GEO_BULLET], false, false, 100, 100, Color(1.f, 0.f, 0.f));
+					RenderMesh(Par->mesh, true);
 					modelStack.PopMatrix();
-					break;
 				}
-			case Particle::PAR_MESH:
-				{
-					if (Par->mesh != NULL)
-					{
-						modelStack.PushMatrix();
-						modelStack.Translate(Par->Pos);
-						modelStack.Rotate(Par->Rotation.x, 1, 0, 0);
-						modelStack.Rotate(Par->Rotation.y, 0, 1, 0);
-						modelStack.Rotate(Par->Rotation.z, 0, 0, 1);
-						modelStack.Scale(Par->Scale);
-						RenderMesh(Par->mesh, true);
-						modelStack.PopMatrix();
-					}
-				}
+			}
 			default:
 				break;
 			}
@@ -2999,124 +3042,124 @@ void mainscene::RenderMesh(Mesh *mesh, bool enableLight, bool enableFog, float v
 	switch (m_renderPass)
 	{
 	case RENDER_PASS_PRE:
-		{
-			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
-			mesh->Render();
-			break;
-		}
+	{
+		Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GPASS], 1, GL_FALSE, &lightDepthMVP.a[0]);
+		mesh->Render();
+		break;
+	}
 	case RENDER_PASS_MAIN:
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+
+		modelView = viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
+
+		if (enableLight)
 		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+			glUniform1i(m_parameters[U_LIGHTENABLED], 1);
 
-			modelView = viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
+			modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
+			glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
+			//
+			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
+			//
+			//load material
+			glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
+			glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
+			glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
+			glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
+		}
+		else
+		{
+			glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+		}
 
-			if (enableLight)
+		for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
+		{
+			if (mesh->textureID[i] > 0)
 			{
-				glUniform1i(m_parameters[U_LIGHTENABLED], 1);
-
-				modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
-				glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
-				//
-				Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-				glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP], 1, GL_FALSE, &lightDepthMVP.a[0]);
-				//
-				//load material
-				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT], 1, &mesh->material.kAmbient.r);
-				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE], 1, &mesh->material.kDiffuse.r);
-				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR], 1, &mesh->material.kSpecular.r);
-				glUniform1f(m_parameters[U_MATERIAL_SHININESS], mesh->material.kShininess);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
 			}
 			else
 			{
-				glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
 			}
 
-			for (unsigned i = 0; i < Mesh::NUM_TEXTURES; ++i)
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
+			glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
+		}
+		mesh->Render(); //this line should only be called once
+		break;
+	}
+	case RENDER_PASS_LIGHT:
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
+		mesh->Render();
+		break;
+	}
+	case RENDER_PASS_GBUFFER:
+	{
+		MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MVP_GBUFFER], 1, GL_FALSE, &MVP.a[0]);
+
+		modelView = viewStack.Top() * modelStack.Top();
+		glUniformMatrix4fv(m_parameters[U_MODELVIEW_GBUFFER], 1, GL_FALSE, &modelView.a[0]);
+
+		if (enableLight)
+		{
+			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 1);
+
+			modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
+			glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
+
+			Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
+			glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GBUFFER], 1, GL_FALSE, &lightDepthMVP.a[0]);
+
+			//load material
+			if (material == NULL)
 			{
-				if (mesh->textureID[i] > 0)
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 1);
-				}
-				else
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED + i], 0);
-				}
+				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &mesh->material.kAmbient.r);
+				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &mesh->material.kDiffuse.r);
+				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &mesh->material.kSpecular.r);
+				glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &mesh->material.kEmissive.r);
+				glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], mesh->material.kShininess);
+			}
+			else
+			{
+				glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &material->kAmbient.r);
+				glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &material->kDiffuse.r);
+				glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &material->kSpecular.r);
+				glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &material->kEmissive.r);
+				glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], material->kShininess);
+			}
+		}
+		else
+		{
+			glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 0);
+		}
+		for (int i = 0; i < 1; ++i)
+		{
+			if (mesh->textureID[i] > 0)
+			{
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 1);
 
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
-				glUniform1i(m_parameters[U_COLOR_TEXTURE + i], i);
-			}
-			mesh->Render(); //this line should only be called once
-			break;
-		}
-	case RENDER_PASS_LIGHT:
-		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MVP_LIGHTPASS], 1, GL_FALSE, &MVP.a[0]);
-			mesh->Render();
-			break;
-		}
-	case RENDER_PASS_GBUFFER:
-		{
-			MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MVP_GBUFFER], 1, GL_FALSE, &MVP.a[0]);
-
-			modelView = viewStack.Top() * modelStack.Top();
-			glUniformMatrix4fv(m_parameters[U_MODELVIEW_GBUFFER], 1, GL_FALSE, &modelView.a[0]);
-
-			if (enableLight)
-			{
-				glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 1);
-
-				modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
-				glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE_GBUFFER], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
-
-				Mtx44 lightDepthMVP = m_lightDepthProj * m_lightDepthView * modelStack.Top();
-				glUniformMatrix4fv(m_parameters[U_LIGHT_DEPTH_MVP_GBUFFER], 1, GL_FALSE, &lightDepthMVP.a[0]);
-
-				//load material
-				if (material == NULL)
-				{
-					glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &mesh->material.kAmbient.r);
-					glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &mesh->material.kDiffuse.r);
-					glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &mesh->material.kSpecular.r);
-					glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &mesh->material.kEmissive.r);
-					glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], mesh->material.kShininess);
-				}
-				else
-				{
-					glUniform3fv(m_parameters[U_MATERIAL_AMBIENT_GBUFFER], 1, &material->kAmbient.r);
-					glUniform3fv(m_parameters[U_MATERIAL_DIFFUSE_GBUFFER], 1, &material->kDiffuse.r);
-					glUniform3fv(m_parameters[U_MATERIAL_SPECULAR_GBUFFER], 1, &material->kSpecular.r);
-					glUniform3fv(m_parameters[U_MATERIAL_EMISSIVE_GBUFFER], 1, &material->kEmissive.r);
-					glUniform1f(m_parameters[U_MATERIAL_SHININESS_GBUFFER], material->kShininess);
-				}
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_GBUFFER + i], i);
 			}
 			else
 			{
-				glUniform1i(m_parameters[U_LIGHTENABLED_GBUFFER], 0);
+				glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 0);
 			}
-			for (int i = 0; i < 1; ++i)
-			{
-				if (mesh->textureID[i] > 0)
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 1);
-
-					glActiveTexture(GL_TEXTURE0 + i);
-					glBindTexture(GL_TEXTURE_2D, mesh->textureID[i]);
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_GBUFFER + i], i);
-				}
-				else
-				{
-					glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED_GBUFFER + i], 0);
-				}
-			}
-			mesh->Render();
-			break;
 		}
+		mesh->Render();
+		break;
+	}
 	}
 }
 
@@ -3283,7 +3326,7 @@ void mainscene::RenderWorldShadow(void)
 				CharacterObject *CO = dynamic_cast<CharacterObject*>(go);
 				if (CO != NULL)
 				{
-					if(CurrentPower == PT_SUPERVISION && PowerActive)
+					if (CurrentPower == PT_SUPERVISION && PowerActive)
 					{
 						glDisable(GL_DEPTH_TEST);
 						RenderCharacter(CO);
@@ -3329,6 +3372,31 @@ void mainscene::RenderWorldShadow(void)
 	RenderCharacter(&P_Player);
 	RenderParticles();
 
+
+
+	//Keycards
+	for (unsigned i = 0; i < Keys.size(); ++i)
+	{
+			modelStack.PushMatrix();
+			modelStack.Translate(Keys[i].Position.x, 3, Keys[i].Position.z);
+			modelStack.Rotate(KeyRotate, 0, 1, 0);
+			modelStack.Scale(5, 5, 5);
+			RenderMesh(meshList[GEO_KEYCARD], false);
+			modelStack.PopMatrix();
+	}
+
+	//Doors
+	for (unsigned i = 0; i < Doors.size(); ++i)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(Doors[i].Position.x, 0, Doors[i].Position.z);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(5, 5, 5);
+		RenderMesh(meshList[GEO_DOOR], false);
+		modelStack.PopMatrix();
+	}
+
+	//Dialogues On Screen
 	for (unsigned i = 0; i < Dialogues.size(); ++i)
 	{
 		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
@@ -3336,8 +3404,11 @@ void mainscene::RenderWorldShadow(void)
 		if (Result == "TIME")
 			delete Dialogues[i];
 		else if (Result != "")
-			RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0,1,1), 3.5f, 15.f, 10.f); 
+			RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0, 1, 1), 3.5f, 15.f, 10.f);
 	}
+
+	if (status != "\0")
+		RenderTextOnScreen(meshList[GEO_TEXT], status, Color(0, 1, 1), 5.f, 15.f, 60.f);
 }
 
 /******************************************************************************/
@@ -3388,7 +3459,7 @@ void mainscene::RenderUI(void)
 		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
 		modelStack.PopMatrix();
-				
+
 		if (P_Player.holding != NULL)
 		{
 			if (P_Player.holding->isGun)
@@ -3849,17 +3920,76 @@ void mainscene::CheckPlayerSound(void)
 	{
 		GameObject *go = (GameObject *)*it;
 		if (go->active)
-		{	
+		{
 			AI *ai = dynamic_cast<AI*>(go);
-			if(ai != NULL)
+			if (ai != NULL)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
-					std::cout<<"- Player has been heard!\n";
 					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
-				}	
+					ai->setState(AI::ALERT);
+				}
 			}
+		}
+	}
+}
+
+void mainscene::checkDoor()
+{
+	for (unsigned i = 0; i < Doors.size(); ++i)
+	{
+		if (CollisionBox::checkCollision(P_Player.collisionMesh, Doors[i]))
+		{
+			if (this->KeyCount > 0)
+			{
+				KeyCount--;
+				Doors.erase(Doors.begin() + i);
+				addStatus("Door Opened! Key Used!", 150);
+				break;
+			}
+			else
+			{
+				std::cout << "DAMDAMDAMDAMDMADMAMDAMDMA!!!!!!!!!\n";
+				addStatus("Need Keycard!", 150);
+				Vector3 pushBack = P_Player.vel;
+				pushBack.y = 0;
+				P_Player.vel = Vector3(0, 0, 0);
+				P_Player.vel -= pushBack * 3;
+				break;
+			}
+		}
+	}
+}
+
+void mainscene::checkKey()
+{
+	for (unsigned i = 0; i < Keys.size(); ++i)
+	{
+			if (CollisionBox::checkCollision(P_Player.collisionMesh, Keys[i]))
+			{
+				KeyCount++;
+				Keys.erase(Keys.begin() + i);
+				addStatus("Key Obtained!", 150);
+			}
+	}
+}
+
+void mainscene::addStatus(std::string status, double statusTimer)
+{
+	this->status = status;
+	this->statusTimer = statusTimer;
+}
+
+void mainscene::checkStatus()
+{
+	if (status != "\0")
+	{
+		statusTimer -= 1.0;
+		if (statusTimer <= 0)
+		{ 
+			status = "\0";
+			statusTimer = 0;
 		}
 	}
 }

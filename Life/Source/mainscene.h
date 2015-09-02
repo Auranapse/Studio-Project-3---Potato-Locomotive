@@ -45,7 +45,6 @@ Main scene
 #include "SoundDetect.h"
 #include "PressurePlate.h"
 
-
 /******************************************************************************/
 /*!
 		Class mainscene:
@@ -91,6 +90,8 @@ class mainscene : public Scene
 		//OBJ MODELS--------------
 		GEO_OBJCAKE,
 		GEO_SECURITYCAMERA,
+		GEO_KEYCARD,
+		GEO_DOOR,
 
 		//Weapons
 		GEO_M9,
@@ -491,8 +492,18 @@ private:
 
 	//Ray Collision
 	bool CollisionBetween(Vector3, Vector3&);
+	void checkDoor();
+	void checkKey();
+	void checkStatus();
 	void CheckPlayerSound(void);
+	void addStatus(std::string, double);
 	std::vector<PressurePlate*> Dialogues;
+	std::vector<CollisionBox> Keys;
+	std::vector<CollisionBox> Doors;
+	std::string status;
+	double statusTimer;
+	int KeyCount;
+	float KeyRotate;
 };
 
 #endif

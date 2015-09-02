@@ -443,6 +443,9 @@
     <ClInclude Include="Source\PressurePlate.h">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Door.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameData\Shader\comg.fragmentshader">
