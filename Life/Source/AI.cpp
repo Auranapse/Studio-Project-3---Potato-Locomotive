@@ -1,8 +1,9 @@
 /****************************************************************************/
 /*!
 \file AI.cpp
-\author I'sa Hong Xi
+\author I'sa Hong Xi & Ong Swee Seng
 \par email: dreamwalker56@gmail.com
+			sweeseng123@gmail.com
 \brief
 Handles AI position and physics
 !*/
@@ -707,7 +708,7 @@ void AI::AiLookatRotation(double &dt)
 {
 	if(currentLookat != 0)
 	{
-		static float rotationSpeed = 2;
+		static float rotationSpeed = 4;
 
 		if(e_State == ATTACK)
 		{
@@ -720,12 +721,29 @@ void AI::AiLookatRotation(double &dt)
 
 		if (b_aiRotating == false)
 		{
-			float rotationdiff = (CalAnglefromPosition(currentLookat, pos, true) - CalAnglefromPosition(Lookat, pos, true)) * 2.f;
-			static float f_rotationLimiter = 0.f;
+			float rotationdiff = (CalAnglefromPosition(currentLookat, pos, true) - CalAnglefromPosition(Lookat, pos, true));
+			
+			if (rotationdiff >= 180)
+			{
+				Mtx44 rotation;
+				Lookat = Lookat - pos;
+				rotation.SetToRotation(-360, 0, 1, 0);
+				Lookat = rotation * Lookat;
+				Lookat = Lookat + pos;
+				rotationdiff -= 360;
+			}
+			else if (rotationdiff <= -180)
+			{
+				Mtx44 rotation;
+				Lookat = Lookat - pos;
+				rotation.SetToRotation(360, 0, 1, 0);
+				Lookat = rotation * Lookat;
+				Lookat = Lookat + pos;
+				rotationdiff += 360;
+			}
 
 			Mtx44 rotation;
 			Lookat = Lookat - pos;
-			f_rotationLimiter += rotationdiff * static_cast<float>(dt);
 			rotation.SetToRotation(rotationdiff * rotationSpeed * static_cast<float>(dt), 0, 1, 0);
 			Lookat = rotation * Lookat;
 			Lookat = Lookat + pos;
