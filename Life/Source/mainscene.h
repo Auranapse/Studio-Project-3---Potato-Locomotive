@@ -504,6 +504,8 @@ private:
 	double statusTimer;
 	int KeyCount;
 	float KeyRotate;
+	float DoorRotate;
+
 };
 
 #endif

@@ -566,8 +566,8 @@ void mainscene::Init()
 	meshList[GEO_KEYCARD] = MeshBuilder::GenerateOBJ("Keycard", "GameData//OBJ//Items//keycard.obj");
 	meshList[GEO_KEYCARD]->textureID[0] = LoadTGA("GameData//Image//Items//keycard.tga", true);
 
-	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("Doorman", "GameData//OBJ//doorman.obj");
-	meshList[GEO_DOOR]->textureID[0] = LoadTGA("GameData//Image//doorman.tga");
+	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//doorman.obj");
+	meshList[GEO_DOOR]->textureID[0] = LoadTGA("GameData//Image//door.tga");
 	
 
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
@@ -720,12 +720,18 @@ void mainscene::Init()
 	DBox1.Type = CollisionBox::CT_SPHERE;
 	DBox1.Position = Vector3(40, 0, 520);
 	DBox1.radius = 100;
+
+
 	PressurePlate *Dialogue1 = new PressurePlate(DBox1, 1000);
 	std::string S1_1 = "Welcome To Gene!";
 	std::string S2_1 = "Press B - See Through Walls!";
 	std::vector<std::string>Messages1;
 	Messages1.push_back(S1_1);
 	Messages1.push_back(S2_1);
+
+	//Timer always set to be at 1000
+	//
+
 	double T1_1 = 800;
 	double T2_1 = 100;
 	std::vector<double>MsgSeq1;
@@ -755,6 +761,7 @@ void mainscene::Init()
 
 	KeyRotate = 0;
 	KeyCount = 0;
+	DoorRotate = 0;
 }
 
 /******************************************************************************/
@@ -2513,6 +2520,10 @@ void mainscene::Update(double dt)
 		if (KeyRotate >= 360)
 			KeyRotate = 0;
 
+		DoorRotate += 60 * dt;
+		if (DoorRotate >= 360)
+			DoorRotate = 0;
+
 		checkDoor();
 		checkKey();
 		checkStatus();
@@ -3391,9 +3402,9 @@ void mainscene::RenderWorldShadow(void)
 	for (unsigned i = 0; i < Doors.size(); ++i)
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(Doors[i].Position.x, 0, Doors[i].Position.z);
-		modelStack.Rotate(90, 0, 1, 0);
-		modelStack.Scale(5, 5, 5);
+		modelStack.Translate(Doors[i].Position.x, -1, Doors[i].Position.z);
+		modelStack.Rotate(DoorRotate, 0, 1, 0);
+		modelStack.Scale(7, 10, 7);
 		RenderMesh(meshList[GEO_DOOR], false);
 		modelStack.PopMatrix();
 	}
