@@ -26,7 +26,7 @@ Aperture Science Laboratories Underground
 mainscene Constructor
 */
 /******************************************************************************/
-mainscene::mainscene() : TESTMODE(true), NUM_LIGHT_PARAM(11)
+mainscene::mainscene() : TESTMODE(false), NUM_LIGHT_PARAM(11)
 {
 
 }
@@ -3960,9 +3960,8 @@ void mainscene::CheckPlayerSound(void)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
-					std::cout<<"PLAYER HEARD!";
-					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
-					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
+					ai->setcurrentLookat(P_Player.pos);
+					ai->setDestination(P_Player.pos);
 					ai->setState(AI::ALERT);
 				}
 			}

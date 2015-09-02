@@ -554,9 +554,14 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 			//If player is infront and near player, then ai will switch to attack state
 			if (isVisible(pos, Lookat, getDetectionAngle(), playerPos) && (playerPos - pos).LengthSquared() < d_detectionRange)
 			{
+				currentLookat.x = playerPos.x;
+				currentLookat.z = playerPos.z;
+				destination = playerPos;
+			}
+
+			if (b_isDestinationVisible && b_isDestinationWithinFOV && destination == playerPos)
+			{
 				e_State = ATTACK;
-				b_updateAI = true;
-				b_rotateClockwiseFirst = NULL;
 			}
 
 			if(b_isDestinationVisible && b_isDestinationWithinFOV)
@@ -774,12 +779,10 @@ void AI::Update(double &dt, Vector3 &playerPos, std::vector<GameObject*> &m_GOLi
 		vel.z += SForceZ * static_cast<float>(dt) * 4.f;
 	}
 
-	if (b_updateAI)
-	{
-		Animation.Update(dt, vel.LengthSquared() * 4);
-		Lookat += vel * 10 * static_cast<float>(dt);
-		pos += vel * 10 * static_cast<float>(dt);
-	}
+
+	Animation.Update(dt, vel.LengthSquared() * 4);
+	Lookat += vel * 10 * static_cast<float>(dt);
+	pos += vel * 10 * static_cast<float>(dt);
 }
 
 /******************************************************************************/
