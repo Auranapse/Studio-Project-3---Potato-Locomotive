@@ -1101,12 +1101,16 @@ bool mainscene::loadLevel(int level)
 								if (GAME_MAP.map_data[y][x][2] == '1')
 								{
 									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f + 5));
-									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f - 5));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f + 10));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f - 10));
+									loadLevel_GenerateOBJ("IW_SCALPLE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f) - 5);
 								}
 								else
 								{
 									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f + 5, 20.f, y*worldsize*2.f));
-									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f - 5, 20.f, y*worldsize*2.f));
+									loadLevel_GenerateOBJ("IW_SCALPLE", Vector3(x*worldsize*2.f - 5, 20.f, y*worldsize*2.f));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f + 10, 20.f, y*worldsize*2.f));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f - 10, 20.f, y*worldsize*2.f));
 								}
 							}
 							else if (GAME_MAP.map_data[y][x][4] == '2')
@@ -2127,7 +2131,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 							if(ai->getShootGun() == true)
 							{
 								SE_Engine.playSound3D(soundList[WO->AttackSound], ai->pos);
-								Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ai->getDirection(true).Normalize(), WO->shootvelocity, WO->range);
+								Shoot(ai->pos + ai->HeadPos + ai->ModelPos + (ai->getDirection(true).Normalize() * 20), ((P_Player.pos + P_Player.ModelPos + P_Player.HeadPos) - (ai->pos + ai->HeadPos + ai->ModelPos)).Normalize(), WO->shootvelocity, WO->range);
 							}
 						}
 					}
@@ -3712,8 +3716,6 @@ void mainscene::RenderUI(void)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, Application::GetWindowHeight()*0.1f - 1.f);
 	}
-
-
 }
 
 /******************************************************************************/
