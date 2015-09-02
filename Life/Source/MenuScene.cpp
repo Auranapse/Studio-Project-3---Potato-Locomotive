@@ -128,7 +128,7 @@ void MenuScene::InitShaders()
 {
 	// Init VBO here
 	// Set background color to whatever
-	glClearColor(0.9f, 0.9f, 0.9f, 0.0f);
+	glClearColor(1.f, 0.65f, 0.439f, 0.0f);
 
 	//Enable depth buffer and depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -177,7 +177,7 @@ void MenuScene::InitMeshList()
 	}
 
 	P_meshArray[E_GEO_AXES] = MeshBuilder::GenerateAxes("AXES", 10000, 10000, 10000);
-	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.8f, 0.8f, 0.8f), 10000, 1000, 10);
+	P_meshArray[E_GEO_MATRIX] = MeshBuilder::GenerateMatrix("Matrix", Color(0.835f, 0.56f, 0.396f), 10000, 1000, 10);
 	//Text
 	P_meshArray[E_GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	P_meshArray[E_GEO_TEXT]->textureID[0] = LoadTGA("GameData//Image//font//inputm.tga", false, false);
@@ -209,8 +209,8 @@ Initializes menu
 /******************************************************************************/
 void MenuScene::InitMenu(void)
 {
-	UIColor.Set(0.1f, 0.1f, 0.1f);
-	UIColorPressed.Set(0.5f, 0.5f, 0.5f);
+	UIColor.Set(0.21f, 0.21f, 0.21f);
+	UIColorPressed.Set(0.3f, 0.3f, 0.3);
 
 	v3_Menupos[E_M_SPLASH].Set(0, -2000, 0);
 	v3_Menupos[E_M_MAIN].Set(0, 0, 0);
