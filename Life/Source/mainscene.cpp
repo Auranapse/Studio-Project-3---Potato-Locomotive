@@ -19,7 +19,7 @@ Aperture Science Laboratories Underground
 
 #include <fstream>
 #include <sstream>
-
+//#include <vld.h>
 
 /******************************************************************************/
 /*!
@@ -3880,8 +3880,32 @@ Clears memory upon exit
 /******************************************************************************/
 void mainscene::Exit(void)
 {
+	if (PlayerSound != NULL)
+	{
+		delete PlayerSound;
+	}
+	
+	for (unsigned j = 0; j < 10; ++j)
+	{
+		for (unsigned i = 0; i < Dialogues[j].size(); ++i)
+		{
+			delete Dialogues[j][i];
+		}
+	}
+
 	Application::SetCursor(true);
 	SE_Engine.Exit();
+
+	while (v_buttonList.size() > 0)
+	{
+		TextButton *TB = v_buttonList.back();
+		if (TB != NULL)
+		{
+			delete TB;
+			TB = NULL;
+		}
+		v_buttonList.pop_back();
+	}
 
 	while (m_goList.size() > 0)
 	{

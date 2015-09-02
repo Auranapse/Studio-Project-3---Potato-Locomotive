@@ -39,6 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files %28x86%29\Visual Leak Detector/include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Visual Leak Detector\lib\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -145,7 +147,6 @@
     <ClInclude Include="Source\Asset.h" />
     <ClInclude Include="Source\BulletObject.h" />
     <ClInclude Include="Source\Button.h" />
-    <ClInclude Include="Source\Door.h" />
     <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\Living.h" />
     <ClInclude Include="Source\NonLiving.h" />

@@ -16,7 +16,7 @@ class ItemObject : public GameObject
 {
 public:
 	ItemObject();
-	~ItemObject();
+	virtual ~ItemObject();
 
 	bool isWeapon;
 	bool isGun;

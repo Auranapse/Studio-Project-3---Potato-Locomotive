@@ -20,7 +20,7 @@ private:
 	float timer;
 public:
 	WeaponsObject();
-	~WeaponsObject();
+	virtual ~WeaponsObject();
 	
 	float shootvelocity;
 	float recoilEffect;

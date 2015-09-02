@@ -447,7 +447,6 @@ void Application::Run()
 		e_currentScene = scene->GetNextScene();
 		SetCursor(true);
 		scene->Exit();
-
 		delete scene;
 	}
 }

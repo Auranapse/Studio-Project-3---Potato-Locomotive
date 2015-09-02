@@ -18,7 +18,7 @@ public:
 	};
 
 	SecurityCam(void);
-	~SecurityCam(void);
+	virtual ~SecurityCam(void);
 
 	void setRotationAngle(float f_rotationAngle);
 	void update(const double &dt, Vector3 &playerPos, std::vector<GameObject*> m_goList);

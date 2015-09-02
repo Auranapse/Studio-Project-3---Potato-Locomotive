@@ -114,7 +114,7 @@ public:
 	virtual void Update(const double &dt);
 
 	CharacterObject();
-	~CharacterObject();
+	virtual ~CharacterObject();
 };
 
 #endif

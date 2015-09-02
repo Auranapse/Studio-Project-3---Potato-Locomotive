@@ -28,7 +28,14 @@ Default destructor
 /****************************************************************************/
 MapLoader::~MapLoader()
 {
-	std::vector<std::vector<std::string>>().swap(map_data);
+	for (unsigned i = 0; i < map_data.size(); ++i)
+	{
+		for (unsigned j = 0; j < map_data[i].size(); ++j)
+		{
+			std::vector<std::string>().swap(map_data[i]);
+		}
+		std::vector<std::vector<std::string>>().swap(map_data);
+	}
 }
 
 /****************************************************************************/
@@ -61,8 +68,13 @@ bool MapLoader::loadMap(std::string file)
 	}
 
 	FILE_LOCATION = file;
-	if (map_data.size() > 0)
+
+	for (unsigned i = 0; i < map_data.size(); ++i)
 	{
+		for (unsigned j = 0; j < map_data[i].size(); ++j)
+		{
+			std::vector<std::string>().swap(map_data[i]);
+		}
 		std::vector<std::vector<std::string>>().swap(map_data);
 	}
 
@@ -82,6 +94,7 @@ bool MapLoader::loadMap(std::string file)
 		}
 		map_width = Column.size();
 		map_data.push_back(Column);
+
 		std::vector<std::string>().swap(Column);
 	}
 

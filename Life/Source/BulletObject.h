@@ -7,7 +7,7 @@ class BulletObject : public GameObject
 {
 public:
 	BulletObject();
-	~BulletObject();
+	virtual ~BulletObject();
 
 	float life;
 };

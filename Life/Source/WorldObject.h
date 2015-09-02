@@ -16,7 +16,7 @@ class WorldObject : public GameObject
 {
 public:
 	WorldObject();
-	~WorldObject();
+	virtual ~WorldObject();
 };
 
 #endif

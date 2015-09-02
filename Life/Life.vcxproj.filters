@@ -186,9 +186,6 @@
     <ClCompile Include="Source\ItemObject.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SecurityCam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SaveHandler.cpp">
       <Filter>Source Files\Save/Load</Filter>
     </ClCompile>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="Source\PressurePlate.cpp">
       <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SecurityCam.cpp">
+      <Filter>Source Files\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +362,6 @@
     <ClInclude Include="Source\ItemObject.h">
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SecurityCam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SaveHandler.h">
       <Filter>Header Files\Save/Load</Filter>
     </ClInclude>
@@ -443,8 +440,8 @@
     <ClInclude Include="Source\PressurePlate.h">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Door.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\SecurityCam.h">
+      <Filter>Header Files\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

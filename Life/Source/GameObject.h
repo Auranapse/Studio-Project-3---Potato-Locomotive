@@ -40,7 +40,7 @@ public:
 	float lightPower;*/
 
 	GameObject();
-	~GameObject();
+	virtual ~GameObject();
 
 	virtual void Update(double &dt);
 };
