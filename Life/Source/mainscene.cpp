@@ -881,7 +881,7 @@ bool mainscene::loadLevel(int level)
 	{
 		for (unsigned x = 0; x < GAME_MAP.map_width; ++x)
 		{
-			if (GAME_MAP.map_data[y][x] == "." || GAME_MAP.map_data[y][x] == "")
+			if (GAME_MAP.map_data[y][x] == "." || GAME_MAP.map_data[y][x] == "" || GAME_MAP.map_data[y][x].size() <= 0)
 			{
 				continue;
 			}
@@ -1088,8 +1088,19 @@ bool mainscene::loadLevel(int level)
 							if (GAME_MAP.map_data[y][x][4] == '1')
 							{
 								loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f));
+
+								if (GAME_MAP.map_data[y][x][2] == '1')
+								{
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f + 5));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f - 5));
+								}
+								else
+								{
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f + 5, 20.f, y*worldsize*2.f));
+									loadLevel_GenerateOBJ("II_SYRINGE", Vector3(x*worldsize*2.f - 5, 20.f, y*worldsize*2.f));
+								}
 							}
-							if (GAME_MAP.map_data[y][x][4] == '2')
+							else if (GAME_MAP.map_data[y][x][4] == '2')
 							{
 								if (GAME_MAP.map_data[y][x][2] == '1')
 								{
@@ -1099,6 +1110,10 @@ bool mainscene::loadLevel(int level)
 								{
 									loadLevel_GenerateOBJ("IW_KATANA", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f), Vector3(0, 0, 90));
 								}
+							}
+							else if (GAME_MAP.map_data[y][x][4] == '3')
+							{
+								loadLevel_GenerateOBJ("IW_SCALPLE", Vector3(x*worldsize*2.f, 20.f, y*worldsize*2.f), Vector3(0, 0, 0));
 							}
 						}
 					}
@@ -2555,17 +2570,20 @@ void mainscene::Update(double dt)
 		editFOV(f_fov);
 	}
 
-	if (Application::IsKeyPressed('2'))
+	if (TESTMODE)
 	{
-		if (!Application::IsKeyPressed(VK_SHIFT))
+		if (Application::IsKeyPressed('2'))
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			if (!Application::IsKeyPressed(VK_SHIFT))
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
 		}
-		else
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-	}
+	}	
 
 	UpdateButtons();
 
