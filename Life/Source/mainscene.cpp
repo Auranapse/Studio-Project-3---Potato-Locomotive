@@ -1265,6 +1265,7 @@ bool mainscene::loadLevel(int level)
 
 	FPC.Init(P_Player.pos + P_Player.CamOffset, P_Player.pos + P_Player.CamOffset + Vector3(0.f, 0.f, -1.f), Vector3(0.f, 1.f, 0.f), f_mouseSensitivity);
 	std::cout << "Map Successfully loaded\n";
+	Application::waitforload();
 	return true;
 }
 

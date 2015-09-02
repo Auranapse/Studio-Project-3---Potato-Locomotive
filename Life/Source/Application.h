@@ -52,6 +52,7 @@ public:
 	static void GetMouseChange(float &x, float &y);
 	static void resizeWindow(int width, int height, bool fullscreen = false);
 	static void fullscreentoggle(void);
+	static void waitforload(void);
 private:
 	/******************************************************************************/
 	/*!

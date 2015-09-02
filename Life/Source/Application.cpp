@@ -32,6 +32,7 @@ const int initHeight = 720;
 int Application::i_WINDOW_WIDTH = initWidth;
 int Application::i_WINDOW_HEIGHT = initHeight;
 static bool togglefullscreen = false;
+static bool loaddone = false;
 
 /******************************************************************************/
 /*!
@@ -214,6 +215,17 @@ void Application::fullscreentoggle(void)
 /******************************************************************************/
 /*!
 \brief
+freezes delta time for a second when loading something big inside the scene
+*/
+/******************************************************************************/
+void Application::waitforload(void)
+{
+	loaddone = false;
+}
+
+/******************************************************************************/
+/*!
+\brief
 Return the current Width of the window
 
 \return int with the current Width of the window
@@ -375,18 +387,24 @@ void Application::Run()
 			scene = new MenuScene();
 			break;
 		}
-		scene->Init();
 
+		loaddone = false;
+		scene->Init();
+				
 		m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 		while (scene->GetNextScene() == E_SCENE_TOTAL && !b_quitProgram)
 		{
 			// Main ViewPort
 			//glViewport(0.0f, 0.0f, GetWindowWidth(), GetWindowHeight());
-			m_dElapsedTime = m_timer.getElapsedTime();
-			m_dAccumulatedTime_Thread += m_dElapsedTime;
-
+			m_dAccumulatedTime_Thread += m_timer.getElapsedTime();
+			
 			if (m_dAccumulatedTime_Thread > 0.016)
 			{
+				if (!loaddone)
+				{
+					loaddone = true;
+					m_dAccumulatedTime_Thread = 0.f;
+				}
 				scene->Update(m_dAccumulatedTime_Thread);
 				m_dAccumulatedTime_Thread = 0.0;
 			}
