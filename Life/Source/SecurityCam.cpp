@@ -106,12 +106,31 @@ void SecurityCam::update(const double &dt, Vector3 &playerPos, std::vector<GameO
 
 	case FOUND:
 		{
-			float rotationdiff = (CalAnglefromPosition(playerPos, pos, true) - CalAnglefromPosition(Lookat, pos, true)) * 2.f;
-			
+			float rotationdiff = (CalAnglefromPosition(playerPos, pos, true) - CalAnglefromPosition(Lookat, pos, true));
+
+			if (rotationdiff >= 180)
+			{
+				Mtx44 rotation;
+				Lookat = Lookat - pos;
+				rotation.SetToRotation(-360, 0, 1, 0);
+				Lookat = rotation * Lookat;
+				Lookat = Lookat + pos;
+				rotationdiff -= 360;
+			}
+			else if (rotationdiff <= -180)
+			{
+				Mtx44 rotation;
+				Lookat = Lookat - pos;
+				rotation.SetToRotation(360, 0, 1, 0);
+				Lookat = rotation * Lookat;
+				Lookat = Lookat + pos;
+				rotationdiff += 360;
+			}
+
 			Mtx44 rotation;
 			Lookat = Lookat - pos;
 			f_rotationLimiter += rotationdiff * static_cast<float>(dt);
-			rotation.SetToRotation(rotationdiff * static_cast<float>(dt), 0, 1, 0);
+			rotation.SetToRotation(rotationdiff * 2 * static_cast<float>(dt), 0, 1, 0);
 			Lookat = rotation * Lookat;
 			Lookat = Lookat + pos;
 
