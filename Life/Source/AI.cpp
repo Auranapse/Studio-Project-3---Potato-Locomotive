@@ -97,7 +97,7 @@ void AI::movementFB(double &dt, bool forward)
 
 	if (forward)
 	{
-		vel += (getDirection(true).Normalize() * f_movementSpeed) * static_cast<float>(dt);
+		vel += (getDirection(true).Normalize() * (f_movementSpeed * 2)) * static_cast<float>(dt);
 	}
 	else
 	{
@@ -151,18 +151,18 @@ sensors made to see if there is anything in the way of the AI and also move towa
 void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 {
 	float rotationDiff = CalAnglefromPosition(destination, pos, true) - CalAnglefromPosition(Lookat, pos, true);
-	movementLR(dt, false, rotationDiff);
+	movementLR(dt, false, rotationDiff * 0.5f);
 
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
-		movementLR(dt, false, 360.f);
+		movementLR(dt, false, 720.f);
 	}
 
 	//when left has nothing to collide
 	else if (left == false && mid == true && right == true)
 	{
-		movementLR(dt, true, 360.f);
+		movementLR(dt, true, 720.f);
 	}
 
 	//when middle has nothing to collide
@@ -186,36 +186,20 @@ void AI::SensorUpdate2(double &dt, bool left, bool mid, bool right)
 	//random betwee walking straight and right
 	else if(left == true && mid == false && right == false)
 	{
-		int dothis = Math::RandIntMinMax(1, 2);
-		if(dothis == 1)
-			movementFB(dt, true);
-
-		else
-			movementLR(dt, false, 360.f);
+		movementFB(dt, true);
 	}
 
 	//random betwee walking straight and left
 	else if(left == false && mid == false && right == true)
 	{
-		int dothis = Math::RandIntMinMax(1, 2);
-		if(dothis == 1)
-			movementFB(dt, true);
-
-		else
-		{
-			movementFB(dt, false);
-			movementLR(dt, true, 360.f);
-		}
+		
+		movementFB(dt, true);
 	}
 
 	else if(left == false && mid == true && right == false)
 	{
-		int dothis = Math::RandIntMinMax(1, 2);
-		if(dothis == 1)
-			movementLR(dt, true, 720.f);
-
-		else
-			movementLR(dt, false, 720.f);
+		rotationDiff = CalAnglefromPosition(destination, pos, true) - CalAnglefromPosition(Lookat, pos, true);
+		movementLR(dt, false, rotationDiff);
 	}
 	else
 	{
