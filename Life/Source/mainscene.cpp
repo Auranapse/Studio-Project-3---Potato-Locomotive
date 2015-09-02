@@ -691,10 +691,14 @@ void mainscene::Init()
 
 	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
 	soundList[ST_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//alert.wav");
+	
+	soundList[ST_OBJ_BREAK] = SE_Engine.preloadSound("GameData//sounds//effects//objbreak.wav");
+	soundList[ST_OBJ_BREAK]->setDefaultVolume(0.3f);
+	soundList[ST_OBJ_BREAK]->setDefaultMinDistance(150.f);
 
 	soundList[ST_WEAPON_M9_SHOOT] = SE_Engine.preloadSound("GameData//sounds//weapons//M9//FIRE.wav");
 	soundList[ST_WEAPON_M9_SHOOT]->setDefaultVolume(0.3f);
-	soundList[ST_WEAPON_M9_SHOOT]->setDefaultMinDistance(1000.f);
+	soundList[ST_WEAPON_M9_SHOOT]->setDefaultMinDistance(500.f);
 
 	soundList[ST_WEAPON_KATANA] = SE_Engine.preloadSound("GameData//sounds//weapons//Katana.mp3");
 
@@ -1397,7 +1401,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_KATANA].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
-	WO_presetList[WO_KATANA].range = 0.05f;
+	WO_presetList[WO_KATANA].range = 0.06f;
 
 	WO_presetList[WO_SCALPLE].active = true;
 	WO_presetList[WO_SCALPLE].mesh = meshList[GEO_SCALPLE];
@@ -1416,7 +1420,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_SCALPLE].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_SCALPLE].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_SCALPLE].AttackSound = ST_WEAPON_KATANA;
-	WO_presetList[WO_SCALPLE].range = 0.02f;
+	WO_presetList[WO_SCALPLE].range = 0.04f;
 
 	f_curRecoil = 0.f;
 }
@@ -2106,7 +2110,21 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 						}
 						else
 						{
-							CO->DropObject(Vector3(-go->vel.x*0.1f, Math::RandFloatMinMax(20, 120), -go->vel.z*0.1f));
+							if (CO->holding == NULL)
+							{
+								SE_Engine.playSound3D(soundList[ST_AI_DEATH], CO->pos);
+								SE_Engine.playSound3D(soundList[ST_OBJ_BREAK], CO->pos);
+								go->active = false;
+								CO->DropObject();
+								CO->active = false;
+								generateCharacterParticle(CO, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)));
+							}
+							else
+							{
+								SE_Engine.playSound3D(soundList[ST_OBJ_BREAK], CO->pos);
+								go->active = false;
+								CO->DropObject(Vector3(-go->vel.x*0.1f, Math::RandFloatMinMax(20, 120), -go->vel.z*0.1f));
+							}							
 						}
 					}
 				}

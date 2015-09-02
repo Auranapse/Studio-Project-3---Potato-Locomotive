@@ -54,7 +54,6 @@ public:
 	void collisionHandler(std::vector<GameObject *> &m_GOList);
 
 	void ai_ScanArea(double &dt);
-	void UpdateLookat(double &dt, Vector3 &playerPos);
 	void aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*> &m_GOList);
 	void AiLookatRotation(double &dt);
 	void moveToDestination(double &dt);
