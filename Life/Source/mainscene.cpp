@@ -832,11 +832,19 @@ bool mainscene::loadLevel(int level)
 	std::cout << "Dialogues Cleared\n";
 
 	//Door Clear
-	Doors.clear();
+
+	while (Doors.size() > 0)
+	{
+		Doors.pop_back();
+	}
 
 	//Keys Clear
+	while (Keys.size() > 0)
+	{
+		Keys.pop_back();
+	}
+
 	std::cout << "Keys Cleared\n";
-	Keys.clear();
 	KeyCount = 0;
 
 	//Status Clear
