@@ -944,7 +944,7 @@ bool mainscene::loadLevel(int level)
 			{
 				CollisionBox Key;
 				Key.Type = CollisionBox::CT_SPHERE;
-				Key.Position = Vector3(x * worldsize * 2.f, 0, y * worldsize * 2.f);
+				Key.Position = Vector3(x * worldsize * 2.f, 15, y * worldsize * 2.f);
 				Key.radius = 10;
 				Keys.push_back(Key);
 			}
@@ -2034,10 +2034,6 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
-		if (ai->getState() == AI::ALERT)
-		{
-			addStatus("Enemies Searching...", 10);
-		}
 		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()) && (ai->getDestination() - ai->pos).LengthSquared() < ai->getDetectionRange_Max())
 		{
 			ai->b_isDestinationWithinFOV = true;
