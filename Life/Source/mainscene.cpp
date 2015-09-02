@@ -45,27 +45,37 @@ mainscene::~mainscene()
 /*!
 \brief
 Loads save file from file
+\param save
+if true will overwrite files, if not will load
 */
 /******************************************************************************/
-void mainscene::assignSave(void)
+void mainscene::assignSave(bool save)
 {
-	SH_1.assign(f_fov, 70.f, 1);
-	SH_1.assign(f_mouseSensitivity, 100.f, 2);
+	SH_1.assign(f_fov, 70.f, 1, save);
+	if (save)
+	{
+		f_mouseSensitivity *= 100.f;
+	}
+
+	SH_1.assign(f_mouseSensitivity, 100.f, 2, save);
 	f_mouseSensitivity *= 0.01f;
-	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3);
-	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4);
-	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5);
-	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6);
-	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7);
-	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8);
-	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9);
-	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10);
-	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11);
-	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12);
-	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13);
-	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14);
-	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15);
-	SH_1.assign(Graphics, GRA_MAX, 16);
+	SH_1.assign(us_control[E_CTRL_MOVE_FRONT], 'W', 3, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_BACK], 'S', 4, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_LEFT], 'A', 5, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_RIGHT], 'D', 6, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_SPRINT], VK_SHIFT, 7, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_WALK], VK_CONTROL, 8, save);
+	SH_1.assign(us_control[E_CTRL_MOVE_JUMP], VK_SPACE, 9, save);
+	SH_1.assign(us_control[E_CTRL_INTERACT], 'E', 10, save);
+	SH_1.assign(us_control[E_CTRL_THROW], VK_RBUTTON, 11, save);
+	SH_1.assign(us_control[E_CTRL_ATTACK], VK_LBUTTON, 12, save);
+	SH_1.assign(us_control[E_CTRL_AIM], VK_MBUTTON, 13, save);
+	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
+	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15, save);
+	SH_1.assign(Graphics, GRA_MAX, 16, save);
+	SH_1.assign(currentLevel, 1, 17, save);
+
+	SH_1.saveData();
 }
 
 /******************************************************************************/
@@ -196,6 +206,8 @@ void mainscene::Init()
 {
 	SE_Engine.Init();
 	Graphics = GRA_MAX;
+	currentLevel = 1;
+
 	//Control initialization--------------
 	for (unsigned i = 0; i < E_CTRL_TOTAL; ++i)
 	{
@@ -723,7 +735,7 @@ void mainscene::Init()
 
 	GAMESTATE = GS_PLAY;
 
-	currentLevel = 1;
+	
 	loadLevel(currentLevel);
 
 	PlayerSound = new SoundDetect(P_Player.pos, 100);
@@ -3700,12 +3712,22 @@ void mainscene::RenderUI(void)
 		break;
 	case mainscene::GS_END:
 	case mainscene::GS_PAUSED:
+	{		
 		modelStack.PushMatrix();
 		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
 		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()), static_cast<float>(Application::GetWindowHeight()), 0.f);
 		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 70.f, 10.f, Color(0.f, 0.f, 0.f));
 		modelStack.PopMatrix();
+
+		std::stringstream ss;
+		ss << "Current Level: " << currentLevel;
+		modelStack.PushMatrix();
+		modelStack.Translate(Application::GetWindowWidth()*0.022f, Application::GetWindowHeight()*0.05f + 10.f, 0.1f);
+		modelStack.Scale(2.5f, 2.5f, 2.5f);
+		RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), UIColor);
+		modelStack.PopMatrix();
 		break;
+	}
 	default:
 		break;
 	}
@@ -3984,6 +4006,7 @@ Clears memory upon exit
 /******************************************************************************/
 void mainscene::Exit(void)
 {
+	assignSave(true);
 	Application::SetCursor(true);
 	SE_Engine.Exit();
 

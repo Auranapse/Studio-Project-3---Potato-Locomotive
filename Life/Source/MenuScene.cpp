@@ -76,6 +76,7 @@ void MenuScene::assignsave(bool save)
 	SH_1.assign(us_control[E_CTRL_ABILITY_1], 'V', 14, save);
 	SH_1.assign(us_control[E_CTRL_ABILITY_2], 'B', 15, save);
 	SH_1.assign(Graphics, GRA_MAX, 16, save);
+	SH_1.assign(currentLevel, 1, 17, save);
 
 	SH_1.saveData();
 }

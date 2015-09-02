@@ -429,7 +429,7 @@ private:
 	unsigned short us_control[E_CTRL_TOTAL];
 
 	SaveHandler SH_1;
-	void assignSave(void);
+	void assignSave(bool save = false);
 
 	float f_defaultfov;
 	float f_fov;

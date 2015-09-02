@@ -311,6 +311,7 @@ private:
 	unsigned short *us_ControlChange;
 
 	int Graphics;
+	int currentLevel;
 
 	/******************************************************************************/
 	/*!
