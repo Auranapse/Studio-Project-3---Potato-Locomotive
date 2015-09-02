@@ -961,7 +961,7 @@ bool mainscene::loadLevel(int level)
 
 				float radius;
 
-				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != '\0'; ++i)
 				{
 					temp_str_radius += GAME_MAP.map_data[y][x][i];
 				}
