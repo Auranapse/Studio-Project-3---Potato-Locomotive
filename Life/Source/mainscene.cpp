@@ -732,7 +732,7 @@ void mainscene::Init()
 	MsgSeq1.push_back(T1_1);
 	MsgSeq1.push_back(T2_1);
 	Dialogue1->setDialogue(Messages1, MsgSeq1);
-	Dialogues.push_back(Dialogue1);
+	Dialogues[0].push_back(Dialogue1);
 
 	//Dialogue Test
 	CollisionBox DBox2;
@@ -751,7 +751,7 @@ void mainscene::Init()
 	MsgSeq2.push_back(T1_2);
 	MsgSeq2.push_back(T2_2);
 	Dialogue2->setDialogue(Messages2, MsgSeq2);
-	Dialogues.push_back(Dialogue2);
+	Dialogues[0].push_back(Dialogue2);
 
 	KeyRotate = 0;
 	KeyCount = 0;
@@ -807,12 +807,14 @@ bool mainscene::loadLevel(int level)
 	f_playerHealthTint = 0.f;
 
 	//Dialogue Reload
-	for (unsigned i = 0; i < Dialogues.size(); ++i)
+	for (unsigned i =0; i < 4; ++i)
 	{
-		std::cout << "Dialogues Cleared";
-		Dialogues[i]->setTimer(1000);
+		for (unsigned k = 0; k < Dialogues[i].size(); ++k)
+		{
+			std::cout << "Dialogues Cleared";
+			Dialogues[i][k]->setTimer(1000);
+		}
 	}
-
 	//Keys Clear
 	std::cout << "Keys Cleared\n";
 	Keys.clear();
@@ -2504,7 +2506,7 @@ void mainscene::Update(double dt)
 		Vector3 newRad = P_Player.vel;
 		if (P_Player.vel.y == 0)
 		{
-			PlayerSound->setSoundRadius(newRad.Length()*0.4f);
+			PlayerSound->setSoundRadius(newRad.Length()*0.35f);
 			CheckPlayerSound();
 		}
 		KeyRotate += 25 * dt;
@@ -3397,15 +3399,15 @@ void mainscene::RenderWorldShadow(void)
 	}
 
 	//Dialogues On Screen
-	for (unsigned i = 0; i < Dialogues.size(); ++i)
-	{
-		std::string Result = Dialogues[i]->inEffect(&P_Player, 1);
-		//std::cout<<Result;
-		if (Result == "TIME")
-			delete Dialogues[i];
-		else if (Result != "")
-			RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0, 1, 1), 3.5f, 15.f, 10.f);
-	}
+		for (unsigned i = 0; i < Dialogues[currentLevel - 1].size(); ++i)
+		{
+			std::string Result = Dialogues[currentLevel - 1][i]->inEffect(&P_Player, 1);
+			//std::cout<<Result;
+			if (Result == "TIME")
+				delete Dialogues[currentLevel - 1][i];
+			else if (Result != "")
+				RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0, 1, 1), 3.5f, 15.f, 10.f);
+		}
 
 	if (status != "\0")
 		RenderTextOnScreen(meshList[GEO_TEXT], status, Color(0, 1, 1), 5.f, 15.f, 60.f);
@@ -3926,6 +3928,7 @@ void mainscene::CheckPlayerSound(void)
 			{
 				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
 				{
+					std::cout<<"PLAYER HEARD!";
 					ai->setcurrentLookat(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setDestination(Vector3(P_Player.pos.x, 0, P_Player.pos.z));
 					ai->setState(AI::ALERT);
@@ -3950,7 +3953,6 @@ void mainscene::checkDoor()
 			}
 			else
 			{
-				std::cout << "DAMDAMDAMDAMDMADMAMDAMDMA!!!!!!!!!\n";
 				addStatus("Need Keycard!", 150);
 				Vector3 pushBack = P_Player.vel;
 				pushBack.y = 0;
