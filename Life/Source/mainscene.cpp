@@ -886,7 +886,7 @@ bool mainscene::loadLevel(int level)
 			if (GAME_MAP.map_data[y][x] == "SPAWN")//Generate spawnpoint
 			{
 				P_Player.active = true;
-				P_Player.pos.Set(x*worldsize*2.f, 5.f, y*worldsize*2.f);
+				P_Player.pos.Set(x*worldsize*2.f, 10.f, y*worldsize*2.f);
 				P_Player.collisionMesh.Position = P_Player.pos;
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'I')
