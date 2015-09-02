@@ -44,6 +44,7 @@ Main scene
 #include "SceneManager.h"
 #include "SoundDetect.h"
 #include "PressurePlate.h"
+#include <sstream>
 
 /******************************************************************************/
 /*!
@@ -105,6 +106,7 @@ class mainscene : public Scene
 
 		//Other
 		GEO_TABLE,
+		GEO_KEYCOUNT,
 
 		//------------------------
 		//EFFECTS/OTHERS

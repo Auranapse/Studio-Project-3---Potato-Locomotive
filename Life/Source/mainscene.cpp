@@ -573,6 +573,9 @@ void mainscene::Init()
 	meshList[GEO_EXIT] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//door.obj");
 	meshList[GEO_EXIT]->textureID[0] = LoadTGA("GameData//Image//doorexit.tga");
 
+	meshList[GEO_KEYCOUNT] = MeshBuilder::GenerateQuad("keycount",Color(0,1,0), 1.0, 1.0);
+	meshList[GEO_KEYCOUNT]->textureID[0] = LoadTGA("GameData//Image//card.tga", false);
+
 
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
@@ -3501,20 +3504,6 @@ void mainscene::RenderWorldShadow(void)
 		modelStack.PopMatrix();
 	}
 	*/
-
-	//Dialogues On Screen
-		for (unsigned i = 0; i < Dialogues[currentLevel - 1].size(); ++i)
-		{
-			std::string Result = Dialogues[currentLevel - 1][i]->inEffect(&P_Player, 1);
-			//std::cout<<Result;
-			if (Result == "TIME")
-				delete Dialogues[currentLevel - 1][i];
-			else if (Result != "")
-				RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0, 1, 1), 3.5f, 15.f, 10.f);
-		}
-
-	if (status != "\0")
-		RenderTextOnScreen(meshList[GEO_TEXT], status, Color(0, 1, 1), 5.f, 15.f, 60.f);
 }
 
 /******************************************************************************/
@@ -3552,101 +3541,128 @@ void mainscene::RenderUI(void)
 		modelStack.PopMatrix();
 		break;
 	case mainscene::GS_PLAY:
-		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(10));
-		modelStack.PushMatrix();
-		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
-		modelStack.PopMatrix();
-		glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
-
-		modelStack.PushMatrix();
-		modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
-		modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
-		RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
-		modelStack.PopMatrix();
-
-		if (P_Player.holding != NULL)
 		{
-			if (P_Player.holding->isGun)
+			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(10));
+			modelStack.PushMatrix();
+			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+			modelStack.PopMatrix();
+			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
+
+			modelStack.PushMatrix();
+			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
+			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
+			modelStack.PopMatrix();
+
+			//Dialogues On Screen
+			for (unsigned i = 0; i < Dialogues[currentLevel - 1].size(); ++i)
 			{
-				WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
-				if (WO->animState)
+				std::string Result = Dialogues[currentLevel - 1][i]->inEffect(&P_Player, 1);
+				//std::cout<<Result;
+				if (Result == "TIME")
+					delete Dialogues[currentLevel - 1][i];
+				else if (Result != "")
+					RenderTextOnScreen(meshList[GEO_TEXT], Result, Color(0, 1, 1), 3.5f, 15.f, 10.f);
+			}
+
+			if (status != "\0")
+				RenderTextOnScreen(meshList[GEO_TEXT], status, Color(0, 1, 1), 5.f, 15.f, 60.f);
+
+			modelStack.PushMatrix();
+			modelStack.Translate(8, 4.5,0);
+			modelStack.Scale(5.5,3.5,0);
+			RenderMeshin2D(meshList[GEO_KEYCOUNT], false);
+			modelStack.PopMatrix();
+
+			std::stringstream ss;
+			ss << KeyCount;
+			std::string keys = ss.str();
+			RenderTextOnScreen(meshList[GEO_TEXT], keys, Color(1,1,0), 4.0f, 9.0f, 3.0f);
+
+			if (P_Player.holding != NULL)
+			{
+				if (P_Player.holding->isGun)
 				{
-					Color c_crosshair(0.f, 1.f, 1.f);
+					WeaponsObject *WO = dynamic_cast<WeaponsObject*>(P_Player.holding);
+					if (WO->animState)
+					{
+						Color c_crosshair(0.f, 1.f, 1.f);
 
-					if (WO->CurrentClip <= 0)
-					{
-						c_crosshair.Set(1.f, 0.f, 0.f);
-					}
-					else if (!(WO->attackRate + firerate < timer))
-					{
-						c_crosshair.Set(0.f, 0.5f, 0.5f);
-					}
-					else
-					{
-						c_crosshair.Set(0.f, 1.f, 1.f);
-					}
+						if (WO->CurrentClip <= 0)
+						{
+							c_crosshair.Set(1.f, 0.f, 0.f);
+						}
+						else if (!(WO->attackRate + firerate < timer))
+						{
+							c_crosshair.Set(0.f, 0.5f, 0.5f);
+						}
+						else
+						{
+							c_crosshair.Set(0.f, 1.f, 1.f);
+						}
 
+						modelStack.PushMatrix();
+						modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
+
+						modelStack.PushMatrix();
+						modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+						RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+						modelStack.PopMatrix();
+
+						modelStack.PushMatrix();
+						modelStack.Rotate(90, 0, 0, 1);
+						modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+						RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+						modelStack.PopMatrix();
+
+						modelStack.PushMatrix();
+						modelStack.Rotate(-90, 0, 0, 1);
+						modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+						RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+						modelStack.PopMatrix();
+
+						modelStack.PushMatrix();
+						modelStack.Rotate(180, 0, 0, 1);
+						modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
+						RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
+						modelStack.PopMatrix();
+
+						modelStack.PopMatrix();
+					}
+				}
+				else
+				{
 					modelStack.PushMatrix();
 					modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
-
-					modelStack.PushMatrix();
-					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
-					modelStack.PopMatrix();
-
-					modelStack.PushMatrix();
-					modelStack.Rotate(90, 0, 0, 1);
-					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
-					modelStack.PopMatrix();
-
-					modelStack.PushMatrix();
-					modelStack.Rotate(-90, 0, 0, 1);
-					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
-					modelStack.PopMatrix();
-
-					modelStack.PushMatrix();
-					modelStack.Rotate(180, 0, 0, 1);
-					modelStack.Translate(0, 1 + f_curRecoil * 0.5f, 0);
-					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, c_crosshair);
-					modelStack.PopMatrix();
-
+					modelStack.Rotate(-45, 0, 0, 1);
+					modelStack.Scale(0.8f, 2.f, 1.f);
+					RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, Color(0.8f, 0.8f, 0.8f));
 					modelStack.PopMatrix();
 				}
 			}
-			else
+			if (f_poweramount > 0)
 			{
 				modelStack.PushMatrix();
-				modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 1.f);
-				modelStack.Rotate(-45, 0, 0, 1);
-				modelStack.Scale(0.8f, 2.f, 1.f);
-				RenderMeshin2D(meshList[GEO_CROSSHAIR], false, 100.f, 10.f, Color(0.8f, 0.8f, 0.8f));
+				modelStack.Translate(0, 0, 0.2f);
+				modelStack.Scale(1, 10.f, 0.f);
+				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.2f));
+				modelStack.PopMatrix();
+
+				modelStack.PushMatrix();
+				modelStack.Translate(0, 0, 0.3f);
+				modelStack.Scale(1, f_poweramount*0.1f, 0.f);
+				if (f_poweramount < 20)
+				{
+					RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.5f, 0.f, 0.f));
+				}
+				else
+				{
+					RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.f, 1.f, 1.f));
+				}
 				modelStack.PopMatrix();
 			}
-		}
-		if (f_poweramount > 0)
-		{
-			modelStack.PushMatrix();
-			modelStack.Translate(0, 0, 0.2f);
-			modelStack.Scale(1, 10.f, 0.f);
-			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.2f));
-			modelStack.PopMatrix();
-
-			modelStack.PushMatrix();
-			modelStack.Translate(0, 0, 0.3f);
-			modelStack.Scale(1, f_poweramount*0.1f, 0.f);
-			if (f_poweramount < 20)
-			{
-				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.5f, 0.f, 0.f));
-			}
-			else
-			{
-				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 100.f, 10.f, Color(0.f, 1.f, 1.f));
-			}
-			modelStack.PopMatrix();
 		}
 		break;
 	case mainscene::GS_END:
@@ -3667,6 +3683,8 @@ void mainscene::RenderUI(void)
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<long double>(FPScounter)), Color(0, 1, 1), 2, 1, Application::GetWindowHeight()*0.1f - 1.f);
 	}
+
+
 }
 
 /******************************************************************************/
@@ -4012,18 +4030,6 @@ bool mainscene::CollisionBetween(Vector3 start, Vector3 &end)
 	float line = 0; 
 
 
-	while(line < length) 
-	{ 
-		CollisionBox Test; 
-		Test.Type = CollisionBox::CT_SPHERE; 
-		Test.radius = 5; 
-		start += direction * 5; 
-		Test.Position = start; 
-		line += 5; 
-		Temporary.push_back(Test); 
-	} 
-
-
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it) 
 	{ 
 		GameObject *go = (GameObject *)*it; 
@@ -4032,11 +4038,17 @@ bool mainscene::CollisionBetween(Vector3 start, Vector3 &end)
 			WorldObject *WO = dynamic_cast<WorldObject*>(go); 
 			if(WO != NULL) 
 			{ 
-				for (unsigned i = 0; i < Temporary.size(); ++i) 
-				{ 
-					if (CollisionBox::checkCollision(Temporary[i], go->collisionMesh)) 
-						return true; 
-				} 
+				while (line < length)
+				{
+					CollisionBox Test;
+					Test.Type = CollisionBox::CT_SPHERE; 
+					Test.radius = 5; 
+					start += direction * 5; 
+					Test.Position = start; 
+					line += 5; 
+					if (CollisionBox::checkCollision(Test, go->collisionMesh))
+						return true;
+				}
 			} 
 		} 
 	}
