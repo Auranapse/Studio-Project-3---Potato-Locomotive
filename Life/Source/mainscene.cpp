@@ -569,6 +569,10 @@ void mainscene::Init()
 	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//door.obj");
 	meshList[GEO_DOOR]->textureID[0] = LoadTGA("GameData//Image//door.tga");
 	
+	
+	meshList[GEO_EXIT] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//door.obj");
+	meshList[GEO_EXIT]->textureID[0] = LoadTGA("GameData//Image//doorexit.tga");
+
 
 	meshList[GEO_M9]->material.kAmbient.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_M9]->material.kDiffuse.Set(0.4f, 0.4f, 0.4f);
@@ -1110,13 +1114,13 @@ bool mainscene::loadLevel(int level)
 				WO = new WorldObject();
 				WO->active = true;
 				WO->colEnable = false;
-				WO->scale.Set(3.f, 3.f, 3.f);
+				WO->scale.Set(20.f, 25.f, 20.f);
 				WO->pos.Set(x*worldsize*2.f, 1, y*worldsize*2.f);
 				WO->collisionMesh.Type = CollisionBox::CT_SPHERE;
 				WO->collisionMesh.radius = 30.f;
 				WO->collisionMesh.Position = WO->pos;
 				WO->dynamicRendering = true;
-				WO->mesh = meshList[GEO_OBJCAKE];
+				WO->mesh = meshList[GEO_EXIT];
 				WO_END = WO;
 				m_goList.push_back(WO);
 			}

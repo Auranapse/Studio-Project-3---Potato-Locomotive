@@ -92,6 +92,7 @@ class mainscene : public Scene
 		GEO_SECURITYCAMERA,
 		GEO_KEYCARD,
 		GEO_DOOR,
+		GEO_EXIT,
 
 		//Weapons
 		GEO_M9,
