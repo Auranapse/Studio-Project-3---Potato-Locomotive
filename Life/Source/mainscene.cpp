@@ -967,7 +967,8 @@ bool mainscene::loadLevel(int level)
 				}
 
 				radius = static_cast<float>(std::atoi(temp_str_radius.c_str()));
-
+				if (radius < 0)
+					radius = worldsize;
 				CollisionBox doorBound;
 				doorBound.Type = CollisionBox::CT_SPHERE;
 				doorBound.Position = Vector3(x * worldsize * 2.f, 30, y * worldsize * 2.f);
