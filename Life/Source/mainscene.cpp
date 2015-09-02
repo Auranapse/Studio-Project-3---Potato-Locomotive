@@ -822,6 +822,10 @@ bool mainscene::loadLevel(int level)
 			Dialogues[i][k]->setTimer(1000);
 		}
 	}
+
+	//Door Clear
+
+	Doors.clear();
 	//Keys Clear
 	std::cout << "Keys Cleared\n";
 	Keys.clear();
