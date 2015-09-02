@@ -718,21 +718,15 @@ void mainscene::Init()
 	//Dialogue Test
 	CollisionBox DBox1;
 	DBox1.Type = CollisionBox::CT_SPHERE;
-	DBox1.Position = Vector3(40, 0, 520);
-	DBox1.radius = 100;
-
-
+	DBox1.Position = Vector3(40, 5, 280);
+	DBox1.radius = 130;
 	PressurePlate *Dialogue1 = new PressurePlate(DBox1, 1000);
 	std::string S1_1 = "Welcome To Gene!";
 	std::string S2_1 = "Press B - See Through Walls!";
 	std::vector<std::string>Messages1;
 	Messages1.push_back(S1_1);
 	Messages1.push_back(S2_1);
-
-	//Timer always set to be at 1000
-	//
-
-	double T1_1 = 800;
+	double T1_1 = 900;
 	double T2_1 = 100;
 	std::vector<double>MsgSeq1;
 	MsgSeq1.push_back(T1_1);
@@ -743,16 +737,16 @@ void mainscene::Init()
 	//Dialogue Test
 	CollisionBox DBox2;
 	DBox2.Type = CollisionBox::CT_SPHERE;
-	DBox2.Position = Vector3(10, 0, 70);
-	DBox2.radius = 50;
+	DBox2.Position = Vector3(50, 60, 70);
+	DBox2.radius = 100;
 	PressurePlate *Dialogue2 = new PressurePlate(DBox2, 1000);
 	std::string S1_2 = "Too Loud! You'll get caught!";
 	std::string S2_2 = "Press Ctrl to Stealth Walk!";
 	std::vector<std::string>Messages2;
 	Messages2.push_back(S1_2);
 	Messages2.push_back(S2_2);
-	double T1_2 = 800;
-	double T2_2 = 400;
+	double T1_2 = 900;
+	double T2_2 = 100;
 	std::vector<double>MsgSeq2;
 	MsgSeq2.push_back(T1_2);
 	MsgSeq2.push_back(T2_2);
@@ -762,6 +756,7 @@ void mainscene::Init()
 	KeyRotate = 0;
 	KeyCount = 0;
 	DoorRotate = 0;
+
 }
 
 /******************************************************************************/
@@ -950,7 +945,7 @@ bool mainscene::loadLevel(int level)
 				CollisionBox Key;
 				Key.Type = CollisionBox::CT_SPHERE;
 				Key.Position = Vector3(x * worldsize * 2.f, 0, y * worldsize * 2.f);
-				Key.radius = 5;
+				Key.radius = 10;
 				Keys.push_back(Key);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'D')
@@ -2743,6 +2738,8 @@ void mainscene::Update(double dt)
 	default:
 		break;
 	}
+
+	std::cout<<P_Player.pos.x<<", "<<P_Player.pos.y<<", "<<P_Player.pos.z<<"\n";
 }
 
 /******************************************************************************/

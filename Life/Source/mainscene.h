@@ -498,7 +498,7 @@ private:
 	void checkStatus();
 	void CheckPlayerSound(void);
 	void addStatus(std::string, double);
-	std::vector<PressurePlate*> Dialogues[4];
+	std::vector<PressurePlate*> Dialogues[10];
 	std::vector<CollisionBox> Keys;
 	std::vector<CollisionBox> Doors;
 	std::string status;
