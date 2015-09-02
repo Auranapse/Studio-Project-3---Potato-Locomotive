@@ -15,7 +15,7 @@ Character Object used by AI and player
 Default constructor
 */
 /******************************************************************************/
-CharacterObject::CharacterObject(void) : Lookat(0.f, 0.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(40.f), f_movementSpeed(f_move_walk)
+CharacterObject::CharacterObject(void) : Lookat(0.f, 0.f, 1.f), Head(NULL), Chest(NULL), Arm_left(NULL), Arm_right(NULL), Leg_left(NULL), Leg_right(NULL), Animation(0, 0, 0, 0), f_move_crawl(10.f), f_move_walk(20.f), f_move_run(30.f), f_movementSpeed(f_move_walk)
 {
 	HeadPos.Set(0.f, 6.f, 0.f);
 	ArmPos.Set(4.f, 4.f, 0.f);

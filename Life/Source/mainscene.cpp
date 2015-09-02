@@ -2141,6 +2141,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 						if (BO != NULL)
 						{
 							//AI DIES
+							alertDeath(CO->pos, 100);
 							SE_Engine.playSound3D(soundList[ST_AI_DEATH], CO->pos);
 							BO->active = false;
 							CO->DropObject();
@@ -2151,6 +2152,7 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 						{
 							if (CO->holding == NULL)
 							{
+								alertDeath(CO->pos, 100);
 								SE_Engine.playSound3D(soundList[ST_AI_DEATH], CO->pos);
 								SE_Engine.playSound3D(soundList[ST_OBJ_BREAK], CO->pos);
 								go->active = false;
@@ -4217,6 +4219,34 @@ void mainscene::activateTrap()
 						generateCharacterParticle(ai, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)));
 					}
 					PulseBombs.erase(PulseBombs.begin() + i);
+				}
+			}
+		}
+	}
+}
+
+void mainscene::alertDeath(Vector3 pos, float alertRadius)
+{
+	CollisionBox alertBound;
+	alertBound.Type = CollisionBox::CT_SPHERE;
+	alertBound.radius = alertRadius;
+	alertBound.Position = pos;
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			AI *ai = dynamic_cast<AI*>(go);
+			if (ai != NULL)
+			{
+				if (CollisionBox::checkCollision(alertBound, ai->collisionMesh))
+				{
+					if (ai->getState() == AI::WALKING)
+					{
+						ai->setcurrentLookat(alertBound.Position);
+						ai->setDestination(alertBound.Position);
+						ai->setState(AI::ALERT);
+					}
 				}
 			}
 		}

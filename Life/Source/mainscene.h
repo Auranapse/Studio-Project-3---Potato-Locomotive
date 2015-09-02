@@ -504,6 +504,7 @@ private:
 	void pushPlayer();
 	void CheckPlayerSound(void);
 	void addStatus(std::string, double);
+	void alertDeath(Vector3 pos, float alertRadius = 100.f);
 	void layTrap(Vector3 pos);
 	void activateTrap();
 	std::vector<PressurePlate*> Dialogues[10];
