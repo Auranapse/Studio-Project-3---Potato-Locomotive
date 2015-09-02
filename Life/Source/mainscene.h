@@ -496,6 +496,7 @@ private:
 	void checkDoor();
 	void checkKey();
 	void checkStatus();
+	void pushPlayer();
 	void CheckPlayerSound(void);
 	void addStatus(std::string, double);
 	std::vector<PressurePlate*> Dialogues[10];

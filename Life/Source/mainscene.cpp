@@ -2546,6 +2546,7 @@ void mainscene::Update(double dt)
 		checkDoor();
 		checkKey();
 		checkStatus();
+		pushPlayer();
 
 		if (WO_END != NULL)
 		{
@@ -2713,8 +2714,6 @@ void mainscene::Update(double dt)
 	default:
 		break;
 	}
-
-	std::cout<<P_Player.pos.x<<", "<<P_Player.pos.y<<", "<<P_Player.pos.z<<"\n";
 }
 
 /******************************************************************************/
@@ -4023,6 +4022,32 @@ void mainscene::checkStatus()
 		{ 
 			status = "\0";
 			statusTimer = 0;
+		}
+	}
+}
+
+void mainscene::pushPlayer()
+{
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			AI *ai = dynamic_cast<AI*>(go);
+			
+			if (ai != NULL)
+			{
+				AI *temp = ai;
+				temp->collisionMesh.Position.y = 20;
+				if (CollisionBox::checkCollision(P_Player.collisionMesh, temp->collisionMesh))
+				{
+					std::cout<<"LOLOLOLOL";
+					P_Player.vel = Vector3(0,0,0);
+					P_Player.vel += ai->vel * 30;
+					
+					std::cout<<ai->vel.x<<", "<<ai->vel.y<<", "<<ai->vel.z<<"\n";
+				}
+			}
 		}
 	}
 }
