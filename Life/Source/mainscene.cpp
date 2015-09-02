@@ -1908,6 +1908,7 @@ void mainscene::UpdateGO(double &dt)
 			if (go->enablePhysics && !go->isHeld)
 			{
 				go->colEnable = false;
+
 				if (collide(Vector3(go->pos.x, go->pos.y - go->collisionMesh.ColBox.y, go->pos.z)))
 				{
 					if (go->vel.y != 0)
@@ -1926,6 +1927,11 @@ void mainscene::UpdateGO(double &dt)
 						float Friction = 0 - go->vel.z;
 						go->vel.z += Friction * 0.1f;
 					}
+
+					if (collide(Vector3(go->pos.x, go->pos.y - go->collisionMesh.ColBox.y *0.8f, go->pos.z)))
+					{
+						go->vel.y = 500.f * static_cast<float>(dt);
+					}
 				}
 				else
 				{
@@ -1941,6 +1947,11 @@ void mainscene::UpdateGO(double &dt)
 					{
 						go->vel.x = 0;
 					}
+
+					if (collide(Vector3(go->pos.x, go->pos.y + go->collisionMesh.ColBox.x *0.8f, go->pos.z)))
+					{
+						go->vel.x = -500 * static_cast<float>(dt);
+					}
 				}
 
 				if (collide(Vector3(go->pos.x - go->collisionMesh.ColBox.x, go->pos.y, go->pos.z)))
@@ -1948,6 +1959,11 @@ void mainscene::UpdateGO(double &dt)
 					if (go->vel.x < 0)
 					{
 						go->vel.x = 0;
+					}
+
+					if (collide(Vector3(go->pos.x, go->pos.y - go->collisionMesh.ColBox.x *0.8f, go->pos.z)))
+					{
+						go->vel.x = 500 * static_cast<float>(dt);
 					}
 				}
 
@@ -1957,6 +1973,11 @@ void mainscene::UpdateGO(double &dt)
 					{
 						go->vel.z = 0;
 					}
+
+					if (collide(Vector3(go->pos.x, go->pos.y + go->collisionMesh.ColBox.z *0.8f, go->pos.z)))
+					{
+						go->vel.z = -500 * static_cast<float>(dt);
+					}
 				}
 
 				if (collide(Vector3(go->pos.x, go->pos.y, go->pos.z - go->collisionMesh.ColBox.z)))
@@ -1964,6 +1985,11 @@ void mainscene::UpdateGO(double &dt)
 					if (go->vel.z < 0)
 					{
 						go->vel.z = 0;
+					}
+
+					if (collide(Vector3(go->pos.x, go->pos.y - go->collisionMesh.ColBox.z *0.8f, go->pos.z)))
+					{
+						go->vel.z = 500 * static_cast<float>(dt);
 					}
 				}
 
