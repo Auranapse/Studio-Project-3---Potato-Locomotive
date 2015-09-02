@@ -566,7 +566,7 @@ void mainscene::Init()
 	meshList[GEO_KEYCARD] = MeshBuilder::GenerateOBJ("Keycard", "GameData//OBJ//Items//keycard.obj");
 	meshList[GEO_KEYCARD]->textureID[0] = LoadTGA("GameData//Image//Items//keycard.tga", true);
 
-	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//doorman.obj");
+	meshList[GEO_DOOR] = MeshBuilder::GenerateOBJ("door", "GameData//OBJ//door.obj");
 	meshList[GEO_DOOR]->textureID[0] = LoadTGA("GameData//Image//door.tga");
 	
 
@@ -952,8 +952,9 @@ bool mainscene::loadLevel(int level)
 			{
 				CollisionBox doorBound;
 				doorBound.Type = CollisionBox::CT_SPHERE;
-				doorBound.Position = Vector3(x * worldsize * 2.f, 30, y * worldsize * 2.f);
+				doorBound.Position = Vector3(x * worldsize * 2.f, 50, y * worldsize * 2.f);
 				doorBound.radius = worldsize;
+
 				Doors.push_back(doorBound);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'A')
@@ -3424,7 +3425,7 @@ void mainscene::RenderWorldShadow(void)
 		modelStack.PushMatrix();
 		modelStack.Translate(Doors[i].Position.x, -1, Doors[i].Position.z);
 		modelStack.Rotate(DoorRotate, 0, 1, 0);
-		modelStack.Scale(7, 10, 7);
+		modelStack.Scale(20, 25, 20);
 		RenderMesh(meshList[GEO_DOOR], false);
 		modelStack.PopMatrix();
 	}
