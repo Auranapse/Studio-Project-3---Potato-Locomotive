@@ -1,7 +1,7 @@
 #include "SecurityCam.h"
 
 float SecurityCam::f_cameraFOV = 30;
-float SecurityCam::f_cameraRange = 48000;
+float SecurityCam::f_cameraRange = 24000;
 
 SecurityCam::SecurityCam(void) : Lookat(0, 0, -1), c_State(NOTFOUND)
 {
@@ -14,7 +14,7 @@ SecurityCam::SecurityCam(void) : Lookat(0, 0, -1), c_State(NOTFOUND)
 
 
 SecurityCam::~SecurityCam(void)
-{
+{	
 }
 
 SecurityCam::CAMERA_STATE SecurityCam::getState()

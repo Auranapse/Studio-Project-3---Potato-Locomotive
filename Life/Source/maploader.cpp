@@ -96,7 +96,7 @@ bool MapLoader::loadMap(std::string file)
 		map_data.push_back(Column);
 
 		std::vector<std::string>().swap(Column);
-	}
+	}	
 
 	worldSize = static_cast<float>(std::stoi(map_data[0][0]));
 	worldHeight = static_cast<float>(std::stoi(map_data[0][1]));

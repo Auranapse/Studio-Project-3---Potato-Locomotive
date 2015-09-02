@@ -217,6 +217,10 @@ sensors made to see if there is anything in the way of the AI
 /******************************************************************************/
 void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 {
+	if(mid || left || right)
+	{
+		destination = pos;
+	}
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
@@ -563,13 +567,13 @@ void AI::aiStateHandling(double &dt, Vector3 &playerPos, std::vector<GameObject*
 			{
 				e_State = ATTACK;
 			}
-
+				
 			if(b_isDestinationVisible && b_isDestinationWithinFOV)
 			{
 				moveToDestination(dt);
 			}
 
-			if((pos - destination).LengthSquared() < 10)
+			if((pos - destination).LengthSquared() < 300)
 			{
 				e_State = WALKING;
 			}
