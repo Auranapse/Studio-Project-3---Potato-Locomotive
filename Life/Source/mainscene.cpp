@@ -646,8 +646,8 @@ void mainscene::Init()
 	P_Player.scale.Set(10, 10, 10);
 	P_Player.collisionMesh.Type = CollisionBox::CT_AABB;
 	P_Player.collisionMesh.Position = P_Player.pos;
-	P_Player.collisionMesh.ColBox.Set(6, 15, 6);
-	P_Player.collisionMesh.ColOffset.Set(0, 15, 0);
+	P_Player.collisionMesh.ColBox.Set(5, 5, 5);
+	P_Player.collisionMesh.ColOffset = P_Player.ModelPos + P_Player.HeadPos;
 
 	b_step = false;
 
@@ -1415,7 +1415,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_KATANA].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_KATANA].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_KATANA].AttackSound = ST_WEAPON_KATANA;
-	WO_presetList[WO_KATANA].range = 0.1f;
+	WO_presetList[WO_KATANA].range = 0.05f;
 
 	WO_presetList[WO_SCALPLE].active = true;
 	WO_presetList[WO_SCALPLE].mesh = meshList[GEO_SCALPLE];
@@ -1434,7 +1434,7 @@ void mainscene::initWeapons(void)
 	WO_presetList[WO_SCALPLE].collisionMesh.Type = CollisionBox::CT_AABB;
 	WO_presetList[WO_SCALPLE].collisionMesh.ColBox.Set(3, 3, 3);
 	WO_presetList[WO_SCALPLE].AttackSound = ST_WEAPON_KATANA;
-	WO_presetList[WO_SCALPLE].range = 0.05f;
+	WO_presetList[WO_SCALPLE].range = 0.02f;
 
 	f_curRecoil = 0.f;
 }
@@ -1640,8 +1640,28 @@ void mainscene::UpdatePlayer(double &dt)
 		}
 	}
 
-	if (f_poweramount < 0)
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			if (CollisionBox::checkCollision(P_Player.collisionMesh, go->collisionMesh))
+			{
+				if (go->vel.LengthSquared() > 2000)
+				{
+					BulletObject *BO = dynamic_cast<BulletObject*>(go);
+					if (BO != NULL)
+					{
+						f_poweramount -= 90.f;
+					}
+				}
+			}
+		}
+	}
+
+	if (f_poweramount <= 0)
+	{
+		f_playerHealthTint = 100.f;
 		SE_Engine.stopAllSounds();
 		SE_Engine.effectDistortion(false);
 		SE_Engine.playSound2D(soundList[ST_DEATH]);
@@ -2083,6 +2103,13 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 					}
 				}
 			}
+			else
+			{
+				if ((P_Player.pos - ai->pos).LengthSquared() < 800)
+				{
+					f_poweramount -= 20.f * static_cast<float>(dt);
+				}
+			}
 		}
 
 		ai->Update(dt, P_Player.pos, m_goList);
@@ -2275,7 +2302,7 @@ void mainscene::weaponsUpdate(double &dt)
 							Vector3 ShootVector = FPC.target - FPC.position;
 							ShootVector.Normalize();
 							FPC.rotateCamVertical(static_cast<float>(dt)* WO->recoilEffect);
-							Shoot(FPC.position + ShootVector * 8.f, ShootVector, WO->shootvelocity, WO->range);
+							Shoot(FPC.position + ShootVector * 12.f, ShootVector, WO->shootvelocity, WO->range);
 							WO->rotation.x -= WO->recoilEffect *0.1f;
 							WO->pos.z -= WO->recoilEffect*0.02f;
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
@@ -2298,7 +2325,7 @@ void mainscene::weaponsUpdate(double &dt)
 
 							Vector3 ShootVector = FPC.target - FPC.position;
 							ShootVector.Normalize();
-							Shoot(FPC.position + ShootVector * 8.f, ShootVector, 300.f, WO->range, true);
+							Shoot(FPC.position + ShootVector * 12.f, ShootVector, 350.f, WO->range, true);
 
 							SE_Engine.playSound2D(soundList[WO->AttackSound]);
 						}
