@@ -2618,7 +2618,7 @@ void mainscene::Update(double dt)
 			Vector3 newRad = P_Player.vel;
 			if (P_Player.vel.y == 0)
 			{
-				PlayerSound->setSoundRadius(newRad.Length()*0.45f);
+				PlayerSound->setSoundRadius(newRad.Length()*0.55f);
 				CheckPlayerSound();
 			}
 			KeyRotate += 25 * static_cast<float>(dt);
