@@ -288,7 +288,6 @@ class mainscene : public Scene
 		ST_STEP,
 		ST_JUMP,
 		ST_LAND,
-		ST_BUZZER,
 		ST_ALERT,
 		ST_BACKGROUND,
 
@@ -312,6 +311,8 @@ class mainscene : public Scene
 
 		ST_CAMERA_SPOTTED,
 		ST_CAMERA_FOUND,
+
+		ST_STATUS,
 
 		ST_TOTAL,
 	};
@@ -500,12 +501,16 @@ private:
 	void pushPlayer();
 	void CheckPlayerSound(void);
 	void addStatus(std::string, double);
+	void layTrap(Vector3 pos);
+	void activateTrap();
 	std::vector<PressurePlate*> Dialogues[10];
 	std::vector<CollisionBox> Keys;
 	std::vector<CollisionBox> Doors;
+	std::vector<CollisionBox> PulseBombs;
 	std::string status;
 	double statusTimer;
 	int KeyCount;
+	int bombCount;
 	float KeyRotate;
 	float DoorRotate;
 

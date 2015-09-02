@@ -689,7 +689,6 @@ void mainscene::Init()
 	soundList[ST_LAND] = SE_Engine.preloadSound("GameData//sounds//other//land.wav");
 	soundList[ST_LAND]->setDefaultVolume(0.8f);
 
-	soundList[ST_BUZZER] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
 	soundList[ST_ALERT] = SE_Engine.preloadSound("GameData//sounds//other//alert.wav");
 	
 	soundList[ST_OBJ_BREAK] = SE_Engine.preloadSound("GameData//sounds//effects//objbreak.wav");
@@ -712,6 +711,9 @@ void mainscene::Init()
 	soundList[ST_CAMERA_SPOTTED] = SE_Engine.preloadSound("GameData//sounds//other//EnemySpotted.mp3");
 	soundList[ST_CAMERA_FOUND] = SE_Engine.preloadSound("GameData//sounds//other//Alarm.mp3");
 
+	soundList[ST_STATUS] = SE_Engine.preloadSound("GameData//sounds//other//buzzer.wav");
+	soundList[ST_STATUS]->setDefaultVolume(0.06f);
+	
 	GAMESTATE = GS_PLAY;
 
 	currentLevel = 1;
@@ -760,7 +762,7 @@ void mainscene::Init()
 	KeyRotate = 0;
 	KeyCount = 0;
 	DoorRotate = 0;
-
+	bombCount = 1;
 }
 
 /******************************************************************************/
@@ -817,10 +819,10 @@ bool mainscene::loadLevel(int level)
 	{
 		for (unsigned k = 0; k < Dialogues[i].size(); ++k)
 		{
-			std::cout << "Dialogues Cleared";
 			Dialogues[i][k]->setTimer(1000);
 		}
 	}
+	std::cout << "Dialogues Cleared\n";
 
 	//Door Clear
 	Doors.clear();
@@ -833,6 +835,10 @@ bool mainscene::loadLevel(int level)
 	//Status Clear
 	status = "\0";
 	statusTimer = 0;
+
+	//PulseBombs Clear
+	bombCount = 0;
+	std::cout<<"Traps Cleared\n";
 
 	while (m_goList.size() > 0)
 	{
@@ -2732,6 +2738,13 @@ void mainscene::Update(double dt)
 	default:
 		break;
 	}
+
+	/*
+	if (Application::IsKeyPressed('T'))
+		layTrap(P_Player.pos);
+	if (Application::IsKeyPressed('G'))
+		activateTrap();
+	*/
 }
 
 /******************************************************************************/
@@ -3447,6 +3460,18 @@ void mainscene::RenderWorldShadow(void)
 		modelStack.PopMatrix();
 	}
 
+	/*
+	//Bombs
+	for (unsigned i = 0; i < PulseBombs.size(); ++i)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(PulseBombs[i].Position.x, PulseBombs[i].Position.y, PulseBombs[i].Position.z);
+		modelStack.Scale(20, 25, 20);
+		RenderMesh(meshList[GEO_OBJCAKE], false);
+		modelStack.PopMatrix();
+	}
+	*/
+
 	//Dialogues On Screen
 		for (unsigned i = 0; i < Dialogues[currentLevel - 1].size(); ++i)
 		{
@@ -4025,6 +4050,7 @@ void mainscene::checkDoor()
 			}
 			else
 			{
+				SE_Engine.playSound2D(soundList[ST_STATUS], false, false);
 				addStatus("Need Keycard!", 150);
 				Vector3 pushBack = P_Player.vel;
 				pushBack.y = 0;
@@ -4034,6 +4060,27 @@ void mainscene::checkDoor()
 			}
 		}
 	}
+
+	/*for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			AI *ai = dynamic_cast<AI*>(go);
+			if (ai != NULL)
+			{
+				for (unsigned i = 0; i < Doors.size(); ++i)
+				{
+					if (CollisionBox::checkCollision(ai->collisionMesh, Doors[i]))
+					{
+						Vector3 pushBack = ai->vel.Normalized();
+						ai->pos -= ai->vel;
+						ai->vel -= pushBack * 35;
+					}
+				}
+			}
+		}
+	}*/
 }
 
 void mainscene::checkKey()
@@ -4076,18 +4123,57 @@ void mainscene::pushPlayer()
 		if (go->active)
 		{
 			AI *ai = dynamic_cast<AI*>(go);
-			
 			if (ai != NULL)
 			{
-				AI *temp = ai;
-				temp->collisionMesh.Position.y = 20;
-				if (CollisionBox::checkCollision(P_Player.collisionMesh, temp->collisionMesh))
+				CollisionBox Temp = ai->collisionMesh;
+				Temp.Position.y = 20;
+				if (CollisionBox::checkCollision(P_Player.collisionMesh, Temp))
 				{
-					std::cout<<"LOLOLOLOL";
 					P_Player.vel = Vector3(0,0,0);
 					P_Player.vel += ai->vel * 30;
-					
-					std::cout<<ai->vel.x<<", "<<ai->vel.y<<", "<<ai->vel.z<<"\n";
+				}
+			}
+		}
+	}
+}
+
+void mainscene::layTrap(Vector3 pos)
+{
+	if (bombCount > 0)
+	{
+	float bombRadius = 100;
+	CollisionBox Bomb;
+	Bomb.Type = CollisionBox::CT_SPHERE;
+	Bomb.radius = bombRadius;
+	Bomb.Position = pos;
+	PulseBombs.push_back(Bomb);
+	bombCount--;
+	}
+	else
+		addStatus("PulseBombs Depleted!", 100);
+}
+
+void mainscene::activateTrap()
+{
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			AI *ai = dynamic_cast<AI*>(go);
+			if (ai != NULL)
+			{
+				for (unsigned i = 0; i < PulseBombs.size(); ++i)
+				{
+					if (CollisionBox::checkCollision(PulseBombs[i], ai->collisionMesh))
+					{
+						P_Player.pos.y = 80;
+						SE_Engine.playSound3D(soundList[ST_AI_DEATH], ai->pos);
+						ai->DropObject();
+						ai->active = false;
+						generateCharacterParticle(ai, go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)), go->vel*0.2f + Vector3(Math::RandFloatMinMax(-10, 10), Math::RandFloatMinMax(40, 50), Math::RandFloatMinMax(-10, 10)));
+					}
+					PulseBombs.erase(PulseBombs.begin() + i);
 				}
 			}
 		}
