@@ -3571,20 +3571,6 @@ void mainscene::RenderUI(void)
 		break;
 	case mainscene::GS_PLAY:
 		{
-			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(10));
-			modelStack.PushMatrix();
-			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
-			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.f);
-			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
-			modelStack.PopMatrix();
-			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
-
-			modelStack.PushMatrix();
-			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
-			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
-			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
-			modelStack.PopMatrix();
-
 			//Dialogues On Screen
 			for (unsigned i = 0; i < Dialogues[currentLevel - 1].size(); ++i)
 			{
@@ -3674,13 +3660,13 @@ void mainscene::RenderUI(void)
 			if (f_poweramount > 0)
 			{
 				modelStack.PushMatrix();
-				modelStack.Translate(0, 0, 0.2f);
+				modelStack.Translate(0, 0, 0.3f);
 				modelStack.Scale(1, 10.f, 0.f);
 				RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, 35.f, 10.f, Color(0.f, 0.f, 0.2f));
 				modelStack.PopMatrix();
 
 				modelStack.PushMatrix();
-				modelStack.Translate(0, 0, 0.3f);
+				modelStack.Translate(0, 0, 0.4f);
 				modelStack.Scale(1, f_poweramount*0.1f, 0.f);
 				if (f_poweramount < 20)
 				{
@@ -3692,6 +3678,20 @@ void mainscene::RenderUI(void)
 				}
 				modelStack.PopMatrix();
 			}
+
+			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(10));
+			modelStack.PushMatrix();
+			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0);
+			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.1f);
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_powerTint, 10.f, c_powerColor);
+			modelStack.PopMatrix();
+			glUniform1i(m_parameters[U_LENS_EFFECT], static_cast<GLint>(0));
+
+			modelStack.PushMatrix();
+			modelStack.Translate(Application::GetWindowWidth()*0.05f, Application::GetWindowHeight()*0.05f, 0.1f);
+			modelStack.Scale(static_cast<float>(Application::GetWindowWidth()*0.05f), static_cast<float>(Application::GetWindowHeight()*0.05f), 0.2f);
+			RenderMeshin2D(meshList[GEO_SCREEN_OVERLAY], false, f_playerHealthTint, 10.f, Color(0.5f, 0.f, 0.f));
+			modelStack.PopMatrix();
 		}
 		break;
 	case mainscene::GS_END:
@@ -3982,22 +3982,27 @@ Clears memory upon exit
 /******************************************************************************/
 void mainscene::Exit(void)
 {
+	Application::SetCursor(true);
+	SE_Engine.Exit();
+
 	if (PlayerSound != NULL)
 	{
 		delete PlayerSound;
+		PlayerSound = NULL;
 	}
 
 	for (unsigned j = 0; j < 10; ++j)
 	{
 		for (unsigned i = 0; i < Dialogues[j].size(); ++i)
 		{
-			delete Dialogues[j][i];
+			if (Dialogues[j][i] != NULL)
+			{
+				delete Dialogues[j][i];
+				Dialogues[j][i] = NULL;
+			}			
 		}
 	}
-
-	Application::SetCursor(true);
-	SE_Engine.Exit();
-
+	
 	while (v_buttonList.size() > 0)
 	{
 		TextButton *TB = v_buttonList.back();
@@ -4007,6 +4012,16 @@ void mainscene::Exit(void)
 			TB = NULL;
 		}
 		v_buttonList.pop_back();
+	}
+
+	while (Doors.size() > 0)
+	{
+		Doors.pop_back();
+	}
+
+	while (Keys.size() > 0)
+	{
+		Keys.pop_back();
 	}
 
 	while (m_goList.size() > 0)

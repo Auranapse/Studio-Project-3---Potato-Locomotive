@@ -97,7 +97,16 @@ void AI::movementFB(double &dt, bool forward)
 
 	if (forward)
 	{
-		vel += (getDirection(true).Normalize() * (f_movementSpeed * 2)) * static_cast<float>(dt);
+		if (e_State == ATTACK)
+		{
+			f_movementSpeed = f_move_run;
+		}
+		else
+		{
+			f_movementSpeed = f_move_walk;
+		}
+
+		vel += (getDirection(true).Normalize() * (f_movementSpeed)) * static_cast<float>(dt);
 	}
 	else
 	{
@@ -217,10 +226,6 @@ sensors made to see if there is anything in the way of the AI
 /******************************************************************************/
 void AI::SensorUpdate(double &dt, bool left, bool mid, bool right)
 {
-	if(mid || left || right)
-	{
-		destination = pos;
-	}
 	//when right has nothing to collide
 	if (left == true && mid == true && right == false)
 	{
