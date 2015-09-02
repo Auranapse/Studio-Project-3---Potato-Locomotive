@@ -824,8 +824,8 @@ bool mainscene::loadLevel(int level)
 	}
 
 	//Door Clear
-
 	Doors.clear();
+
 	//Keys Clear
 	std::cout << "Keys Cleared\n";
 	Keys.clear();
@@ -955,10 +955,23 @@ bool mainscene::loadLevel(int level)
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'D')
 			{
+
+				std::string temp_str_radius;
+				temp_str_radius = "";
+
+				float radius;
+
+				for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+				{
+					temp_str_radius += GAME_MAP.map_data[y][x][i];
+				}
+
+				radius = static_cast<float>(std::atoi(temp_str_radius.c_str()));
+
 				CollisionBox doorBound;
 				doorBound.Type = CollisionBox::CT_SPHERE;
 				doorBound.Position = Vector3(x * worldsize * 2.f, 30, y * worldsize * 2.f);
-				doorBound.radius = 10;
+				doorBound.radius = radius;
 				Doors.push_back(doorBound);
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'A')
@@ -2005,6 +2018,10 @@ void mainscene::UpdateCO(CharacterObject *CO, double &dt)
 	AI *ai = dynamic_cast<AI*>(CO);
 	if (ai != NULL)
 	{
+		if (ai->getState() == AI::ALERT)
+		{
+			addStatus("Enemies Searching...", 10);
+		}
 		if(isVisible(ai->pos, ai->Lookat, static_cast<float>(ai->getDetectionAngle()), ai->getDestination()) && (ai->getDestination() - ai->pos).LengthSquared() < ai->getDetectionRange_Max())
 		{
 			ai->b_isDestinationWithinFOV = true;

@@ -108,6 +108,7 @@ class mainscene : public Scene
 		//------------------------
 		//EFFECTS/OTHERS
 		GEO_BULLET,
+		GEO_STATUS,
 
 		GEO_SCREEN_OVERLAY,
 
