@@ -782,7 +782,7 @@ void mainscene::Init()
 	KeyCount = 0;
 	DoorRotate = 0;
 	bombCount = 1;
-
+	
 }
 
 /******************************************************************************/
@@ -855,6 +855,15 @@ bool mainscene::loadLevel(int level)
 	while (Keys.size() > 0)
 	{
 		Keys.pop_back();
+	}
+
+	while (PulseBombs.size() > 0)
+	{
+		PulseBombs.pop_back();
+	}
+	while (Stopper.size() > 0)
+	{
+		Stopper.pop_back();
 	}
 
 	std::cout << "Keys Cleared\n";
@@ -977,6 +986,64 @@ bool mainscene::loadLevel(int level)
 				WO->dynamicRendering = true;
 				WO->mesh = meshList[GEO_WORLD_CUBE];
 				m_goList.push_back(WO);
+			}
+			else if (GAME_MAP.map_data[y][x][0] == 'S')
+			{
+				if (GAME_MAP.map_data[y][x][1] == 'W')
+				{
+					std::string temp_str_X, temp_str_Y, temp_str_Z;
+					temp_str_X = "";
+					temp_str_Y = "";
+					temp_str_Z = "";
+
+					float SizeX, SizeY, SizeZ;
+					SizeX = 0.f;
+					SizeY = 0.f;
+					SizeZ = 0.f;
+					int temp_int_1 = 1;
+
+					for (unsigned i = 1; GAME_MAP.map_data[y][x][i] != 'x'; ++i)
+					{
+						temp_str_X += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'y'; ++i)
+					{
+						temp_str_Y += GAME_MAP.map_data[y][x][i];
+						temp_int_1 = i + 2;
+					}
+
+					for (unsigned i = temp_int_1; GAME_MAP.map_data[y][x][i] != 'z'; ++i)
+					{
+						temp_str_Z += GAME_MAP.map_data[y][x][i];
+					}
+
+					SizeX = static_cast<float>(std::atoi(temp_str_X.c_str()));
+					SizeY = static_cast<float>(std::atoi(temp_str_Y.c_str()));
+					SizeZ = static_cast<float>(std::atoi(temp_str_Z.c_str()));
+
+					if (SizeX > worldsize)
+					{
+						SizeX = worldsize;
+					}
+
+					if (SizeY > worldHeight)
+					{
+						SizeY = worldHeight;
+					}
+
+					if (SizeZ > worldsize)
+					{
+						SizeZ = worldsize;
+					}
+
+					CollisionBox Stop;
+					Stop.Type = CollisionBox::CT_AABB;
+					Stop.ColBox.Set(SizeX, SizeY, SizeZ);
+					Stop.Position = Vector3(x*worldsize*2.f, SizeY, y*worldsize*2.f);
+					Stopper.push_back(Stop);
+				}
 			}
 			else if (GAME_MAP.map_data[y][x][0] == 'K')
 			{
@@ -2650,6 +2717,7 @@ void mainscene::Update(double dt)
 			checkKey();
 			checkStatus();
 			pushPlayer();
+			stopAI(3);
 
 			if (WO_END != NULL)
 			{
@@ -4028,7 +4096,7 @@ void mainscene::Exit(void)
 			}			
 		}
 	}
-	
+
 	while (v_buttonList.size() > 0)
 	{
 		TextButton *TB = v_buttonList.back();
@@ -4048,6 +4116,16 @@ void mainscene::Exit(void)
 	while (Keys.size() > 0)
 	{
 		Keys.pop_back();
+	}
+
+	while (Stopper.size() > 0)
+	{
+		Stopper.pop_back();
+	}
+
+	while (PulseBombs.size() > 0)
+	{
+		PulseBombs.pop_back();
 	}
 
 	while (m_goList.size() > 0)
@@ -4228,7 +4306,7 @@ void mainscene::checkStatus()
 	}
 }
 
-void mainscene::pushPlayer()
+void mainscene::pushPlayer(float pushForce)
 {
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
@@ -4243,7 +4321,7 @@ void mainscene::pushPlayer()
 				if (CollisionBox::checkCollision(P_Player.collisionMesh, Temp))
 				{
 					P_Player.vel = Vector3(0,0,0);
-					P_Player.vel += ai->vel * 30;
+					P_Player.vel += ai->vel * pushForce;
 				}
 			}
 		}
@@ -4314,6 +4392,38 @@ void mainscene::alertDeath(Vector3 pos, float alertRadius)
 						ai->setcurrentLookat(alertBound.Position);
 						ai->setDestination(alertBound.Position);
 						ai->setState(AI::ALERT);
+					}
+				}
+			}
+		}
+	}
+}
+
+void mainscene::stopAI(float pushForce)
+{
+	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
+	{
+		GameObject *go = (GameObject *)*it;
+		if (go->active)
+		{
+			AI *ai = dynamic_cast<AI*>(go);
+			if (ai != NULL)
+			{
+				if (ai->getState() == AI::WALKING)
+				{
+					for (unsigned i = 0; i < Stopper.size(); ++i)
+					{
+						if (CollisionBox::checkCollision(Stopper[i], ai->collisionMesh))
+						{
+							Vector3 newPos = ai->pos + ai->Lookat;
+							Vector3 dir = (ai->pos - newPos);
+							ai->pos -= ai->vel * 1.01f;//Take it out of the new Position 
+							ai->Lookat = dir;
+							ai->setcurrentLookat(dir);//Goal!
+							
+							ai->vel = ai->getCurrentLookAt().Normalized() *pushForce;
+							//ai->AiLookatRotation(dt);
+						}
 					}
 				}
 			}

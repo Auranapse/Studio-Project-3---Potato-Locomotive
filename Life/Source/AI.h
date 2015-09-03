@@ -63,6 +63,7 @@ public:
 	double getDetectionRange_Max();
 	bool getShootGun();
 	Vector3 getDestination();
+	Vector3 getCurrentLookAt();
 	E_AI_STATE getState();
 	void setState(E_AI_STATE e_State);
 	void setDestination(Vector3 &destination);

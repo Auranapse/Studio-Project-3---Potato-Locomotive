@@ -425,6 +425,19 @@ Vector3 AI::getDestination()
 /******************************************************************************/
 /*!
 \brief
+Return the AI's LookAt destination
+
+\return
+currentLookAt
+*/
+/******************************************************************************/
+Vector3 AI::getCurrentLookAt()
+{
+	return this->currentLookat;
+}
+/******************************************************************************/
+/*!
+\brief
 Return the AI state
 
 \param 
