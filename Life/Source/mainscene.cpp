@@ -2717,7 +2717,7 @@ void mainscene::Update(double dt)
 			checkKey();
 			checkStatus();
 			pushPlayer();
-			stopAI(2);
+			stopAI(2.0f);
 
 			if (WO_END != NULL)
 			{
