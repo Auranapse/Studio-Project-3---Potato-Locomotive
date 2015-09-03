@@ -2717,7 +2717,7 @@ void mainscene::Update(double dt)
 			checkKey();
 			checkStatus();
 			pushPlayer();
-			stopAI(3);
+			stopAI(2);
 
 			if (WO_END != NULL)
 			{
@@ -4215,11 +4215,14 @@ void mainscene::CheckPlayerSound(void)
 			AI *ai = dynamic_cast<AI*>(go);
 			if (ai != NULL)
 			{
-				if (PlayerSound->heard(go->pos) && ai->getState() == AI::WALKING)
+				if (PlayerSound->heard(go->pos))
 				{
+					if (ai->getState() == AI::WALKING)
+					{
 					ai->setcurrentLookat(P_Player.pos);
 					ai->setDestination(P_Player.pos);
 					ai->setState(AI::ALERT);
+					}
 				}
 			}
 		}
@@ -4251,27 +4254,6 @@ void mainscene::checkDoor()
 			}
 		}
 	}
-
-	/*for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
-	{
-	GameObject *go = (GameObject *)*it;
-	if (go->active)
-	{
-	AI *ai = dynamic_cast<AI*>(go);
-	if (ai != NULL)
-	{
-	for (unsigned i = 0; i < Doors.size(); ++i)
-	{
-	if (CollisionBox::checkCollision(ai->collisionMesh, Doors[i]))
-	{
-	Vector3 pushBack = ai->vel.Normalized();
-	ai->pos -= ai->vel;
-	ai->vel -= pushBack * 35;
-	}
-	}
-	}
-	}
-	}*/
 }
 
 void mainscene::checkKey()
